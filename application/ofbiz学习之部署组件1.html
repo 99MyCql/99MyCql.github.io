@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/golang32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/golang16.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"99mycql.github.io","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":"gitalk","storage":true,"lazyload":false,"nav":null,"activeClass":"gitalk"},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"./public/search.xml"};
+  </script>
+
+  <meta name="description" content="一、创建组件右键点击ofbiz根目录下的build.xml——Run as(运行方式)——Ant构建(第二个)——在“选择要执行的目标”的框中——取消start——找到create component打钩——点击运行——在出现的输入框中都输入组建的名字learning——最后一步选择Y——完成——刷新左边的资源管理视图——hot-deploy下出现learning组件目录">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ofbiz学习之部署组件1">
+<meta property="og:url" content="https://99mycql.github.io/application/ofbiz%E5%AD%A6%E4%B9%A0%E4%B9%8B%E9%83%A8%E7%BD%B2%E7%BB%84%E4%BB%B61.html">
+<meta property="og:site_name" content="dounine&#39;s blog">
+<meta property="og:description" content="一、创建组件右键点击ofbiz根目录下的build.xml——Run as(运行方式)——Ant构建(第二个)——在“选择要执行的目标”的框中——取消start——找到create component打钩——点击运行——在出现的输入框中都输入组建的名字learning——最后一步选择Y——完成——刷新左边的资源管理视图——hot-deploy下出现learning组件目录">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://99mycql.github.io/application/ofbiz%E5%AD%A6%E4%B9%A0%E4%B9%8B%E9%83%A8%E7%BD%B2%E7%BB%84%E4%BB%B61/ofbiz.PNG">
+<meta property="og:image" content="https://99mycql.github.io/application/ofbiz%E5%AD%A6%E4%B9%A0%E4%B9%8B%E9%83%A8%E7%BD%B2%E7%BB%84%E4%BB%B61/ofbiz2.PNG">
+<meta property="article:published_time" content="2018-11-14T05:44:42.000Z">
+<meta property="article:modified_time" content="2021-04-04T13:06:06.759Z">
+<meta property="article:author" content="dounine">
+<meta property="article:tag" content="Java">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://99mycql.github.io/application/ofbiz%E5%AD%A6%E4%B9%A0%E4%B9%8B%E9%83%A8%E7%BD%B2%E7%BB%84%E4%BB%B61/ofbiz.PNG">
+
+<link rel="canonical" href="https://99mycql.github.io/application/ofbiz%E5%AD%A6%E4%B9%A0%E4%B9%8B%E9%83%A8%E7%BD%B2%E7%BB%84%E4%BB%B61.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>ofbiz学习之部署组件1 | dounine's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">dounine's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">4</span></a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">20</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">69</span></a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://github.com/99MyCql" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://99mycql.github.io/application/ofbiz%E5%AD%A6%E4%B9%A0%E4%B9%8B%E9%83%A8%E7%BD%B2%E7%BB%84%E4%BB%B61.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/githubAvatar.jpg">
+      <meta itemprop="name" content="dounine">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dounine's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          ofbiz学习之部署组件1
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2018-11-14 13:44:42" itemprop="dateCreated datePublished" datetime="2018-11-14T13:44:42+08:00">2018-11-14</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-04-04 21:06:06" itemprop="dateModified" datetime="2021-04-04T21:06:06+08:00">2021-04-04</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/application/" itemprop="url" rel="index"><span itemprop="name">应用与开发</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>17k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>15 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h3 id="一、创建组件"><a href="#一、创建组件" class="headerlink" title="一、创建组件"></a>一、创建组件</h3><p>右键点击ofbiz根目录下的build.xml——Run as(运行方式)——Ant构建(第二个)——在“选择要执行的目标”的框中——取消start——找到create component打钩——点击运行——在出现的输入框中都输入组建的名字learning——最后一步选择Y——完成——刷新左边的资源管理视图——hot-deploy下出现learning组件目录</p>
+<a id="more"></a>
+<h3 id="二、初始部署"><a href="#二、初始部署" class="headerlink" title="二、初始部署"></a>二、初始部署</h3><h4 id="1、修改learning-ofbiz-component-xml文件中的webapp标签："><a href="#1、修改learning-ofbiz-component-xml文件中的webapp标签：" class="headerlink" title="1、修改learning/ofbiz-component.xml文件中的webapp标签："></a>1、修改learning/ofbiz-component.xml文件中的webapp标签：</h4><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">webapp</span> <span class="attr">name</span>=<span class="string">"learning"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">title</span>=<span class="string">"learning"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">server</span>=<span class="string">"default-server"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">location</span>=<span class="string">"webapp/learning"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">base-permission</span>=<span class="string">"OFBTOOLS"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">mount-point</span>=<span class="string">"/learning"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">app-bar-display</span>=<span class="string">"true"</span>/&gt;</span></span><br></pre></td></tr></table></figure>
+<p>base-permission代表登陆权限，app-bar-display=”true”表示该应用会在后台应用主菜单中出现。</p>
+<h4 id="2、初次体验。"><a href="#2、初次体验。" class="headerlink" title="2、初次体验。"></a>2、初次体验。</h4><p>启动ofbiz，浏览器进入后台目录管理界面，点击左上角的应用菜单，再点击learning，进入应用主页面。如果页面中显示“不允许你浏览这个页面。”，不必担心，这只是你未做任何添加前的自动生成页面。</p>
+<h4 id="3、创建controller。"><a href="#3、创建controller。" class="headerlink" title="3、创建controller。"></a>3、创建controller。</h4><p>在learning/webapp/learning/WEB-INF/controller.xml中，添加一个请求映射：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">request-map</span> <span class="attr">uri</span>=<span class="string">"FindProductPlan"</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">security</span> <span class="attr">https</span>=<span class="string">"true"</span> <span class="attr">auth</span>=<span class="string">"true"</span> /&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">response</span> <span class="attr">name</span>=<span class="string">"success"</span> <span class="attr">type</span>=<span class="string">"view"</span> <span class="attr">value</span>=<span class="string">"FindProductPlan"</span> /&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">request-map</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>根据请求映射，再添加一个响应的view视图映射：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">view-map</span> <span class="attr">name</span>=<span class="string">"FindProductPlan"</span> <span class="attr">type</span>=<span class="string">"screen"</span> <span class="attr">page</span>=<span class="string">"component://learning/widget/learningScreens.xml#FindProductPlan"</span>/&gt;</span></span><br></pre></td></tr></table></figure>
+<h4 id="4、创建视图。"><a href="#4、创建视图。" class="headerlink" title="4、创建视图。"></a>4、创建视图。</h4><p>在learning/widget/learningScreens.xml中，添加一个name=FindProductPlan的screen视图装饰器：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">screen</span> <span class="attr">name</span>=<span class="string">"FindProductPlan"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">section</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">actions</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">set</span> <span class="attr">field</span>=<span class="string">"headerItem"</span> <span class="attr">value</span>=<span class="string">"ProductPlan"</span>/&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">actions</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">widgets</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">decorator-screen</span> <span class="attr">name</span>=<span class="string">"main-decorator"</span> <span class="attr">location</span>=<span class="string">"$&#123;parameters.mainDecoratorLocation&#125;"</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">decorator-section</span> <span class="attr">name</span>=<span class="string">"body"</span>&gt;</span></span><br><span class="line">	                    <span class="tag">&lt;<span class="name">section</span>&gt;</span></span><br><span class="line">		                     <span class="tag">&lt;<span class="name">widgets</span>&gt;</span></span><br><span class="line">		                         <span class="tag">&lt;<span class="name">decorator-screen</span> <span class="attr">name</span>=<span class="string">"FindScreenDecorator"</span> <span class="attr">location</span>=<span class="string">"component://common/widget/CommonScreens.xml"</span>&gt;</span></span><br><span class="line">		                             <span class="tag">&lt;<span class="name">decorator-section</span> <span class="attr">name</span>=<span class="string">"menu-bar"</span>&gt;</span></span><br><span class="line">		                                 <span class="tag">&lt;<span class="name">container</span> <span class="attr">style</span>=<span class="string">"button-bar"</span>&gt;</span></span><br><span class="line">		                                     <span class="tag">&lt;<span class="name">link</span> <span class="attr">target</span>=<span class="string">"EditProductPlan"</span> <span class="attr">text</span>=<span class="string">"新建"</span> <span class="attr">style</span>=<span class="string">"buttontext create"</span>/&gt;</span></span><br><span class="line">		                                 <span class="tag">&lt;/<span class="name">container</span>&gt;</span></span><br><span class="line">		                             <span class="tag">&lt;/<span class="name">decorator-section</span>&gt;</span></span><br><span class="line">		                             <span class="tag">&lt;<span class="name">decorator-section</span> <span class="attr">name</span>=<span class="string">"search-options"</span>&gt;</span></span><br><span class="line">		                                 <span class="tag">&lt;<span class="name">include-form</span> <span class="attr">name</span>=<span class="string">"FindProductPlan"</span> <span class="attr">location</span>=<span class="string">"component://learning/widget/learningForms.xml"</span>/&gt;</span></span><br><span class="line">		                             <span class="tag">&lt;/<span class="name">decorator-section</span>&gt;</span></span><br><span class="line">		                             <span class="tag">&lt;<span class="name">decorator-section</span> <span class="attr">name</span>=<span class="string">"search-results"</span>&gt;</span></span><br><span class="line">		                                 <span class="tag">&lt;<span class="name">include-form</span> <span class="attr">name</span>=<span class="string">"ListProductPlan"</span> <span class="attr">location</span>=<span class="string">"component://learning/widget/learningForms.xml"</span>/&gt;</span></span><br><span class="line">		                             <span class="tag">&lt;/<span class="name">decorator-section</span>&gt;</span></span><br><span class="line">		                         <span class="tag">&lt;/<span class="name">decorator-screen</span>&gt;</span></span><br><span class="line">		                     <span class="tag">&lt;/<span class="name">widgets</span>&gt;</span></span><br><span class="line">		                 <span class="tag">&lt;/<span class="name">section</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;/<span class="name">decorator-section</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;/<span class="name">decorator-screen</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">widgets</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">section</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">screen</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>关于ofbiz装饰器的配置规则，请参考<em>Apache+OFBiz+开发初学者指南.chm</em>（关于此份文档如何获取，请浏览本文结尾）。而在该装饰器中，外围嵌套了名为main-decorator(在CommonScreens.xml中)的主装饰器，负责页面的主体装饰。内层嵌套了名为FindScreenDecorator的装饰器，该装饰器主要分为两部分：search-options(搜索选项)和search-results(搜索结果)。在这两部分中分别布置一个搜索表单和列表表单。</p>
+<h4 id="5、创建表单。"><a href="#5、创建表单。" class="headerlink" title="5、创建表单。"></a>5、创建表单。</h4><p>在learning/widget/learningForms.xml中，添加name= FindProductPlan和name=ListProductPlan的表单：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">form</span> <span class="attr">name</span>=<span class="string">"FindProductPlan"</span> <span class="attr">type</span>=<span class="string">"single"</span> <span class="attr">target</span>=<span class="string">"FindProductPlan"</span> <span class="attr">title</span>=<span class="string">""</span> <span class="attr">default-map-name</span>=<span class="string">"ProductPlan"</span></span></span><br><span class="line"><span class="tag">       <span class="attr">header-row-style</span>=<span class="string">"header-row"</span> <span class="attr">default-table-style</span>=<span class="string">"basic-table"</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">field</span> <span class="attr">name</span>=<span class="string">"productPlanId"</span> <span class="attr">title</span>=<span class="string">""</span>&gt;</span><span class="tag">&lt;<span class="name">text-find</span>/&gt;</span><span class="tag">&lt;/<span class="name">field</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">field</span> <span class="attr">name</span>=<span class="string">"itemId"</span>&gt;</span><span class="tag">&lt;<span class="name">text-find</span>/&gt;</span><span class="tag">&lt;/<span class="name">field</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">field</span> <span class="attr">name</span>=<span class="string">"principleId"</span>&gt;</span><span class="tag">&lt;<span class="name">text-find</span>/&gt;</span><span class="tag">&lt;/<span class="name">field</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">field</span> <span class="attr">name</span>=<span class="string">"submitButton"</span> <span class="attr">title</span>=<span class="string">"$&#123;uiLabelMap.CommonFind&#125;"</span>&gt;</span></span><br><span class="line">           <span class="tag">&lt;<span class="name">submit</span> <span class="attr">button-type</span>=<span class="string">"button"</span>/&gt;</span></span><br><span class="line">       <span class="tag">&lt;/<span class="name">field</span>&gt;</span></span><br><span class="line">   <span class="tag">&lt;/<span class="name">form</span>&gt;</span></span><br><span class="line">   <span class="comment">&lt;!-- ！！！一定要注意list-name必须是listIt --&gt;</span></span><br><span class="line">   <span class="tag">&lt;<span class="name">form</span> <span class="attr">name</span>=<span class="string">"ListProductPlan"</span> <span class="attr">type</span>=<span class="string">"list"</span> <span class="attr">list-name</span>=<span class="string">"listIt"</span></span></span><br><span class="line"><span class="tag">   	  <span class="attr">paginate-target</span>=<span class="string">"FindProductPlan"</span> <span class="attr">default-entity-name</span>=<span class="string">"ProductPlan"</span></span></span><br><span class="line"><span class="tag">   	  <span class="attr">odd-row-style</span>=<span class="string">"alternate-row"</span> <span class="attr">default-table-style</span>=<span class="string">"basic-table hover-bar"</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">actions</span>&gt;</span></span><br><span class="line">       	<span class="tag">&lt;<span class="name">set</span> <span class="attr">field</span>=<span class="string">"noConditionFind"</span> <span class="attr">value</span>=<span class="string">"Y"</span>/&gt;</span></span><br><span class="line">           <span class="tag">&lt;<span class="name">service</span> <span class="attr">service-name</span>=<span class="string">"performFind"</span> <span class="attr">result-map</span>=<span class="string">"result"</span> <span class="attr">result-map-list</span>=<span class="string">"listIt"</span>&gt;</span></span><br><span class="line">               <span class="tag">&lt;<span class="name">field-map</span> <span class="attr">field-name</span>=<span class="string">"inputFields"</span> <span class="attr">from-field</span>=<span class="string">"parameters"</span>/&gt;</span></span><br><span class="line">               <span class="tag">&lt;<span class="name">field-map</span> <span class="attr">field-name</span>=<span class="string">"entityName"</span> <span class="attr">value</span>=<span class="string">"ProductPlan"</span>/&gt;</span></span><br><span class="line">           <span class="tag">&lt;/<span class="name">service</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;/<span class="name">actions</span>&gt;</span></span><br><span class="line">   	<span class="tag">&lt;<span class="name">field</span> <span class="attr">name</span>=<span class="string">"productPlanId"</span> <span class="attr">widget-style</span>=<span class="string">"buttontext"</span> <span class="attr">title</span>=<span class="string">"生产计划编号"</span>&gt;</span></span><br><span class="line">   		<span class="tag">&lt;<span class="name">hyperlink</span> <span class="attr">description</span>=<span class="string">"$&#123;productPlanId&#125;"</span> <span class="attr">target</span>=<span class="string">"ViewProductPlan"</span>&gt;</span></span><br><span class="line">   			<span class="comment">&lt;!-- 设定传递参数(parameter)的名字 --&gt;</span></span><br><span class="line">               <span class="tag">&lt;<span class="name">parameter</span> <span class="attr">param-name</span>=<span class="string">"productPlanId"</span>/&gt;</span></span><br><span class="line">           <span class="tag">&lt;/<span class="name">hyperlink</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;/<span class="name">field</span>&gt;</span></span><br><span class="line">   	<span class="tag">&lt;<span class="name">field</span> <span class="attr">name</span>=<span class="string">"itemId"</span> <span class="attr">title</span>=<span class="string">"项目编号"</span>&gt;</span><span class="tag">&lt;<span class="name">display</span>/&gt;</span><span class="tag">&lt;/<span class="name">field</span>&gt;</span></span><br><span class="line">   	<span class="tag">&lt;<span class="name">field</span> <span class="attr">name</span>=<span class="string">"principleId"</span> <span class="attr">title</span>=<span class="string">"负责人编号"</span>&gt;</span><span class="tag">&lt;<span class="name">display</span>/&gt;</span><span class="tag">&lt;/<span class="name">field</span>&gt;</span></span><br><span class="line">   	<span class="tag">&lt;<span class="name">field</span> <span class="attr">name</span>=<span class="string">"useProject"</span> <span class="attr">title</span>=<span class="string">"应用工程"</span>&gt;</span><span class="tag">&lt;<span class="name">display</span>/&gt;</span><span class="tag">&lt;/<span class="name">field</span>&gt;</span></span><br><span class="line">	<span class="comment">&lt;!--type="date"表示只显示日期--&gt;</span></span><br><span class="line">   	<span class="tag">&lt;<span class="name">field</span> <span class="attr">name</span>=<span class="string">"startTime"</span> <span class="attr">title</span>=<span class="string">"开始日期"</span>&gt;</span><span class="tag">&lt;<span class="name">display</span> <span class="attr">type</span>=<span class="string">"date"</span>/&gt;</span><span class="tag">&lt;/<span class="name">field</span>&gt;</span></span><br><span class="line">   	<span class="tag">&lt;<span class="name">field</span> <span class="attr">name</span>=<span class="string">"finishTime"</span> <span class="attr">title</span>=<span class="string">"结束日期"</span>&gt;</span><span class="tag">&lt;<span class="name">display</span> <span class="attr">type</span>=<span class="string">"date"</span>/&gt;</span><span class="tag">&lt;/<span class="name">field</span>&gt;</span></span><br><span class="line">   	<span class="tag">&lt;<span class="name">field</span> <span class="attr">name</span>=<span class="string">"createdStamp"</span> <span class="attr">title</span>=<span class="string">"创建时间"</span>&gt;</span><span class="tag">&lt;<span class="name">display</span>/&gt;</span><span class="tag">&lt;/<span class="name">field</span>&gt;</span></span><br><span class="line">   	<span class="tag">&lt;<span class="name">field</span> <span class="attr">name</span>=<span class="string">"deleteLink"</span> <span class="attr">title</span>=<span class="string">" "</span> <span class="attr">widget-style</span>=<span class="string">"buttontext"</span>&gt;</span></span><br><span class="line">           <span class="tag">&lt;<span class="name">hyperlink</span> <span class="attr">target</span>=<span class="string">"RemoveProductPlan"</span> <span class="attr">description</span>=<span class="string">"$&#123;uiLabelMap.CommonDelete&#125;"</span> <span class="attr">also-hidden</span>=<span class="string">"false"</span>&gt;</span></span><br><span class="line">               <span class="tag">&lt;<span class="name">parameter</span> <span class="attr">param-name</span>=<span class="string">"productPlanId"</span>/&gt;</span></span><br><span class="line">           <span class="tag">&lt;/<span class="name">hyperlink</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;/<span class="name">field</span>&gt;</span></span><br><span class="line">   <span class="tag">&lt;/<span class="name">form</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>关于表单的配置规则一样可以参考上述那个文档。同时，也要注意几个<strong>关键点</strong>：target属性相当于一个请求，当表单进行提交的时候，会定向到该请求上，如：</p>
+<ul>
+<li>target=”FindProductPlan”对应请求转到learning/control/FindProductPlan；</li>
+<li>&lt;hyperlink&gt;标签相当于一个超链接；</li>
+<li>在ListProductPlan表单的&lt;actions&gt;预处理动作中，调用了ofbiz自带的查找服务performFind，使用该功能时- 定要指明entity实体引擎即数据表的名字，同时使用该功能的&lt;form&gt;必须是type=”list”，且list-name必须是listIt(因为performFind服务返回的就是一个name=listIt列表)；</li>
+<li>第二个表单中的几个target使用了，现在还未定义的请求映射，可以置之不理或删除即可。</li>
+</ul>
+<h4 id="6、创建菜单。"><a href="#6、创建菜单。" class="headerlink" title="6、创建菜单。"></a>6、创建菜单。</h4><p>在learning/widget/learningMenus.xml文件的名为MainAppBar&lt;menu&gt;标签中，添加：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">menu-item</span> <span class="attr">name</span>=<span class="string">"ProductPlan"</span> <span class="attr">title</span>=<span class="string">"生产计划"</span>&gt;</span><span class="tag">&lt;<span class="name">link</span> <span class="attr">target</span>=<span class="string">"FindProductPlan"</span>/&gt;</span><span class="tag">&lt;/<span class="name">menu-item</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<h3 id="三、部署实体"><a href="#三、部署实体" class="headerlink" title="三、部署实体"></a>三、部署实体</h3><h4 id="1、在learning-entitydef-entitymodel-xml中，添加entity实体-即数据库表-："><a href="#1、在learning-entitydef-entitymodel-xml中，添加entity实体-即数据库表-：" class="headerlink" title="1、在learning/entitydef/entitymodel.xml中，添加entity实体(即数据库表)："></a>1、在learning/entitydef/entitymodel.xml中，添加entity实体(即数据库表)：</h4><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">entity</span> <span class="attr">entity-name</span>=<span class="string">"ProductPlan"</span> <span class="attr">package-name</span>=<span class="string">""</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">field</span> <span class="attr">name</span>=<span class="string">"productPlanId"</span> <span class="attr">type</span>=<span class="string">"id"</span>/&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">field</span> <span class="attr">name</span>=<span class="string">"itemId"</span> <span class="attr">type</span>=<span class="string">"id"</span>/&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">field</span> <span class="attr">name</span>=<span class="string">"startTime"</span> <span class="attr">type</span>=<span class="string">"date-time"</span>/&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">field</span> <span class="attr">name</span>=<span class="string">"finishTime"</span> <span class="attr">type</span>=<span class="string">"date-time"</span>/&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">field</span> <span class="attr">name</span>=<span class="string">"principleId"</span> <span class="attr">type</span>=<span class="string">"id-vlong"</span>&gt;</span><span class="tag">&lt;/<span class="name">field</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">field</span> <span class="attr">name</span>=<span class="string">"division"</span> <span class="attr">type</span>=<span class="string">"long-varchar"</span>&gt;</span><span class="tag">&lt;/<span class="name">field</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">field</span> <span class="attr">name</span>=<span class="string">"useProject"</span> <span class="attr">type</span>=<span class="string">"description"</span>&gt;</span><span class="tag">&lt;/<span class="name">field</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">field</span> <span class="attr">name</span>=<span class="string">"stageIdenf"</span> <span class="attr">type</span>=<span class="string">"description"</span>&gt;</span><span class="tag">&lt;/<span class="name">field</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">field</span> <span class="attr">name</span>=<span class="string">"tecnoDemand"</span> <span class="attr">type</span>=<span class="string">"description"</span>&gt;</span><span class="tag">&lt;/<span class="name">field</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">field</span> <span class="attr">name</span>=<span class="string">"preparationId"</span> <span class="attr">type</span>=<span class="string">"id-vlong"</span>&gt;</span><span class="tag">&lt;/<span class="name">field</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">field</span> <span class="attr">name</span>=<span class="string">"designDemand"</span> <span class="attr">type</span>=<span class="string">"id-vlong"</span>&gt;</span><span class="tag">&lt;/<span class="name">field</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">field</span> <span class="attr">name</span>=<span class="string">"product"</span> <span class="attr">type</span>=<span class="string">"id-vlong"</span>&gt;</span><span class="tag">&lt;/<span class="name">field</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">field</span> <span class="attr">name</span>=<span class="string">"outCheck"</span> <span class="attr">type</span>=<span class="string">"id-vlong"</span>&gt;</span><span class="tag">&lt;/<span class="name">field</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">field</span> <span class="attr">name</span>=<span class="string">"documentPrepa"</span> <span class="attr">type</span>=<span class="string">"id-vlong"</span>&gt;</span><span class="tag">&lt;/<span class="name">field</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">field</span> <span class="attr">name</span>=<span class="string">"armyCheck"</span> <span class="attr">type</span>=<span class="string">"id-vlong"</span>&gt;</span><span class="tag">&lt;/<span class="name">field</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">field</span> <span class="attr">name</span>=<span class="string">"outJudge"</span> <span class="attr">type</span>=<span class="string">"id-vlong"</span>&gt;</span><span class="tag">&lt;/<span class="name">field</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">field</span> <span class="attr">name</span>=<span class="string">"sureCompile"</span> <span class="attr">type</span>=<span class="string">"short-varchar"</span>&gt;</span><span class="tag">&lt;/<span class="name">field</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">field</span> <span class="attr">name</span>=<span class="string">"sureJudge"</span> <span class="attr">type</span>=<span class="string">"short-varchar"</span>&gt;</span><span class="tag">&lt;/<span class="name">field</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">field</span> <span class="attr">name</span>=<span class="string">"sureApprove"</span> <span class="attr">type</span>=<span class="string">"short-varchar"</span>&gt;</span><span class="tag">&lt;/<span class="name">field</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">field</span> <span class="attr">name</span>=<span class="string">"date"</span> <span class="attr">type</span>=<span class="string">"date-time"</span>&gt;</span><span class="tag">&lt;/<span class="name">field</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">field</span> <span class="attr">name</span>=<span class="string">"departmentId"</span> <span class="attr">type</span>=<span class="string">"id"</span>&gt;</span><span class="tag">&lt;/<span class="name">field</span>&gt;</span></span><br><span class="line"> 	  <span class="tag">&lt;<span class="name">prim-key</span> <span class="attr">field</span>=<span class="string">"productPlanId"</span>/&gt;</span></span><br><span class="line">	  <span class="tag">&lt;<span class="name">relation</span> <span class="attr">type</span>=<span class="string">"one"</span> <span class="attr">fk-name</span>=<span class="string">"ProductPlan_Item"</span> <span class="attr">rel-entity-name</span>=<span class="string">"ProductPlanItem"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">key-map</span> <span class="attr">field-name</span>=<span class="string">"itemId"</span> <span class="attr">rel-field-name</span>=<span class="string">"id"</span>/&gt;</span></span><br><span class="line">      <span class="tag">&lt;/<span class="name">relation</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">relation</span> <span class="attr">type</span>=<span class="string">"one"</span> <span class="attr">fk-name</span>=<span class="string">"ProductPlan_Person"</span> <span class="attr">rel-entity-name</span>=<span class="string">"ProductPlanPerson"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">key-map</span> <span class="attr">field-name</span>=<span class="string">"principleId"</span> <span class="attr">rel-field-name</span>=<span class="string">"id"</span>/&gt;</span></span><br><span class="line">      <span class="tag">&lt;/<span class="name">relation</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">relation</span> <span class="attr">type</span>=<span class="string">"one"</span> <span class="attr">fk-name</span>=<span class="string">"ProductPlan_Pre"</span> <span class="attr">rel-entity-name</span>=<span class="string">"ProductPlanPreparation"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">key-map</span> <span class="attr">field-name</span>=<span class="string">"preparationId"</span> <span class="attr">rel-field-name</span>=<span class="string">"id"</span>/&gt;</span></span><br><span class="line">      <span class="tag">&lt;/<span class="name">relation</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">entity</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">entity</span> <span class="attr">entity-name</span>=<span class="string">"ProductPlanItem"</span> <span class="attr">package-name</span>=<span class="string">""</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">field</span> <span class="attr">name</span>=<span class="string">"id"</span> <span class="attr">type</span>=<span class="string">"id"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">field</span> <span class="attr">name</span>=<span class="string">"name"</span> <span class="attr">type</span>=<span class="string">"name"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">field</span> <span class="attr">name</span>=<span class="string">"category"</span> <span class="attr">type</span>=<span class="string">"description"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">field</span> <span class="attr">name</span>=<span class="string">"secretLevel"</span> <span class="attr">type</span>=<span class="string">"description"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">field</span> <span class="attr">name</span>=<span class="string">"source"</span> <span class="attr">type</span>=<span class="string">"description"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">field</span> <span class="attr">name</span>=<span class="string">"content"</span> <span class="attr">type</span>=<span class="string">"description"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">prim-key</span> <span class="attr">field</span>=<span class="string">"id"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">entity</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">entity</span> <span class="attr">entity-name</span>=<span class="string">"ProductPlanPerson"</span> <span class="attr">package-name</span>=<span class="string">""</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">field</span> <span class="attr">name</span>=<span class="string">"id"</span> <span class="attr">type</span>=<span class="string">"id"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">field</span> <span class="attr">name</span>=<span class="string">"name"</span> <span class="attr">type</span>=<span class="string">"name"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">field</span> <span class="attr">name</span>=<span class="string">"department"</span> <span class="attr">type</span>=<span class="string">"name"</span>&gt;</span><span class="tag">&lt;/<span class="name">field</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">field</span> <span class="attr">name</span>=<span class="string">"phone"</span> <span class="attr">type</span>=<span class="string">"tel-number"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">field</span> <span class="attr">name</span>=<span class="string">"address"</span> <span class="attr">type</span>=<span class="string">"description"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">prim-key</span> <span class="attr">field</span>=<span class="string">"id"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">entity</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">entity</span> <span class="attr">entity-name</span>=<span class="string">"ProductPlanPlan"</span> <span class="attr">package-name</span>=<span class="string">""</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">field</span> <span class="attr">name</span>=<span class="string">"id"</span> <span class="attr">type</span>=<span class="string">"id"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">field</span> <span class="attr">name</span>=<span class="string">"content"</span> <span class="attr">type</span>=<span class="string">"description"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">field</span> <span class="attr">name</span>=<span class="string">"startTime"</span> <span class="attr">type</span>=<span class="string">"date-time"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">field</span> <span class="attr">name</span>=<span class="string">"finishTime"</span> <span class="attr">type</span>=<span class="string">"date-time"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">field</span> <span class="attr">name</span>=<span class="string">"department"</span> <span class="attr">type</span>=<span class="string">"name"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">field</span> <span class="attr">name</span>=<span class="string">"principleId"</span> <span class="attr">type</span>=<span class="string">"id"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">prim-key</span> <span class="attr">field</span>=<span class="string">"id"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">relation</span> <span class="attr">type</span>=<span class="string">"one"</span> <span class="attr">fk-name</span>=<span class="string">"Product_Plan_Person"</span> <span class="attr">rel-entity-name</span>=<span class="string">"ProductPlanPerson"</span>&gt;</span></span><br><span class="line">        	<span class="tag">&lt;<span class="name">key-map</span> <span class="attr">field-name</span>=<span class="string">"principleId"</span> <span class="attr">rel-field-name</span>=<span class="string">"id"</span>/&gt;</span></span><br><span class="line">      	<span class="tag">&lt;/<span class="name">relation</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">entity</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">entity</span> <span class="attr">entity-name</span>=<span class="string">"ProductPlanPreparation"</span> <span class="attr">package-name</span>=<span class="string">""</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">field</span> <span class="attr">name</span>=<span class="string">"id"</span> <span class="attr">type</span>=<span class="string">"id"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">field</span> <span class="attr">name</span>=<span class="string">"category"</span> <span class="attr">type</span>=<span class="string">"description"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">field</span> <span class="attr">name</span>=<span class="string">"materialName"</span> <span class="attr">type</span>=<span class="string">"name"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">field</span> <span class="attr">name</span>=<span class="string">"applyFinishTime"</span> <span class="attr">type</span>=<span class="string">"date-time"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">field</span> <span class="attr">name</span>=<span class="string">"applyPrincipleId"</span> <span class="attr">type</span>=<span class="string">"id"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">field</span> <span class="attr">name</span>=<span class="string">"processFinishTime"</span> <span class="attr">type</span>=<span class="string">"date-time"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">field</span> <span class="attr">name</span>=<span class="string">"processPrincipleId"</span> <span class="attr">type</span>=<span class="string">"id"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">field</span> <span class="attr">name</span>=<span class="string">"inCheckFinishTime"</span> <span class="attr">type</span>=<span class="string">"date-time"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">field</span> <span class="attr">name</span>=<span class="string">"inCheckPrincipleId"</span> <span class="attr">type</span>=<span class="string">"id"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">prim-key</span> <span class="attr">field</span>=<span class="string">"id"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">relation</span> <span class="attr">type</span>=<span class="string">"one"</span> <span class="attr">fk-name</span>=<span class="string">"Product_Pre_Person1"</span> <span class="attr">rel-entity-name</span>=<span class="string">"ProductPlanPerson"</span>&gt;</span></span><br><span class="line">        	<span class="tag">&lt;<span class="name">key-map</span> <span class="attr">field-name</span>=<span class="string">"applyPrincipleId"</span> <span class="attr">rel-field-name</span>=<span class="string">"id"</span>/&gt;</span></span><br><span class="line">      	<span class="tag">&lt;/<span class="name">relation</span>&gt;</span></span><br><span class="line">      	<span class="tag">&lt;<span class="name">relation</span> <span class="attr">type</span>=<span class="string">"one"</span> <span class="attr">fk-name</span>=<span class="string">"Product_Pre_Person2"</span> <span class="attr">rel-entity-name</span>=<span class="string">"ProductPlanPerson"</span>&gt;</span></span><br><span class="line">        	<span class="tag">&lt;<span class="name">key-map</span> <span class="attr">field-name</span>=<span class="string">"processPrincipleId"</span> <span class="attr">rel-field-name</span>=<span class="string">"id"</span>/&gt;</span></span><br><span class="line">      	<span class="tag">&lt;/<span class="name">relation</span>&gt;</span></span><br><span class="line">      	<span class="tag">&lt;<span class="name">relation</span> <span class="attr">type</span>=<span class="string">"one"</span> <span class="attr">fk-name</span>=<span class="string">"Product_Pre_Person3"</span> <span class="attr">rel-entity-name</span>=<span class="string">"ProductPlanPerson"</span>&gt;</span></span><br><span class="line">        	<span class="tag">&lt;<span class="name">key-map</span> <span class="attr">field-name</span>=<span class="string">"inCheckPrincipleId"</span> <span class="attr">rel-field-name</span>=<span class="string">"id"</span>/&gt;</span></span><br><span class="line">      	<span class="tag">&lt;/<span class="name">relation</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">entity</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>实体配置规则同样参照上述文档，此处不再复述。</p>
+<h4 id="2、利用相应的操作mysql数据库工具，对ProductPlan数据表新增一些数据。"><a href="#2、利用相应的操作mysql数据库工具，对ProductPlan数据表新增一些数据。" class="headerlink" title="2、利用相应的操作mysql数据库工具，对ProductPlan数据表新增一些数据。"></a>2、利用相应的操作mysql数据库工具，对ProductPlan数据表新增一些数据。</h4><h3 id="四、小有成就"><a href="#四、小有成就" class="headerlink" title="四、小有成就"></a>四、小有成就</h3><p>启动ofbiz，进入learning应用，点击菜单中的生产计划，即可看到FindProductPlan界面：<br><img src="ofbiz学习之部署组件1/ofbiz.PNG" alt="FindProductPlan"></p>
+<p>在搜索选项中输入数据项，点击查找，便可出现相应的搜索结果，查找功能暂且完成。但这仅仅是个小小的成果，还有View展示详细数据、Create新建数据、Remove删除数据、Edit修改数据等功能需要我们去实现。路漫漫其修远兮，吾将上下而求索···</p>
+<h3 id="五、实现View功能"><a href="#五、实现View功能" class="headerlink" title="五、实现View功能"></a>五、实现View功能</h3><h4 id="1、由于ProductPlan数据表有很多字段，所以我们需要一个ViewProductPlan页面显示某一个数据项的详细信息。展现一个页面的基本步骤，可以参照本文第三部分："><a href="#1、由于ProductPlan数据表有很多字段，所以我们需要一个ViewProductPlan页面显示某一个数据项的详细信息。展现一个页面的基本步骤，可以参照本文第三部分：" class="headerlink" title="1、由于ProductPlan数据表有很多字段，所以我们需要一个ViewProductPlan页面显示某一个数据项的详细信息。展现一个页面的基本步骤，可以参照本文第三部分："></a>1、由于ProductPlan数据表有很多字段，所以我们需要一个ViewProductPlan页面显示某一个数据项的详细信息。展现一个页面的基本步骤，可以参照本文第三部分：</h4><ul>
+<li>配置control.xml文件，将请求映射到视图，再由视图映射到具体的装饰器(screen)；</li>
+<li>在装饰器xml配置文件中，通过该装饰器对视图进行布置，同时还要调用表单；</li>
+<li>在表单xml配置文件中，完成被调用表单的配置。</li>
+</ul>
+<p>（PS：如果数据库表字段不多，仅通过上述FindProductPlan界面就能完全显示，那可以不需要View功能。）</p>
+<h4 id="2、代码如下："><a href="#2、代码如下：" class="headerlink" title="2、代码如下："></a>2、代码如下：</h4><p>（1）control.xml:</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">request-map</span> <span class="attr">uri</span>=<span class="string">"ViewProductPlan"</span>&gt;</span></span><br><span class="line">	    <span class="tag">&lt;<span class="name">security</span> <span class="attr">https</span>=<span class="string">"true"</span> <span class="attr">auth</span>=<span class="string">"true"</span> /&gt;</span></span><br><span class="line">	    <span class="tag">&lt;<span class="name">response</span> <span class="attr">name</span>=<span class="string">"success"</span> <span class="attr">type</span>=<span class="string">"view"</span> <span class="attr">value</span>=<span class="string">"ViewProductPlan"</span> /&gt;</span></span><br><span class="line">	<span class="tag">&lt;/<span class="name">request-map</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">view-map</span> <span class="attr">name</span>=<span class="string">"ViewProductPlan"</span> <span class="attr">type</span>=<span class="string">"screen"</span> <span class="attr">page</span>=<span class="string">"component://learning/widget/learningScreens.xml#ViewProductPlan"</span>/&gt;</span></span><br></pre></td></tr></table></figure>
+<p>（2）learningScreens.xml:</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">screen</span> <span class="attr">name</span>=<span class="string">"ViewProductPlan"</span>&gt;</span></span><br><span class="line">	    <span class="tag">&lt;<span class="name">section</span>&gt;</span></span><br><span class="line">	    	<span class="tag">&lt;<span class="name">actions</span>&gt;</span></span><br><span class="line">	    		<span class="comment">&lt;!-- 接受list表单传进来的parameter参数 --&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">set</span> <span class="attr">field</span>=<span class="string">"ProductPlanId"</span> <span class="attr">from-field</span>=<span class="string">"parameters.ProductPlanId"</span>/&gt;</span></span><br><span class="line">                <span class="comment">&lt;!-- 以下这句话非常关键？ --&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">entity-one</span> <span class="attr">entity-name</span>=<span class="string">"ProductPlan"</span> <span class="attr">value-field</span>=<span class="string">"ProductPlan"</span>/&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">actions</span>&gt;</span></span><br><span class="line">	        <span class="tag">&lt;<span class="name">widgets</span>&gt;</span></span><br><span class="line">	            <span class="tag">&lt;<span class="name">decorator-screen</span> <span class="attr">name</span>=<span class="string">"CommonRoutingDecorator"</span> <span class="attr">location</span>=<span class="string">"component://manufacturing/widget/manufacturing/RoutingScreens.xml"</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">decorator-section</span> <span class="attr">name</span>=<span class="string">"body"</span>&gt;</span></span><br><span class="line">                        <span class="tag">&lt;<span class="name">screenlet</span> <span class="attr">title</span>=<span class="string">"生产计划表"</span>&gt;</span></span><br><span class="line">                            <span class="tag">&lt;<span class="name">container</span> <span class="attr">style</span>=<span class="string">"button-bar"</span>&gt;</span></span><br><span class="line">                                <span class="tag">&lt;<span class="name">link</span> <span class="attr">target</span>=<span class="string">"FindProductPlan"</span> <span class="attr">text</span>=<span class="string">"返回"</span> <span class="attr">style</span>=<span class="string">"buttontext"</span>/&gt;</span></span><br><span class="line">                            <span class="tag">&lt;/<span class="name">container</span>&gt;</span></span><br><span class="line">                            <span class="tag">&lt;<span class="name">include-form</span> <span class="attr">name</span>=<span class="string">"ViewProductPlan"</span> <span class="attr">location</span>=<span class="string">"component://learning/widget/learningForms.xml"</span>&gt;</span><span class="tag">&lt;/<span class="name">include-form</span>&gt;</span></span><br><span class="line">                        <span class="tag">&lt;/<span class="name">screenlet</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;/<span class="name">decorator-section</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;/<span class="name">decorator-screen</span>&gt;</span></span><br><span class="line">	        <span class="tag">&lt;/<span class="name">widgets</span>&gt;</span></span><br><span class="line">	    <span class="tag">&lt;/<span class="name">section</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;/<span class="name">screen</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>表单的actions预处理动作，保证了显示表单中的数据项是传进来的ProductPlanId的数据项（虽然笔者也不知为何？）。</p>
+<p>（3）learningForms.xml:</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">form</span> <span class="attr">name</span>=<span class="string">"ViewProductPlan"</span> <span class="attr">type</span>=<span class="string">"single"</span> <span class="attr">target</span>=<span class="string">"EditProductPlan"</span> <span class="attr">title</span>=<span class="string">""</span> <span class="attr">default-map-name</span>=<span class="string">"ProductPlan"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">field</span> <span class="attr">name</span>=<span class="string">"productPlanId"</span> <span class="attr">tooltip</span>=<span class="string">""</span> <span class="attr">title</span>=<span class="string">""</span> <span class="attr">position</span>=<span class="string">"1"</span>&gt;</span><span class="tag">&lt;<span class="name">text</span>/&gt;</span><span class="tag">&lt;/<span class="name">field</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">field</span> <span class="attr">name</span>=<span class="string">"itemId"</span> <span class="attr">position</span>=<span class="string">"2"</span>&gt;</span><span class="tag">&lt;<span class="name">lookup</span> <span class="attr">target-form-name</span>=<span class="string">"LookupProductPlanItem"</span> <span class="attr">size</span>=<span class="string">"16"</span>/&gt;</span><span class="tag">&lt;/<span class="name">field</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">field</span> <span class="attr">name</span>=<span class="string">"startTime"</span> <span class="attr">position</span>=<span class="string">"1"</span>&gt;</span><span class="tag">&lt;<span class="name">text</span> <span class="attr">type</span>=<span class="string">"date"</span>/&gt;</span><span class="tag">&lt;/<span class="name">field</span>&gt;</span></span><br><span class="line">	    <span class="tag">&lt;<span class="name">field</span> <span class="attr">name</span>=<span class="string">"finishTime"</span> <span class="attr">position</span>=<span class="string">"2"</span>&gt;</span><span class="tag">&lt;<span class="name">text</span> <span class="attr">type</span>=<span class="string">"date"</span>/&gt;</span><span class="tag">&lt;/<span class="name">field</span>&gt;</span></span><br><span class="line">	    <span class="tag">&lt;<span class="name">field</span> <span class="attr">name</span>=<span class="string">"principleId"</span>&gt;</span><span class="tag">&lt;<span class="name">lookup</span> <span class="attr">target-form-name</span>=<span class="string">"LookupProductPlanPerson"</span> <span class="attr">size</span>=<span class="string">"16"</span>/&gt;</span><span class="tag">&lt;/<span class="name">field</span>&gt;</span></span><br><span class="line">	    <span class="tag">&lt;<span class="name">field</span> <span class="attr">name</span>=<span class="string">"division"</span> <span class="attr">position</span>=<span class="string">"2"</span>&gt;</span><span class="tag">&lt;<span class="name">text</span>/&gt;</span><span class="tag">&lt;/<span class="name">field</span>&gt;</span></span><br><span class="line">	    <span class="tag">&lt;<span class="name">field</span> <span class="attr">name</span>=<span class="string">"useProject"</span>&gt;</span><span class="tag">&lt;<span class="name">text</span>/&gt;</span><span class="tag">&lt;/<span class="name">field</span>&gt;</span></span><br><span class="line">	    <span class="tag">&lt;<span class="name">field</span> <span class="attr">name</span>=<span class="string">"stageIdenf"</span> <span class="attr">position</span>=<span class="string">"2"</span>&gt;</span><span class="tag">&lt;<span class="name">text</span>/&gt;</span><span class="tag">&lt;/<span class="name">field</span>&gt;</span></span><br><span class="line">	    <span class="tag">&lt;<span class="name">field</span> <span class="attr">name</span>=<span class="string">"tecnoDemand"</span>&gt;</span><span class="tag">&lt;<span class="name">text</span>/&gt;</span><span class="tag">&lt;/<span class="name">field</span>&gt;</span></span><br><span class="line">	    <span class="tag">&lt;<span class="name">field</span> <span class="attr">name</span>=<span class="string">"preparationId"</span> <span class="attr">position</span>=<span class="string">"2"</span>&gt;</span><span class="tag">&lt;<span class="name">lookup</span> <span class="attr">target-form-name</span>=<span class="string">"LookupProductPlanPreparation"</span> <span class="attr">size</span>=<span class="string">"16"</span>/&gt;</span><span class="tag">&lt;/<span class="name">field</span>&gt;</span></span><br><span class="line">	    <span class="tag">&lt;<span class="name">field</span> <span class="attr">name</span>=<span class="string">"designDemand"</span>&gt;</span><span class="tag">&lt;<span class="name">text</span>/&gt;</span><span class="tag">&lt;/<span class="name">field</span>&gt;</span></span><br><span class="line">	    <span class="tag">&lt;<span class="name">field</span> <span class="attr">name</span>=<span class="string">"product"</span> <span class="attr">position</span>=<span class="string">"2"</span>&gt;</span><span class="tag">&lt;<span class="name">text</span>/&gt;</span><span class="tag">&lt;/<span class="name">field</span>&gt;</span></span><br><span class="line">	    <span class="tag">&lt;<span class="name">field</span> <span class="attr">name</span>=<span class="string">"outCheck"</span>&gt;</span><span class="tag">&lt;<span class="name">text</span>/&gt;</span><span class="tag">&lt;/<span class="name">field</span>&gt;</span></span><br><span class="line">	    <span class="tag">&lt;<span class="name">field</span> <span class="attr">name</span>=<span class="string">"documentPrepa"</span> <span class="attr">position</span>=<span class="string">"2"</span>&gt;</span><span class="tag">&lt;<span class="name">text</span>/&gt;</span><span class="tag">&lt;/<span class="name">field</span>&gt;</span></span><br><span class="line">	    <span class="tag">&lt;<span class="name">field</span> <span class="attr">name</span>=<span class="string">"armyCheck"</span>&gt;</span><span class="tag">&lt;<span class="name">text</span>/&gt;</span><span class="tag">&lt;/<span class="name">field</span>&gt;</span></span><br><span class="line">	    <span class="tag">&lt;<span class="name">field</span> <span class="attr">name</span>=<span class="string">"outJudge"</span> <span class="attr">position</span>=<span class="string">"2"</span>&gt;</span><span class="tag">&lt;<span class="name">text</span>/&gt;</span><span class="tag">&lt;/<span class="name">field</span>&gt;</span></span><br><span class="line">	    <span class="tag">&lt;<span class="name">field</span> <span class="attr">name</span>=<span class="string">"sureCompile"</span>&gt;</span><span class="tag">&lt;<span class="name">text</span>/&gt;</span><span class="tag">&lt;/<span class="name">field</span>&gt;</span></span><br><span class="line">	    <span class="tag">&lt;<span class="name">field</span> <span class="attr">name</span>=<span class="string">"sureJudge"</span> <span class="attr">position</span>=<span class="string">"2"</span>&gt;</span><span class="tag">&lt;<span class="name">text</span>/&gt;</span><span class="tag">&lt;/<span class="name">field</span>&gt;</span></span><br><span class="line">	    <span class="tag">&lt;<span class="name">field</span> <span class="attr">name</span>=<span class="string">"sureApprove"</span>&gt;</span><span class="tag">&lt;<span class="name">text</span>/&gt;</span><span class="tag">&lt;/<span class="name">field</span>&gt;</span></span><br><span class="line">	    <span class="tag">&lt;<span class="name">field</span> <span class="attr">name</span>=<span class="string">"departmentId"</span> <span class="attr">position</span>=<span class="string">"2"</span>&gt;</span><span class="tag">&lt;<span class="name">text</span>/&gt;</span><span class="tag">&lt;/<span class="name">field</span>&gt;</span></span><br><span class="line">	    <span class="tag">&lt;<span class="name">field</span> <span class="attr">name</span>=<span class="string">"submitButton"</span> <span class="attr">title</span>=<span class="string">"修改"</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">submit</span> <span class="attr">button-type</span>=<span class="string">"button"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">field</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">form</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>在该表中，有几个要点：</p>
+<ul>
+<li><code>&lt;field&gt;</code>的属性position=”2”是表示该数据项的左右位置（默认是1），但相邻的数据项之间不能都等于2（此处玄学，笔者不甚了解）；</li>
+<li><code>&lt;text type=&quot;date&quot;&gt;</code>表示该数据项只显示日期；</li>
+<li><code>&lt;lookup target-form-name=&quot;LookupProductPlanItem&quot; size=&quot;16&quot;/&gt;</code>是数据项的一种可以提供便捷查找功能的格式，其属性target对应一个请求（control/LookupProductPlanItem），说明我们还要创建一个请求以及响应视图才能使用这个功能。</li>
+</ul>
+<p>（4）创建Lookup请求，在controller.xml中添加：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">request-map</span> <span class="attr">uri</span>=<span class="string">"LookupProductPlanItem"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">security</span> <span class="attr">https</span>=<span class="string">"true"</span> <span class="attr">auth</span>=<span class="string">"true"</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">response</span> <span class="attr">name</span>=<span class="string">"success"</span> <span class="attr">type</span>=<span class="string">"view"</span> <span class="attr">value</span>=<span class="string">"LookupProductPlanItem"</span> /&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">request-map</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">view-map</span> <span class="attr">name</span>=<span class="string">"LookupProductPlanItem"</span> <span class="attr">type</span>=<span class="string">"screen"</span> <span class="attr">page</span>=<span class="string">"component://learning/widget/LearningScreens.xml#LookupProductPlanItem"</span>/&gt;</span></span><br></pre></td></tr></table></figure>
+<p>（5）创建Lookup视图，在LearningScreens.xml中添加：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">screen</span> <span class="attr">name</span>=<span class="string">"LookupProductPlanItem"</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">section</span>&gt;</span></span><br><span class="line">           <span class="tag">&lt;<span class="name">condition</span>&gt;</span></span><br><span class="line">               <span class="tag">&lt;<span class="name">if-service-permission</span> <span class="attr">service-name</span>=<span class="string">"catalogPermissionCheck"</span> <span class="attr">main-action</span>=<span class="string">"VIEW"</span>/&gt;</span></span><br><span class="line">           <span class="tag">&lt;/<span class="name">condition</span>&gt;</span></span><br><span class="line">           <span class="tag">&lt;<span class="name">actions</span>&gt;</span></span><br><span class="line">               <span class="tag">&lt;<span class="name">set</span> <span class="attr">field</span>=<span class="string">"title"</span> <span class="attr">value</span>=<span class="string">"查找项目"</span>/&gt;</span></span><br><span class="line">               <span class="tag">&lt;<span class="name">set</span> <span class="attr">field</span>=<span class="string">"queryString"</span> <span class="attr">from-field</span>=<span class="string">"result.queryString"</span>/&gt;</span></span><br><span class="line"></span><br><span class="line">               <span class="tag">&lt;<span class="name">set</span> <span class="attr">field</span>=<span class="string">"entityName"</span> <span class="attr">value</span>=<span class="string">"ProductPlanItem"</span>/&gt;</span></span><br><span class="line">               <span class="tag">&lt;<span class="name">set</span> <span class="attr">field</span>=<span class="string">"searchFields"</span> <span class="attr">value</span>=<span class="string">"[id, name, category, secretLevel]"</span>/&gt;</span></span><br><span class="line">           <span class="tag">&lt;/<span class="name">actions</span>&gt;</span></span><br><span class="line">           <span class="tag">&lt;<span class="name">widgets</span>&gt;</span></span><br><span class="line">               <span class="tag">&lt;<span class="name">decorator-screen</span> <span class="attr">name</span>=<span class="string">"LookupDecorator"</span> <span class="attr">location</span>=<span class="string">"component://common/widget/CommonScreens.xml"</span>&gt;</span></span><br><span class="line">                   <span class="tag">&lt;<span class="name">decorator-section</span> <span class="attr">name</span>=<span class="string">"search-options"</span>&gt;</span></span><br><span class="line">                   	<span class="tag">&lt;<span class="name">include-form</span> <span class="attr">name</span>=<span class="string">"FindProductPlanItem"</span> <span class="attr">location</span>=<span class="string">"component://learning/widget/LearningForms.xml"</span>/&gt;</span></span><br><span class="line">                   <span class="tag">&lt;/<span class="name">decorator-section</span>&gt;</span></span><br><span class="line">                   <span class="tag">&lt;<span class="name">decorator-section</span> <span class="attr">name</span>=<span class="string">"search-results"</span>&gt;</span></span><br><span class="line">                   	<span class="tag">&lt;<span class="name">include-form</span> <span class="attr">name</span>=<span class="string">"ListProductPlanItem"</span> <span class="attr">location</span>=<span class="string">"component://learning/widget/LearningForms.xml"</span>/&gt;</span></span><br><span class="line">                   <span class="tag">&lt;/<span class="name">decorator-section</span>&gt;</span></span><br><span class="line">               <span class="tag">&lt;/<span class="name">decorator-screen</span>&gt;</span></span><br><span class="line">           <span class="tag">&lt;/<span class="name">widgets</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;/<span class="name">section</span>&gt;</span></span><br><span class="line">   <span class="tag">&lt;/<span class="name">screen</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>&lt;actions&gt;中的第三个&lt;set&gt;标签是指定具体数据库表；第四个是用来，在调用该Lookup功能的数据项旁，显示value中字段数据的。</p>
+<p>（6）创建Form表单，在LearningForms.xml中添加：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">form</span> <span class="attr">name</span>=<span class="string">"FindProductPlanItem"</span> <span class="attr">type</span>=<span class="string">"single"</span> <span class="attr">target</span>=<span class="string">"LookupProductPlanItem"</span> <span class="attr">title</span>=<span class="string">""</span> <span class="attr">default-map-name</span>=<span class="string">"ProductPlanItem"</span></span></span><br><span class="line"><span class="tag">       <span class="attr">header-row-style</span>=<span class="string">"header-row"</span> <span class="attr">default-table-style</span>=<span class="string">"basic-table"</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">field</span> <span class="attr">name</span>=<span class="string">"id"</span> <span class="attr">title</span>=<span class="string">""</span>&gt;</span><span class="tag">&lt;<span class="name">text-find</span>/&gt;</span><span class="tag">&lt;/<span class="name">field</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">field</span> <span class="attr">name</span>=<span class="string">"name"</span>&gt;</span><span class="tag">&lt;<span class="name">text-find</span>/&gt;</span><span class="tag">&lt;/<span class="name">field</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">field</span> <span class="attr">name</span>=<span class="string">"category"</span>&gt;</span><span class="tag">&lt;<span class="name">text-find</span>/&gt;</span><span class="tag">&lt;/<span class="name">field</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">field</span> <span class="attr">name</span>=<span class="string">"submitButton"</span> <span class="attr">title</span>=<span class="string">"$&#123;uiLabelMap.CommonFind&#125;"</span>&gt;</span></span><br><span class="line">           <span class="tag">&lt;<span class="name">submit</span> <span class="attr">button-type</span>=<span class="string">"button"</span>/&gt;</span></span><br><span class="line">       <span class="tag">&lt;/<span class="name">field</span>&gt;</span></span><br><span class="line">   <span class="tag">&lt;/<span class="name">form</span>&gt;</span></span><br><span class="line"></span><br><span class="line">   <span class="comment">&lt;!-- ！！！一定要注意list-name必须是listIt --&gt;</span></span><br><span class="line">   <span class="tag">&lt;<span class="name">form</span> <span class="attr">name</span>=<span class="string">"ListProductPlanItem"</span> <span class="attr">type</span>=<span class="string">"list"</span> <span class="attr">list-name</span>=<span class="string">"listIt"</span></span></span><br><span class="line"><span class="tag">   	  <span class="attr">paginate-target</span>=<span class="string">"LookupProductPlanItem"</span> <span class="attr">default-entity-name</span>=<span class="string">"ProductPlanItem"</span></span></span><br><span class="line"><span class="tag">   	  <span class="attr">odd-row-style</span>=<span class="string">"alternate-row"</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">actions</span>&gt;</span></span><br><span class="line">       	<span class="tag">&lt;<span class="name">set</span> <span class="attr">field</span>=<span class="string">"noConditionFind"</span> <span class="attr">value</span>=<span class="string">"Y"</span>/&gt;</span></span><br><span class="line">           <span class="tag">&lt;<span class="name">service</span> <span class="attr">service-name</span>=<span class="string">"performFind"</span> <span class="attr">result-map</span>=<span class="string">"result"</span> <span class="attr">result-map-list</span>=<span class="string">"listIt"</span>&gt;</span></span><br><span class="line">               <span class="tag">&lt;<span class="name">field-map</span> <span class="attr">field-name</span>=<span class="string">"inputFields"</span> <span class="attr">from-field</span>=<span class="string">"parameters"</span>/&gt;</span></span><br><span class="line">               <span class="tag">&lt;<span class="name">field-map</span> <span class="attr">field-name</span>=<span class="string">"entityName"</span> <span class="attr">value</span>=<span class="string">"ProductPlanItem"</span>/&gt;</span></span><br><span class="line">           <span class="tag">&lt;/<span class="name">service</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;/<span class="name">actions</span>&gt;</span></span><br><span class="line">       <span class="comment">&lt;!-- 以下是点击id后退出，并将点击的id显示id框中 --&gt;</span></span><br><span class="line">   	<span class="tag">&lt;<span class="name">field</span> <span class="attr">name</span>=<span class="string">"id"</span> <span class="attr">widget-style</span>=<span class="string">"smallSubmit"</span>&gt;</span></span><br><span class="line">       	<span class="tag">&lt;<span class="name">hyperlink</span> <span class="attr">also-hidden</span>=<span class="string">"false"</span> <span class="attr">target-type</span>=<span class="string">"plain"</span> <span class="attr">description</span>=<span class="string">"$&#123;id&#125;"</span> <span class="attr">target</span>=<span class="string">"javascript:set_value('$&#123;id&#125;')"</span>/&gt;</span></span><br><span class="line">       <span class="tag">&lt;/<span class="name">field</span>&gt;</span></span><br><span class="line">   	<span class="tag">&lt;<span class="name">field</span> <span class="attr">name</span>=<span class="string">"name"</span>&gt;</span><span class="tag">&lt;<span class="name">display</span>/&gt;</span><span class="tag">&lt;/<span class="name">field</span>&gt;</span></span><br><span class="line">   	<span class="tag">&lt;<span class="name">field</span> <span class="attr">name</span>=<span class="string">"category"</span>&gt;</span><span class="tag">&lt;<span class="name">display</span>/&gt;</span><span class="tag">&lt;/<span class="name">field</span>&gt;</span></span><br><span class="line">   	<span class="tag">&lt;<span class="name">field</span> <span class="attr">name</span>=<span class="string">"secretLevel"</span>&gt;</span><span class="tag">&lt;<span class="name">display</span>/&gt;</span><span class="tag">&lt;/<span class="name">field</span>&gt;</span></span><br><span class="line">   	<span class="tag">&lt;<span class="name">field</span> <span class="attr">name</span>=<span class="string">"source"</span>&gt;</span><span class="tag">&lt;<span class="name">display</span>/&gt;</span><span class="tag">&lt;/<span class="name">field</span>&gt;</span></span><br><span class="line">   	<span class="tag">&lt;<span class="name">field</span> <span class="attr">name</span>=<span class="string">"content"</span>&gt;</span><span class="tag">&lt;<span class="name">display</span>/&gt;</span><span class="tag">&lt;/<span class="name">field</span>&gt;</span></span><br><span class="line">   <span class="tag">&lt;/<span class="name">form</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>（7）完工的ViewProductPlan视图<br><img src="ofbiz学习之部署组件1/ofbiz2.PNG" alt="ViewProductPlan"></p>
+<h3 id="结语（本文结束的几个月后所添加的）"><a href="#结语（本文结束的几个月后所添加的）" class="headerlink" title="结语（本文结束的几个月后所添加的）"></a>结语（本文结束的几个月后所添加的）</h3><p>此处推荐一位ofbiz大神博客：<a href="http://ofbizer.iteye.com/blog/2386290" target="_blank" rel="noopener">上海香飘飘</a>，博客中不仅有关于ofbiz的知识，有很多资源链接，读者可以下载阅读。其中就包括入门级指南<em>Apache+OFBiz+开发初学者指南[Ob4.0-EN+Ob9.0-CN].chm</em>。这份指南很全，若能认真反复阅读，必能获益匪浅。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          
+          <div class="post-tags">
+              <a href="/tags/Java/" rel="tag"><i class="fa fa-tag"></i> Java</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/application/ofbiz%E5%AD%A6%E4%B9%A0%E4%B9%8B%E9%83%A8%E7%BD%B2%E7%BB%84%E4%BB%B62.html" rel="prev" title="ofbiz学习之部署组件2">
+      <i class="fa fa-chevron-left"></i> ofbiz学习之部署组件2
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/cs/SUCTF-writeup-douNine.html" rel="next" title="SUCTF线上赛writeup ---- by douNine">
+      SUCTF线上赛writeup ---- by douNine <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="gitalk-container"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#一、创建组件"><span class="nav-text">一、创建组件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#二、初始部署"><span class="nav-text">二、初始部署</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1、修改learning-ofbiz-component-xml文件中的webapp标签："><span class="nav-text">1、修改learning&#x2F;ofbiz-component.xml文件中的webapp标签：</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2、初次体验。"><span class="nav-text">2、初次体验。</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3、创建controller。"><span class="nav-text">3、创建controller。</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4、创建视图。"><span class="nav-text">4、创建视图。</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5、创建表单。"><span class="nav-text">5、创建表单。</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#6、创建菜单。"><span class="nav-text">6、创建菜单。</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#三、部署实体"><span class="nav-text">三、部署实体</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1、在learning-entitydef-entitymodel-xml中，添加entity实体-即数据库表-："><span class="nav-text">1、在learning&#x2F;entitydef&#x2F;entitymodel.xml中，添加entity实体(即数据库表)：</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2、利用相应的操作mysql数据库工具，对ProductPlan数据表新增一些数据。"><span class="nav-text">2、利用相应的操作mysql数据库工具，对ProductPlan数据表新增一些数据。</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#四、小有成就"><span class="nav-text">四、小有成就</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#五、实现View功能"><span class="nav-text">五、实现View功能</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1、由于ProductPlan数据表有很多字段，所以我们需要一个ViewProductPlan页面显示某一个数据项的详细信息。展现一个页面的基本步骤，可以参照本文第三部分："><span class="nav-text">1、由于ProductPlan数据表有很多字段，所以我们需要一个ViewProductPlan页面显示某一个数据项的详细信息。展现一个页面的基本步骤，可以参照本文第三部分：</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2、代码如下："><span class="nav-text">2、代码如下：</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#结语（本文结束的几个月后所添加的）"><span class="nav-text">结语（本文结束的几个月后所添加的）</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="dounine"
+      src="/images/githubAvatar.jpg">
+  <p class="site-author-name" itemprop="name">dounine</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">69</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">20</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/99MyCql" title="GitHub → https://github.com/99MyCql" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      Links
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://st4ck.gitee.io" title="https://st4ck.gitee.io" rel="noopener" target="_blank">Kitty萌新的卧室</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://hitworld.github.io/" title="https://hitworld.github.io/" rel="noopener" target="_blank">hirworld</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://wyjoutstanding.github.io/" title="https://wyjoutstanding.github.io/" rel="noopener" target="_blank">wyjoutstanding</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://iwtf.github.io/" title="https://iwtf.github.io/" rel="noopener" target="_blank">IWTF</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://wood1314.github.io/" title="https://wood1314.github.io/" rel="noopener" target="_blank">wood</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://desperadoccy.github.io/" title="https://desperadoccy.github.io/" rel="noopener" target="_blank">desperadoccy</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://doudouqaq.github.io/" title="https://doudouqaq.github.io/" rel="noopener" target="_blank">doudouqaq</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://kylinnnnn.github.io/" title="https://kylinnnnn.github.io/" rel="noopener" target="_blank">kylinnnnn</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://miaotony.xyz" title="https://miaotony.xyz" rel="noopener" target="_blank">miaotony</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">dounine</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="站点总字数">373k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">5:39</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID    : '7c69ea063e9c78a72075',
+      clientSecret: 'f222b18af36b2dffda7884ce5fd77bbb9172de54',
+      repo        : '99MyCql.github.io',
+      owner       : '99MyCql',
+      admin       : ['99MyCql'],
+      id          : 'b3335a019c3eb9ea018bc1c3b65b5a61',
+        language: 'zh-CN',
+      distractionFreeMode: false
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+});
+</script>
+
+</body>
+</html>

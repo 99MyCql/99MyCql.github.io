@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/golang32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/golang16.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"99mycql.github.io","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":"gitalk","storage":true,"lazyload":false,"nav":null,"activeClass":"gitalk"},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"./public/search.xml"};
+  </script>
+
+  <meta name="description" content="0. 前言实习期间，组长给每位实习生布置了一份作业——关于CI&#x2F;CD，devops的个人理解和可行性。实话实说，我最喜欢带薪学习了。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="聊聊CI&#x2F;CD与DevOps">
+<meta property="og:url" content="https://99mycql.github.io/application/%E8%81%8A%E8%81%8ACI-CD%E4%B8%8EDevOps.html">
+<meta property="og:site_name" content="dounine&#39;s blog">
+<meta property="og:description" content="0. 前言实习期间，组长给每位实习生布置了一份作业——关于CI&#x2F;CD，devops的个人理解和可行性。实话实说，我最喜欢带薪学习了。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://99mycql.github.io/application/%E8%81%8A%E8%81%8ACI-CD%E4%B8%8EDevOps/1.png">
+<meta property="og:image" content="https://99mycql.github.io/application/%E8%81%8A%E8%81%8ACI-CD%E4%B8%8EDevOps/2.png">
+<meta property="og:image" content="https://99mycql.github.io/application/%E8%81%8A%E8%81%8ACI-CD%E4%B8%8EDevOps/4.png">
+<meta property="og:image" content="https://99mycql.github.io/application/%E8%81%8A%E8%81%8ACI-CD%E4%B8%8EDevOps/3.png">
+<meta property="og:image" content="https://99mycql.github.io/application/%E8%81%8A%E8%81%8ACI-CD%E4%B8%8EDevOps/5.png">
+<meta property="og:image" content="https://99mycql.github.io/application/%E8%81%8A%E8%81%8ACI-CD%E4%B8%8EDevOps/6.png">
+<meta property="article:published_time" content="2020-08-04T01:55:27.000Z">
+<meta property="article:modified_time" content="2021-04-04T13:06:07.072Z">
+<meta property="article:author" content="dounine">
+<meta property="article:tag" content="Backend">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://99mycql.github.io/application/%E8%81%8A%E8%81%8ACI-CD%E4%B8%8EDevOps/1.png">
+
+<link rel="canonical" href="https://99mycql.github.io/application/%E8%81%8A%E8%81%8ACI-CD%E4%B8%8EDevOps.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>聊聊CI/CD与DevOps | dounine's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">dounine's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">4</span></a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">20</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">69</span></a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://github.com/99MyCql" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://99mycql.github.io/application/%E8%81%8A%E8%81%8ACI-CD%E4%B8%8EDevOps.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/githubAvatar.jpg">
+      <meta itemprop="name" content="dounine">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dounine's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          聊聊CI/CD与DevOps
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-08-04 09:55:27" itemprop="dateCreated datePublished" datetime="2020-08-04T09:55:27+08:00">2020-08-04</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-04-04 21:06:07" itemprop="dateModified" datetime="2021-04-04T21:06:07+08:00">2021-04-04</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/application/" itemprop="url" rel="index"><span itemprop="name">应用与开发</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>2.3k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>2 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="0-前言"><a href="#0-前言" class="headerlink" title="0. 前言"></a>0. 前言</h2><p>实习期间，组长给每位实习生布置了一份作业——关于CI/CD，devops的个人理解和可行性。实话实说，我最喜欢带薪学习了。</p>
+<a id="more"></a>
+<h2 id="1-从瀑布模型谈起"><a href="#1-从瀑布模型谈起" class="headerlink" title="1. 从瀑布模型谈起"></a>1. 从瀑布模型谈起</h2><p>在谈起CI/CD、DevOps等之前，不得不提起软件工程开发模型的鼻祖——瀑布模型。</p>
+<p>20世纪70年代，软件工程概念刚刚被提出，温斯顿·罗伊斯（Winston Royce）就提出了著名的<strong>瀑布模型</strong>。</p>
+<p>瀑布模型将软件开发过程分为：需求分析、详细设计、编码、测试、运行维护等几大阶段，如下图：</p>
+<p><img src="聊聊CI-CD与DevOps/1.png" alt="pic"></p>
+<p>瀑布模型对软件开发的过程进行了严格的划分，并规范了各阶段的文档要求和质量保证。相信学过软件工程的同学，对此肯定是再熟悉不过了。而且在个人项目中，大多都是这样开发模式。</p>
+<p>但，瀑布模型存在着其显著的缺点：每个阶段必须依赖于前一阶段的完成，缺乏并行性；一旦进行开发阶段，需求很难变更；每个阶段周期长，软件交付周期长达数月甚至数年，导致用户反馈不及时，很多的问题在最后才会暴露出来。</p>
+<p>20世纪末期，软件需求剧增，瀑布模型已经不能满足软件工作者了。于是，迭代模型、快速原型模型、螺旋模型等新一代软件开发模型逐渐涌现出来。</p>
+<p>到了21世纪初，软件工程大师们总结了当时轻量级的软件开发方法，进而提出了<strong>敏捷开发</strong>。</p>
+<h2 id="2-敏捷开发"><a href="#2-敏捷开发" class="headerlink" title="2. 敏捷开发"></a>2. 敏捷开发</h2><p>时至今日，<strong>敏捷开发（agile development）</strong> 已经成为了非常流行的软件开发方法。</p>
+<p>敏捷开发并未提出相关的模型或者工具，更多的是一种概念。以我理解，它的核心是<strong>迭代开发</strong>和<strong>增量开发</strong>：</p>
+<ul>
+<li>迭代开发：将开发分为很多个小周期，每个小周期都包括着分析、设计、编码、测试、发布等步骤。</li>
+<li>增量开发：迭代开发中，并没有说明如何划分迭代，而增量开发则是按照新增功能来划分迭代。</li>
+</ul>
+<p>简单地来说，在敏捷开发中，开发者可以尽早地发布一个具有核心功能但不完善的简单版本，然后不断迭代地进行更新。如下图：</p>
+<p><img src="聊聊CI-CD与DevOps/2.png" alt="pic"></p>
+<p>举个似是而非的例子，去餐馆点10个菜，如果是瀑布模型，可能把10个菜做完一起上，而敏捷开发则是先上第一个主菜，然后接着上后续的菜。</p>
+<p>显然可以看出，敏捷开发的首要优点就是<strong>快速上线</strong>，而快速上线则能及时地得到用户反馈，进而可以不断地完善、贴近市场、降低软件风险，甚至调整软件方向。</p>
+<p>在这个市场日新月异的时代，敏捷开发更符合大多数开发者的口味。</p>
+<p>敏捷开发的4个价值观：</p>
+<blockquote>
+<ul>
+<li>程序员的主观能动性，以及程序员之间的互动，优于既定流程和工具。</li>
+<li>软件能够运行，优于详尽的文档。</li>
+<li>跟客户的密切协作，优于合同和谈判。</li>
+<li>能够响应变化，优于遵循计划。</li>
+</ul>
+</blockquote>
+<h2 id="3-DevOps"><a href="#3-DevOps" class="headerlink" title="3. DevOps"></a>3. DevOps</h2><p>如果说敏捷开发是已经存在20年的老大哥，那 DevOps 就是初出茅庐的小青年。</p>
+<p>DevOps 概念于2009年被提出，与敏捷开发一样，它也是一种软件开发方法。并且，它也没有明确的定义，更多的像是一种文化、一个运行。有人会认为 DevOps 属于敏捷开发，也有人认为并不如此。</p>
+<p>DevOps 提出的初衷是打破开发人员（Development）和运维人员（Operations）之间的壁垒（线上发布80%的问题可以甩锅给运维，同样也可以甩锅给开发），突出重视软件开发人员和运维人员的沟通合作。开发即运维，运维即开发。</p>
+<p><img src="聊聊CI-CD与DevOps/4.png" alt="pic"></p>
+<p>同时，你也可以把 DevOps 看作开发、运维和质量保障（QA）三者的交集。</p>
+<p><img src="聊聊CI-CD与DevOps/3.png" alt="pic"></p>
+<p>在我看来，DevOps 是敏捷开发的继承，也是发展。敏捷开发强调“短平快”的开发节奏，而 DevOps 则在这基础上，进一步强调开发与运维的关系。同时，DevOps 的发展也得益于自动化工具的不断完善，以及容器、K8S、云服务等新技术的出现。尤其是容器和K8S发展起来后，DevOps 更加火热了。</p>
+<p>而这些自动化工具、新技术的加入，逐渐形成了 DevOps 的整套开发流程：计划，编码，构建，测试，发布，部署，运维，监控，反馈，使得 DevOps 更加敏捷方便。如下图所示：</p>
+<p><img src="聊聊CI-CD与DevOps/5.png" alt="pic"></p>
+<h2 id="4-CI-CD"><a href="#4-CI-CD" class="headerlink" title="4. CI/CD"></a>4. CI/CD</h2><p>如果说 DevOps 是一种软件开发方法的话，那么 CI/CD 就是 DevOps 的一些实践。</p>
+<p><strong>CI（Continuous Integration，持续集成）</strong>，指的是开发人员持续地（不断地）向 master 分支提交代码。提交之后，自动化工具（如：Jenkins）会自动拉取代码，并进行自动化构建和测试，最终将结果发聩给开发人员。CI 使开发人员以一个个的小功能为目标，频繁地向主干分支提交代码，从而进行频繁的构建和测试，让错误能更早地暴露给开发人员，降低软件的风险。</p>
+<p><strong>CD（Continuous Delivery，持续交付）/（Continuous Deployment，持续部署）</strong>，CD 有两个解释，对于两者的区别，似乎也没有明确的定义。在我看来，持续部署，指的是 CI 完成后，自动化地将产品部署到生产测试环境进行测试；而持续交付，是指如果部署没有产生问题，则交付给用户。</p>
+<p><img src="聊聊CI-CD与DevOps/6.png" alt="pic"></p>
+<p>可以看出，CI/CD 的重点在于：<strong>持续</strong>与<strong>自动化</strong>。持续，是为了测试能够更加的频繁，从而保证产品的质量；而自动化，则使整个流程更加的便捷，大大地节约了时间与人力成本。</p>
+<p>当然，CI/CD 并不只属于 DevOps ，DevOps 也不是只有 CI/CD 。</p>
+<h2 id="5-总结"><a href="#5-总结" class="headerlink" title="5. 总结"></a>5. 总结</h2><p>从瀑布模型到 DevOps ，软件开发方法越来越完善，软件开发也越来越高效、快速。DevOps 所提倡的开发与运维间的协作、自动化的流水线、持续的集成部署交付等，是值得推崇的。但是，并不能为了 DevOps 而做 DevOps，更不能以频繁的发布次数为荣。我们在享受持续与自动化带来的快速与便捷同时，也要关注代码的质量。</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li><a href="https://juejin.im/post/6844903808317800462" target="_blank" rel="noopener">强推！2019年最火的容器、K8S和DevOps入门都在这了</a></li>
+<li><a href="https://www.infoq.cn/article/WHt0wFMDRrBU-dtkh1Xp" target="_blank" rel="noopener">如何从零开始搭建 CI/CD 流水线</a></li>
+<li><a href="https://blog.jjonline.cn/linux/238.html" target="_blank" rel="noopener">DevOps漫谈之一：DevOps、CI、CD都是什么鬼？</a></li>
+<li><a href="https://catchzeng.com/2019/04/02/DevOps-%E6%98%AF%E4%B8%80%E7%A7%8D%E6%80%8E%E6%A0%B7%E7%9A%84%E4%BD%93%E9%AA%8C/" target="_blank" rel="noopener">DevOps 是一种怎样的体验?</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          
+          <div class="post-tags">
+              <a href="/tags/Backend/" rel="tag"><i class="fa fa-tag"></i> Backend</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/application/docker%E5%85%A5%E9%97%A8.html" rel="prev" title="docker入门">
+      <i class="fa fa-chevron-left"></i> docker入门
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/application/grpc%E5%85%A5%E9%97%A8.html" rel="next" title="grpc 入门">
+      grpc 入门 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="gitalk-container"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#0-前言"><span class="nav-text">0. 前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-从瀑布模型谈起"><span class="nav-text">1. 从瀑布模型谈起</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-敏捷开发"><span class="nav-text">2. 敏捷开发</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-DevOps"><span class="nav-text">3. DevOps</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-CI-CD"><span class="nav-text">4. CI&#x2F;CD</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-总结"><span class="nav-text">5. 总结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考"><span class="nav-text">参考</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="dounine"
+      src="/images/githubAvatar.jpg">
+  <p class="site-author-name" itemprop="name">dounine</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">69</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">20</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/99MyCql" title="GitHub → https://github.com/99MyCql" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      Links
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://st4ck.gitee.io" title="https://st4ck.gitee.io" rel="noopener" target="_blank">Kitty萌新的卧室</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://hitworld.github.io/" title="https://hitworld.github.io/" rel="noopener" target="_blank">hirworld</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://wyjoutstanding.github.io/" title="https://wyjoutstanding.github.io/" rel="noopener" target="_blank">wyjoutstanding</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://iwtf.github.io/" title="https://iwtf.github.io/" rel="noopener" target="_blank">IWTF</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://wood1314.github.io/" title="https://wood1314.github.io/" rel="noopener" target="_blank">wood</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://desperadoccy.github.io/" title="https://desperadoccy.github.io/" rel="noopener" target="_blank">desperadoccy</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://doudouqaq.github.io/" title="https://doudouqaq.github.io/" rel="noopener" target="_blank">doudouqaq</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://kylinnnnn.github.io/" title="https://kylinnnnn.github.io/" rel="noopener" target="_blank">kylinnnnn</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://miaotony.xyz" title="https://miaotony.xyz" rel="noopener" target="_blank">miaotony</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">dounine</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="站点总字数">373k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">5:39</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID    : '7c69ea063e9c78a72075',
+      clientSecret: 'f222b18af36b2dffda7884ce5fd77bbb9172de54',
+      repo        : '99MyCql.github.io',
+      owner       : '99MyCql',
+      admin       : ['99MyCql'],
+      id          : '3021bfa21352f4eff82df97cc7cdf199',
+        language: 'zh-CN',
+      distractionFreeMode: false
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+});
+</script>
+
+</body>
+</html>

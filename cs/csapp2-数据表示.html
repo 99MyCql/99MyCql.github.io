@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/golang32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/golang16.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"99mycql.github.io","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":"gitalk","storage":true,"lazyload":false,"nav":null,"activeClass":"gitalk"},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"./public/search.xml"};
+  </script>
+
+  <meta name="description" content="[TOC] 0. 前言只记载重难点内容。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="CSAPP第2章-数据表示">
+<meta property="og:url" content="https://99mycql.github.io/cs/csapp2-%E6%95%B0%E6%8D%AE%E8%A1%A8%E7%A4%BA.html">
+<meta property="og:site_name" content="dounine&#39;s blog">
+<meta property="og:description" content="[TOC] 0. 前言只记载重难点内容。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://99mycql.github.io/cs/csapp2-%E6%95%B0%E6%8D%AE%E8%A1%A8%E7%A4%BA/1.png">
+<meta property="og:image" content="https://99mycql.github.io/cs/csapp2-%E6%95%B0%E6%8D%AE%E8%A1%A8%E7%A4%BA/2.png">
+<meta property="og:image" content="https://99mycql.github.io/cs/csapp2-%E6%95%B0%E6%8D%AE%E8%A1%A8%E7%A4%BA/3.png">
+<meta property="og:image" content="https://99mycql.github.io/cs/csapp2-%E6%95%B0%E6%8D%AE%E8%A1%A8%E7%A4%BA/4.png">
+<meta property="og:image" content="https://99mycql.github.io/cs/csapp2-%E6%95%B0%E6%8D%AE%E8%A1%A8%E7%A4%BA/5.png">
+<meta property="og:image" content="https://99mycql.github.io/cs/csapp2-%E6%95%B0%E6%8D%AE%E8%A1%A8%E7%A4%BA/6.png">
+<meta property="og:image" content="https://99mycql.github.io/cs/csapp2-%E6%95%B0%E6%8D%AE%E8%A1%A8%E7%A4%BA/7.png">
+<meta property="og:image" content="https://99mycql.github.io/cs/csapp2-%E6%95%B0%E6%8D%AE%E8%A1%A8%E7%A4%BA/8.png">
+<meta property="og:image" content="https://99mycql.github.io/cs/csapp2-%E6%95%B0%E6%8D%AE%E8%A1%A8%E7%A4%BA/9.png">
+<meta property="og:image" content="https://99mycql.github.io/cs/csapp2-%E6%95%B0%E6%8D%AE%E8%A1%A8%E7%A4%BA/10.png">
+<meta property="article:published_time" content="2019-03-27T12:50:48.000Z">
+<meta property="article:modified_time" content="2021-04-04T13:06:06.730Z">
+<meta property="article:author" content="dounine">
+<meta property="article:tag" content="计算机系统">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://99mycql.github.io/cs/csapp2-%E6%95%B0%E6%8D%AE%E8%A1%A8%E7%A4%BA/1.png">
+
+<link rel="canonical" href="https://99mycql.github.io/cs/csapp2-%E6%95%B0%E6%8D%AE%E8%A1%A8%E7%A4%BA.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>CSAPP第2章-数据表示 | dounine's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">dounine's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">4</span></a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">20</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">69</span></a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://github.com/99MyCql" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://99mycql.github.io/cs/csapp2-%E6%95%B0%E6%8D%AE%E8%A1%A8%E7%A4%BA.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/githubAvatar.jpg">
+      <meta itemprop="name" content="dounine">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dounine's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          CSAPP第2章-数据表示
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-03-27 20:50:48" itemprop="dateCreated datePublished" datetime="2019-03-27T20:50:48+08:00">2019-03-27</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-04-04 21:06:06" itemprop="dateModified" datetime="2021-04-04T21:06:06+08:00">2021-04-04</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/cs/" itemprop="url" rel="index"><span itemprop="name">计算机基础</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>1.5k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>[TOC]</p>
+<h2 id="0-前言"><a href="#0-前言" class="headerlink" title="0. 前言"></a>0. 前言</h2><p>只记载重难点内容。</p>
+<a id="more"></a>
+<h2 id="1-进制转换"><a href="#1-进制转换" class="headerlink" title="1. 进制转换"></a>1. 进制转换</h2><p>计算机系统中，以二进制和十六进制最为重要，其转换如下：</p>
+<p><img src="csapp2-数据表示/1.png" alt="img"></p>
+<h2 id="2-寻址和字节顺序"><a href="#2-寻址和字节顺序" class="headerlink" title="2. 寻址和字节顺序"></a>2. 寻址和字节顺序</h2><ul>
+<li><p>多字节对象被存储为连续的字节序列，对象的地址为所使用字节中的最小地址。假设一个<code>int</code>类型变量<code>x</code>，其地址<code>&amp;x</code>为0x100，那么<code>x</code>的4个字节将被存储在 <code>0x100</code>, <code>0x101</code>, <code>0x102</code>, <code>0x103</code> 的内存位置。</p>
+</li>
+<li><p>小端法，最低有效字节(LSB)在最前面(小地址)；大端法，最高有效字节(MSB)在最前面。示例：</p>
+<p>  <img src="csapp2-数据表示/2.png" alt="img"></p>
+</li>
+</ul>
+<h2 id="3-补码"><a href="#3-补码" class="headerlink" title="3. 补码"></a>3. 补码</h2><p>计算机的二进制表示都是采用<strong>补码</strong>的形式。</p>
+<p>二进制补码转十进制公式：</p>
+<p><img src="csapp2-数据表示/3.png" alt="img"></p>
+<p>最高有效位 $X_w-1$ 为<strong>符号位</strong>，权重为 $-2^{w-1}$。其它第 $i$ 位权重则为 $2^{i}$。</p>
+<p>十进制转二进制补码：</p>
+<ul>
+<li><p>先计算十进制对应二进制原码：</p>
+<p>  <img src="csapp2-数据表示/4.png" alt="img"></p>
+</li>
+<li><p>若是<strong>正数</strong>，则 <strong>补码 = 原码</strong>，即 $[x]<em>补 = [x]</em>原$</p>
+</li>
+<li><p>若是<strong>负数</strong>，则 <strong>补码 = 原码 取反 再加一</strong>，即 $[x]<em>补 = ~[x]</em>原 + 1$</p>
+</li>
+</ul>
+<h2 id="4-C语言中的移位运算"><a href="#4-C语言中的移位运算" class="headerlink" title="4. C语言中的移位运算"></a>4. C语言中的移位运算</h2><ul>
+<li><p>算术右移，补符号位</p>
+</li>
+<li><p>逻辑右移，补零</p>
+</li>
+</ul>
+<p>对于有符号数，右移则为算术右移；对于无符号数，则为逻辑右移。</p>
+<p><img src="csapp2-数据表示/5.png" alt="img"></p>
+<h2 id="5-浮点数"><a href="#5-浮点数" class="headerlink" title="5. 浮点数"></a>5. 浮点数</h2><p>以IEEE浮点数标准为主。</p>
+<h3 id="5-1-二进制浮点数标准形式"><a href="#5-1-二进制浮点数标准形式" class="headerlink" title="5.1. 二进制浮点数标准形式"></a>5.1. 二进制浮点数标准形式</h3><p><img src="csapp2-数据表示/6.png" alt="img"></p>
+<p><img src="csapp2-数据表示/7.png" alt="img"></p>
+<p>示例：</p>
+<p>如二进制小数：$$-1011.101$$</p>
+<p>标准化后变为：$$ (-1)^1 \times 0.1011101(或1.011101) \times 2^5(或2^4)$$</p>
+<h3 id="5-2-浮点数的位级表示"><a href="#5-2-浮点数的位级表示" class="headerlink" title="5.2. 浮点数的位级表示"></a>5.2. 浮点数的位级表示</h3><p><img src="csapp2-数据表示/8.png" alt="img"></p>
+<ul>
+<li><p>s字段，表示符号位</p>
+</li>
+<li><p>exp字段，表示阶码</p>
+</li>
+<li><p>face字段，表示尾数</p>
+</li>
+</ul>
+<h3 id="5-3-浮点数编码对应的值"><a href="#5-3-浮点数编码对应的值" class="headerlink" title="5.3. 浮点数编码对应的值"></a>5.3. 浮点数编码对应的值</h3><p><img src="csapp2-数据表示/9.png" alt="img"></p>
+<h4 id="5-3-1-规格化的值"><a href="#5-3-1-规格化的值" class="headerlink" title="5.3.1. 规格化的值"></a>5.3.1. 规格化的值</h4><p>条件：当<strong>exp字段既不全为0，也不全为1</strong>时。</p>
+<ul>
+<li><p>阶码的值 $$E = exp - Bias$$ Bias为偏置常数，其值 $Bias = 2^{k-1} - 1$，<code>k</code>为浮点数的位数。所以，单精度 $Bias = 127$，双精度 $Bias = 1023$；单精度 $E$ 的取值范围为 $-126 至 127$，双精度 $E$ 的取值范围为 $-1022 至 1023$</p>
+<blockquote>
+<p>设置偏置常数，保证exp字段为无符号(不需要考虑补码)，方便浮点数间的运算。</p>
+</blockquote>
+</li>
+<li><p>尾数的值 $$M = 1 + 0.face$$ 比如：face字段的值为$101000…000$，那么尾数的值 $M = 1.101000…000$</p>
+<blockquote>
+<p>尾数部分隐含以1开头，因为我们总可以把$M$看成$1.f_{n-1}f_{n-2}…f_{0}$的二进制形式，相当于科学记数法。这种表示方法轻松获得额外精度位，同时由于第一位总是$1$，我们就不需要显式地表示它了。</p>
+</blockquote>
+</li>
+</ul>
+<h4 id="5-3-2-非规格化的值"><a href="#5-3-2-非规格化的值" class="headerlink" title="5.3.2. 非规格化的值"></a>5.3.2. 非规格化的值</h4><p>条件：当<strong>exp字段全为0</strong>时。</p>
+<ul>
+<li><p>阶码的值$$E = 1 - Bias$$对于单精度或者双精度浮点数，这个值时固定的。</p>
+<blockquote>
+<p>为什么时 $1 - Bias$，而不是 $-Bias$？因为这样提供了一种非规格数向规格化数平滑过渡的方法。</p>
+</blockquote>
+</li>
+<li><p>尾数的值$$M = 0.face$$</p>
+</li>
+</ul>
+<p>非规格化值的作用：</p>
+<ol>
+<li><p>提供可以表示数值0的方法。因为在规格化数中，$M &gt; 1$尾数永远大于1，无法表示0。</p>
+</li>
+<li><p>可以表示非常接近0的浮点数。同样因为规格化数要求$M &gt; 1$，而阶码又最小为 $-126$(单精度)，所以规格化数最小只能表示 $1.0 \times 2^{-126}$。由于非规格化数没有隐层尾数 $M$ 的 $1$，则其可以表示得更小，如：$0.00…001 \times 2^{-126}$。</p>
+</li>
+</ol>
+<h4 id="5-3-3-无穷"><a href="#5-3-3-无穷" class="headerlink" title="5.3.3. 无穷"></a>5.3.3. 无穷</h4><p>条件：当<strong>exp字段全为1，同时face字段全为0</strong>时。</p>
+<p>$s=0$，正无穷；$s=1$，负无穷。</p>
+<h4 id="5-3-4-NaN-Not-a-Number"><a href="#5-3-4-NaN-Not-a-Number" class="headerlink" title="5.3.4. NaN(Not a Number)"></a>5.3.4. NaN(Not a Number)</h4><p>条件：当<strong>exp字段全为1，face字段非零</strong>时。</p>
+<p>当计算 $\sqrt-1$ 等不合常理的式子时，会返回NaN。</p>
+<h3 id="5-4-浮点数取值示例"><a href="#5-4-浮点数取值示例" class="headerlink" title="5.4. 浮点数取值示例"></a>5.4. 浮点数取值示例</h3><p>假设8位浮点数，其中：exp字段4位，face字段3位，B偏置常数 $Bias = 2^{4-1} - 1 = 7$。</p>
+<p>其各种类型的表示和取值为：</p>
+<p><img src="csapp2-数据表示/10.png" alt="img"></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          
+          <div class="post-tags">
+              <a href="/tags/ComputerSystem/" rel="tag"><i class="fa fa-tag"></i> 计算机系统</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/application/%E7%94%A8python%E5%9C%A8gdb%E4%B8%AD%E5%AE%9E%E7%8E%B0%E4%B8%80%E4%B8%AA%E7%AE%80%E5%8D%95%E6%9C%8D%E5%8A%A1%E5%99%A8.html" rel="prev" title="用python在gdb中实现一个简单服务器">
+      <i class="fa fa-chevron-left"></i> 用python在gdb中实现一个简单服务器
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/language/Java%E9%87%8D%E9%9A%BE%E7%82%B9.html" rel="next" title="Java重难点">
+      Java重难点 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="gitalk-container"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#0-前言"><span class="nav-text">0. 前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-进制转换"><span class="nav-text">1. 进制转换</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-寻址和字节顺序"><span class="nav-text">2. 寻址和字节顺序</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-补码"><span class="nav-text">3. 补码</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-C语言中的移位运算"><span class="nav-text">4. C语言中的移位运算</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-浮点数"><span class="nav-text">5. 浮点数</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#5-1-二进制浮点数标准形式"><span class="nav-text">5.1. 二进制浮点数标准形式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-2-浮点数的位级表示"><span class="nav-text">5.2. 浮点数的位级表示</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-3-浮点数编码对应的值"><span class="nav-text">5.3. 浮点数编码对应的值</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#5-3-1-规格化的值"><span class="nav-text">5.3.1. 规格化的值</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5-3-2-非规格化的值"><span class="nav-text">5.3.2. 非规格化的值</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5-3-3-无穷"><span class="nav-text">5.3.3. 无穷</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5-3-4-NaN-Not-a-Number"><span class="nav-text">5.3.4. NaN(Not a Number)</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-4-浮点数取值示例"><span class="nav-text">5.4. 浮点数取值示例</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="dounine"
+      src="/images/githubAvatar.jpg">
+  <p class="site-author-name" itemprop="name">dounine</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">69</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">20</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/99MyCql" title="GitHub → https://github.com/99MyCql" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      Links
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://st4ck.gitee.io" title="https://st4ck.gitee.io" rel="noopener" target="_blank">Kitty萌新的卧室</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://hitworld.github.io/" title="https://hitworld.github.io/" rel="noopener" target="_blank">hirworld</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://wyjoutstanding.github.io/" title="https://wyjoutstanding.github.io/" rel="noopener" target="_blank">wyjoutstanding</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://iwtf.github.io/" title="https://iwtf.github.io/" rel="noopener" target="_blank">IWTF</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://wood1314.github.io/" title="https://wood1314.github.io/" rel="noopener" target="_blank">wood</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://desperadoccy.github.io/" title="https://desperadoccy.github.io/" rel="noopener" target="_blank">desperadoccy</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://doudouqaq.github.io/" title="https://doudouqaq.github.io/" rel="noopener" target="_blank">doudouqaq</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://kylinnnnn.github.io/" title="https://kylinnnnn.github.io/" rel="noopener" target="_blank">kylinnnnn</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://miaotony.xyz" title="https://miaotony.xyz" rel="noopener" target="_blank">miaotony</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">dounine</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="站点总字数">373k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">5:39</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID    : '7c69ea063e9c78a72075',
+      clientSecret: 'f222b18af36b2dffda7884ce5fd77bbb9172de54',
+      repo        : '99MyCql.github.io',
+      owner       : '99MyCql',
+      admin       : ['99MyCql'],
+      id          : '22f4fd9365ed8995b66ff9352e1ba67e',
+        language: 'zh-CN',
+      distractionFreeMode: false
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/golang32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/golang16.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"99mycql.github.io","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":"gitalk","storage":true,"lazyload":false,"nav":null,"activeClass":"gitalk"},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"./public/search.xml"};
+  </script>
+
+  <meta name="description" content="简介工厂方法模式(Factory Method)，又称虚构造器。在《设计模式》中如此定义：  定义一个用于创建对象的接口，让子类决定实例化哪一个类。Factory Method 使一个类的实例化延迟到其子类。  工厂方法模式中包含四个核心角色：抽象工厂、具体工厂、抽象产品、具体产品。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="工厂方法模式">
+<meta property="og:url" content="https://99mycql.github.io/application/%E5%B7%A5%E5%8E%82%E6%96%B9%E6%B3%95%E6%A8%A1%E5%BC%8F.html">
+<meta property="og:site_name" content="dounine&#39;s blog">
+<meta property="og:description" content="简介工厂方法模式(Factory Method)，又称虚构造器。在《设计模式》中如此定义：  定义一个用于创建对象的接口，让子类决定实例化哪一个类。Factory Method 使一个类的实例化延迟到其子类。  工厂方法模式中包含四个核心角色：抽象工厂、具体工厂、抽象产品、具体产品。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://99mycql.github.io/application/%E5%B7%A5%E5%8E%82%E6%96%B9%E6%B3%95%E6%A8%A1%E5%BC%8F/%E5%9B%BE%E7%89%871.png">
+<meta property="article:published_time" content="2019-03-04T12:33:34.000Z">
+<meta property="article:modified_time" content="2021-04-04T13:06:06.978Z">
+<meta property="article:author" content="dounine">
+<meta property="article:tag" content="设计模式">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://99mycql.github.io/application/%E5%B7%A5%E5%8E%82%E6%96%B9%E6%B3%95%E6%A8%A1%E5%BC%8F/%E5%9B%BE%E7%89%871.png">
+
+<link rel="canonical" href="https://99mycql.github.io/application/%E5%B7%A5%E5%8E%82%E6%96%B9%E6%B3%95%E6%A8%A1%E5%BC%8F.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>工厂方法模式 | dounine's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">dounine's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">4</span></a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">20</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">69</span></a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://github.com/99MyCql" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://99mycql.github.io/application/%E5%B7%A5%E5%8E%82%E6%96%B9%E6%B3%95%E6%A8%A1%E5%BC%8F.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/githubAvatar.jpg">
+      <meta itemprop="name" content="dounine">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dounine's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          工厂方法模式
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-03-04 20:33:34" itemprop="dateCreated datePublished" datetime="2019-03-04T20:33:34+08:00">2019-03-04</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-04-04 21:06:06" itemprop="dateModified" datetime="2021-04-04T21:06:06+08:00">2021-04-04</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/application/" itemprop="url" rel="index"><span itemprop="name">应用与开发</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>5.2k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>5 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h3 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h3><p>工厂方法模式(Factory Method)，又称虚构造器。在《设计模式》中如此定义：</p>
+<blockquote>
+<p>定义一个用于创建对象的接口，让子类决定实例化哪一个类。Factory Method 使一个类的实例化延迟到其子类。</p>
+</blockquote>
+<p>工厂方法模式中包含四个核心角色：抽象工厂、具体工厂、抽象产品、具体产品。</p>
+<a id="more"></a>
+<p>工厂方法模式示例图如下：</p>
+<p><img src="工厂方法模式/图片1.png" alt="工厂方法模式"></p>
+<ul>
+<li><p><code>Creator</code>类为抽象工厂类，包含一个虚方法<code>FactoryMethod()</code>，具体由子类实现；包含一个类方法<code>AnOperation()</code>，该方法中通过调用<code>FactoryMethod()</code>类获取产品。</p>
+</li>
+<li><p><code>ConcreteCreator</code>类为具体工厂类，继承于<code>Creator</code>类，实现了<code>FactoryMethod()</code>方法，该方法<strong>实例化</strong>并返回一个<code>ConcreteProduct</code>类。</p>
+</li>
+<li><p><code>Product</code>类为抽象产品类。</p>
+</li>
+<li><p><code>ConcreteProduct</code>类为具体产品类。</p>
+</li>
+</ul>
+<h3 id="理解工厂方法模式"><a href="#理解工厂方法模式" class="headerlink" title="理解工厂方法模式"></a>理解工厂方法模式</h3><p>理解之前，我们先来讲一个小明买衣服的故事。</p>
+<h4 id="小明买衣服"><a href="#小明买衣服" class="headerlink" title="小明买衣服"></a>小明买衣服</h4><p>假设，小明需要一件衣服。</p>
+<p>同时，夏天小明需要的衣服是短袖，冬天小明需要的衣服是棉袄。</p>
+<p>但是呢，小明不会自己织造衣服，更不理解衣服织造的过程，他只是想得到这么一件衣服。</p>
+<p>所以，他需要向生产衣服的工厂购买衣服。假设工厂A生产短袖、工厂B生产棉袄。那么，夏天小明需要向工厂A购买短袖，冬天小明需要向工厂B购买棉袄。</p>
+<p>甚至，小明还需要毛衣、外套，那他只要在需要时，向对应工厂C(生产毛衣)、工厂D(生产外套)，购买毛衣、外套即可。</p>
+<p>换而言之，小明只需要更换相应的工厂就能得到相应的衣服(产品)。</p>
+<h4 id="由此及彼"><a href="#由此及彼" class="headerlink" title="由此及彼"></a>由此及彼</h4><p>其实，小明买衣服的过程就是工厂方法模式的应用。短袖、棉袄等是具体的产品，继承与衣服抽象类。工厂A、B、C、D则是具体的工厂，继承与抽象工厂。每个工厂返回对应的、独有的产品<strong>实例</strong>，就是工厂方法的作用。</p>
+<p>在工厂方法这种模式下，不管有多少新增产品，只要创建出生产对应产品的具体工厂实例即可。完全符合<strong>开闭原则</strong>(允许扩展，不允许修改)。</p>
+<p>虽然，用户不需要知道产品的生产过程，但是，用户必须知道对应的具体工厂，才能得到对应的产品。而且，想要获得一个简单的产品，必须创建一个具体工厂，这也是工厂方法模式的一个缺陷。</p>
+<p>或许，没有结合实际，你还不清楚这个模式究竟有什么用处。</p>
+<p>那接下来，我将结合<code>java</code>代码进行演示，并用<code>jdbc</code>的例子来说明该模式的作用。</p>
+<h3 id="代码演示-java"><a href="#代码演示-java" class="headerlink" title="代码演示(java)"></a>代码演示(java)</h3><p>首先，我们先创建出抽象产品和抽象工厂类：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 抽象产品</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">Product</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">void</span> <span class="title">printInfo</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 抽象工厂</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">Creator</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 工厂方法</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> Product <span class="title">createProudct</span><span class="params">()</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 调用createProduct()虚方法，实例化产品</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">printProductInfo</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        Product product = createProudct();</span><br><span class="line">        System.out.println(<span class="string">"生产出具体产品"</span>);</span><br><span class="line">        product.printInfo();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>然后，我们创建具体产品A，重载并实现抽象产品类中的虚方法：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ConcreteProduct_A</span> <span class="keyword">extends</span> <span class="title">Product</span></span>&#123;</span><br><span class="line">    <span class="keyword">public</span> String name;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">int</span> price;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">ConcreteProduct_A</span><span class="params">(String name, <span class="keyword">int</span> price)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.name = name;</span><br><span class="line">        <span class="keyword">this</span>.price = price;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">printInfo</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        System.out.printf(<span class="string">"this is concrete product a, product's name is %s, product's price is %d.\n"</span>, name, price);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>注意</strong>：此时用户并不知道产品A是如何实现的，也不知道产品A的类名，用户只知道获得一件产品之后可以打印产品信息。因此，用户无法通过<code>new ConreteProduct_A()</code>来获得这个<strong>产品对象</strong>。</p>
+<p>接着，我们创建生产产品A的具体工厂A：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ConcreteCreator_A</span> <span class="keyword">extends</span> <span class="title">Creator</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Product <span class="title">createProudct</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> ConcreteProduct_A(<span class="string">"productA"</span>, <span class="number">12</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>由于工厂A继承于抽象工厂，便可以调用<code>printProductInfo()</code>方法，来打印自己生产的产品的信息。</p>
+<p>同时，告诉用户工厂A <code>ConcreteCreator_A</code> 可以生产产品A，只要调用工厂A的<code>createProudct()</code>方法即可。于是，用户便可以如下获取并使用产品A：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Creator creatorA = <span class="keyword">new</span> ConcreteCreator_A();</span><br><span class="line">Product productA = creatorA.createProudct();</span><br><span class="line">productA.printInfo();</span><br></pre></td></tr></table></figure>
+<p>但是问题来了，为什么不直接告诉用户产品A的类名<code>ConcreteProduct_A</code>，用户直接<code>new ConcreteProduct_A()</code>，不也能得到产品A的实例吗？</p>
+<p>其实，真正的工厂方法并没有那么简单，不是直接<code>new ConcreteProduct_A()</code>返回一个产品实例就完事的，而是需要对产品进行相应的“封装”才返回给用户的。</p>
+<h3 id="举个栗子"><a href="#举个栗子" class="headerlink" title="举个栗子"></a>举个栗子</h3><p>实际开发中，工厂方法模式对于普通用户、普通应用是没有太大作用的，但是对于一些框架的开发是十分有用的。</p>
+<h4 id="JDBC数据库连接"><a href="#JDBC数据库连接" class="headerlink" title="JDBC数据库连接"></a>JDBC数据库连接</h4><p>以<code>JDBC</code>为例，我们用<code>java</code>连接<code>MySql</code>数据库的常规代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.sql.Connection;     <span class="comment">// jdk数据库连接器</span></span><br><span class="line"><span class="keyword">import</span> java.sql.DriverManager;  <span class="comment">// jdk驱动加载管理器</span></span><br><span class="line"><span class="keyword">import</span> java.sql.ResultSet;      <span class="comment">// jdk数据接收器</span></span><br><span class="line"><span class="keyword">import</span> java.sql.Statement;      <span class="comment">// jdk数据sql执行对象</span></span><br><span class="line"><span class="keyword">import</span> com.mysql.jdbc.Driver;   <span class="comment">// 导入mysql的jdbc包</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 1、首先咱们把mysql的驱动交给java管理</span></span><br><span class="line">DriverManager.registerDriver(<span class="keyword">new</span> Driver());</span><br><span class="line"></span><br><span class="line"><span class="comment">// 2、建立数据库连接，并得到数据库连接对象</span></span><br><span class="line">Connection conn = DriverManager.getConnection(<span class="string">"jdbc:mysql://url"</span>, <span class="string">"root"</span>, <span class="string">"xxxxxx"</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 3、得到执行sql的对象</span></span><br><span class="line">Statement sta = conn.createStatement();</span><br></pre></td></tr></table></figure>
+<p>在这个过程中，<code>java.sql.Connection</code>和<code>java.sql.Driver</code>是<code>java</code>提供给数据库方的<strong>接口</strong>。<code>java</code>提供这种规范，要求数据库方必须实现这两个接口，才能让<code>java</code>连接到数据库。同时，由于是接口，用户不能实例化，只有通过工厂方法才能得到实例对象。</p>
+<p><code>java.sql.Connection</code>相当于抽象产品，<code>java.sql.Driver</code>相当于抽象工厂。<code>com.mysql.jdbc.Driver</code>相当于产生具体产品(<code>mysql</code>连接)的具体工厂。而至于具体产品，用户甚至不需要知道它的类名，只需要知道<code>Connection</code>接口中定义了哪些可以使用的方法即可。</p>
+<p>至于数据库方如何实现<code>java</code>与自身数据库的连接，具体过程就更不需要用户知道。用户只需要知道通过<code>com.mysql.jdbc.Driver</code>这个具体工厂，可以得到连接<code>mysql</code>的连接类即可。然后，通过这个连接类(产品)，用户便可以与<code>mysql</code>数据库进行交互了。</p>
+<p>由于，市面上不止<code>mysql</code>一家数据库，还有<code>SQL Server</code>、<code>Oracle</code>等不错的数据库。如果用户想用其它数据库，那就跟小明在不同时空下想购买不同衣服一样，只需要找到对应的具体工厂(数据库驱动类)，就能得到具体产品(数据库连接类)。这两个都由各数据库来实现。</p>
+<p>而用户根据自身情况从不同的具体工厂(数据库驱动类)，获取不同的产品，只需要导入并注册不同的数据库驱动类即可，其它都不需要修改，<a href="https://www.cnblogs.com/kabi/p/5182809.html" target="_blank" rel="noopener">示例博客</a>。</p>
+<h4 id="深入源码"><a href="#深入源码" class="headerlink" title="深入源码"></a>深入源码</h4><p>深入<code>java.sql</code>和<code>com.mysql.jdbc</code>，找到工厂方法<code>getConnection()</code>的源码在<code>java.sql.DriverManage</code>类中：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Connection con = aDriver.driver.connect(url, info);</span><br></pre></td></tr></table></figure>
+<p>这行代码调用<strong>注册的数据库驱动类</strong>中的<code>connect()</code>方法，于是再找到<code>com.mysql.jdbc.Driver</code>类的父类<code>com.mysql.jdbc.NonRegisteringDriver</code>(实现了<code>java.sql.Driver</code>接口)中的<code>connect()</code>方法，如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> Connection <span class="title">connect</span><span class="params">(String url, Properties info)</span> <span class="keyword">throws</span> SQLException </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (url == <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="keyword">throw</span> SQLError.createSQLException(Messages.getString(<span class="string">"NonRegisteringDriver.1"</span>), <span class="string">"08001"</span>, (ExceptionInterceptor)<span class="keyword">null</span>);</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (StringUtils.startsWithIgnoreCase(url, <span class="string">"jdbc:mysql:loadbalance://"</span>)) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">this</span>.connectLoadBalanced(url, info);</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (StringUtils.startsWithIgnoreCase(url, <span class="string">"jdbc:mysql:replication://"</span>)) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">this</span>.connectReplicationConnection(url, info);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        Properties props = <span class="keyword">null</span>;</span><br><span class="line">        <span class="keyword">if</span> ((props = <span class="keyword">this</span>.parseURL(url, info)) == <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (!<span class="string">"1"</span>.equals(props.getProperty(<span class="string">"NUM_HOSTS"</span>))) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">this</span>.connectFailover(url, info);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                com.mysql.jdbc.Connection newConn = ConnectionImpl.getInstance(<span class="keyword">this</span>.host(props), <span class="keyword">this</span>.port(props), props, <span class="keyword">this</span>.database(props), url);</span><br><span class="line">                <span class="keyword">return</span> newConn;</span><br><span class="line">            &#125; <span class="keyword">catch</span> (SQLException var6) &#123;</span><br><span class="line">                <span class="keyword">throw</span> var6;</span><br><span class="line">            &#125; <span class="keyword">catch</span> (Exception var7) &#123;</span><br><span class="line">                SQLException sqlEx = SQLError.createSQLException(Messages.getString(<span class="string">"NonRegisteringDriver.17"</span>) + var7.toString() + Messages.getString(<span class="string">"NonRegisteringDriver.18"</span>), <span class="string">"08001"</span>, (ExceptionInterceptor)<span class="keyword">null</span>);</span><br><span class="line">                sqlEx.initCause(var7);</span><br><span class="line">                <span class="keyword">throw</span> sqlEx;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>可以看到工厂方法并非简单返回一个具体产品(数据库连接类)即可，而是需要进行多层的包装和处理，才能返回给用户。</p>
+<p>所以，这就解释了为什么不直接告诉用户<code>com.mysql.jdbc.Connection</code>类，让用户自己实例化具体产品(<code>new com.mysql.jdbc.Connection(&quot;&quot;)</code>)，而是要通过具体工厂来返回这个实例化的具体产品。当然，其原因不止如此。。。</p>
+<p>总而言之，工厂方法模式在框架开发、多人协作的方面有着广泛的应用，大大降低了各模块之间的耦合性。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          
+          <div class="post-tags">
+              <a href="/tags/DesignPattern/" rel="tag"><i class="fa fa-tag"></i> 设计模式</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/application/VM%E8%99%9A%E6%8B%9F%E6%9C%BA%E5%AE%89%E8%A3%85Ubuntu%E5%8F%8A%E8%BF%9B%E8%A1%8C%E7%9B%B8%E5%85%B3%E9%85%8D%E7%BD%AE.html" rel="prev" title="VM 虚拟机安装及配置 Ubuntu18">
+      <i class="fa fa-chevron-left"></i> VM 虚拟机安装及配置 Ubuntu18
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/application/makefile%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0.html" rel="next" title="makefile入门">
+      makefile入门 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="gitalk-container"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#简介"><span class="nav-text">简介</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#理解工厂方法模式"><span class="nav-text">理解工厂方法模式</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#小明买衣服"><span class="nav-text">小明买衣服</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#由此及彼"><span class="nav-text">由此及彼</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#代码演示-java"><span class="nav-text">代码演示(java)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#举个栗子"><span class="nav-text">举个栗子</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#JDBC数据库连接"><span class="nav-text">JDBC数据库连接</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#深入源码"><span class="nav-text">深入源码</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="dounine"
+      src="/images/githubAvatar.jpg">
+  <p class="site-author-name" itemprop="name">dounine</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">69</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">20</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/99MyCql" title="GitHub → https://github.com/99MyCql" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      Links
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://st4ck.gitee.io" title="https://st4ck.gitee.io" rel="noopener" target="_blank">Kitty萌新的卧室</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://hitworld.github.io/" title="https://hitworld.github.io/" rel="noopener" target="_blank">hirworld</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://wyjoutstanding.github.io/" title="https://wyjoutstanding.github.io/" rel="noopener" target="_blank">wyjoutstanding</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://iwtf.github.io/" title="https://iwtf.github.io/" rel="noopener" target="_blank">IWTF</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://wood1314.github.io/" title="https://wood1314.github.io/" rel="noopener" target="_blank">wood</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://desperadoccy.github.io/" title="https://desperadoccy.github.io/" rel="noopener" target="_blank">desperadoccy</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://doudouqaq.github.io/" title="https://doudouqaq.github.io/" rel="noopener" target="_blank">doudouqaq</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://kylinnnnn.github.io/" title="https://kylinnnnn.github.io/" rel="noopener" target="_blank">kylinnnnn</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://miaotony.xyz" title="https://miaotony.xyz" rel="noopener" target="_blank">miaotony</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">dounine</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="站点总字数">373k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">5:39</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID    : '7c69ea063e9c78a72075',
+      clientSecret: 'f222b18af36b2dffda7884ce5fd77bbb9172de54',
+      repo        : '99MyCql.github.io',
+      owner       : '99MyCql',
+      admin       : ['99MyCql'],
+      id          : '36544d55b070b39c966a737824251b6d',
+        language: 'zh-CN',
+      distractionFreeMode: false
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+});
+</script>
+
+</body>
+</html>

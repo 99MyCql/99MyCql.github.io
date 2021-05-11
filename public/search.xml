@@ -8129,7 +8129,7 @@
     <title>shell学习笔记</title>
     <url>/language/shell%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0.html</url>
     <content><![CDATA[<p>[TOC]</p>
-<h2 id="0-前言"><a href="#0-前言" class="headerlink" title="0. 前言"></a>0. 前言</h2><p>鉴于实习中经常使用 shell 语言，因此趁此机会好好学习一下强大的 shell 语言。</p>
+<h2 id="0-前言"><a href="#0-前言" class="headerlink" title="0. 前言"></a>0. 前言</h2><p>鉴于实习中经常使用 shell 语言，因此趁此机会好好学习一下“强大”的 shell 语言。</p>
 <a id="more"></a>
 <p>参考：</p>
 <ul>
@@ -8310,7 +8310,7 @@
 <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 写法一</span></span><br><span class="line"><span class="built_in">test</span> expr</span><br><span class="line"></span><br><span class="line"><span class="comment"># 写法二</span></span><br><span class="line">[ expr ]</span><br><span class="line"></span><br><span class="line"><span class="comment"># 写法三</span></span><br><span class="line">[[ expr ]]</span><br></pre></td></tr></table></figure>
 <p><strong>注意</strong>：中括号 <code>[ ]</code> 与表达式之间必须包含空格</p>
 <p>由于 <code>test</code> 是一个命令，它支持很多选项：</p>
-<h4 id="文件判断"><a href="#文件判断" class="headerlink" title="文件判断"></a>文件判断</h4><ul>
+<h4 id="1-文件判断"><a href="#1-文件判断" class="headerlink" title="1) 文件判断"></a>1) 文件判断</h4><ul>
 <li><code>[ -a file ]</code>：如果 file 存在，则为true。</li>
 <li><code>[ -b file ]</code>：如果 file 存在并且是一个块（设备）文件，则为true。</li>
 <li><code>[ -c file ]</code>：如果 file 存在并且是一个字符（设备）文件，则为true。</li>
@@ -8319,7 +8319,7 @@
 <li><code>[ -f file ]</code>：如果 file 存在并且是一个普通文件，则为true。</li>
 </ul>
 <p>更多见：<a href="https://wangdoc.com/bash/condition.html#%E6%96%87%E4%BB%B6%E5%88%A4%E6%96%AD" target="_blank" rel="noopener">条件判断</a></p>
-<h4 id="字符串判断"><a href="#字符串判断" class="headerlink" title="字符串判断"></a>字符串判断</h4><ul>
+<h4 id="2-字符串判断"><a href="#2-字符串判断" class="headerlink" title="2) 字符串判断"></a>2) 字符串判断</h4><ul>
 <li><code>[ str ]</code>：如果str不为空（长度大于0），则判断为真。</li>
 <li><code>[ -n str ]</code>：如果字符串str的长度大于零，则判断为真。</li>
 <li><code>[ -z str ]</code>：如果字符串str的长度为零，则判断为真。</li>
@@ -8330,7 +8330,7 @@
 <li><code>[ str1 &#39;&lt;&#39; str2 ]</code>：如果按照字典顺序str1排列在str2之前，则判断为真。</li>
 </ul>
 <p><strong>注意</strong>：test命令内部的<code>&gt;</code>和<code>&lt;</code>，必须用引号括起来（或者是用反斜杠转义），否则它们会被 shell 解释为重定向操作符。</p>
-<h4 id="整数判断"><a href="#整数判断" class="headerlink" title="整数判断"></a>整数判断</h4><p>由于 <code>&gt;</code> <code>&lt;</code> 会被误解为重定向操作法，所以有专门的整数判断指令。</p>
+<h4 id="3-整数判断"><a href="#3-整数判断" class="headerlink" title="3) 整数判断"></a>3) 整数判断</h4><p>由于 <code>&gt;</code> <code>&lt;</code> 会被误解为重定向操作法，所以有专门的整数判断指令。</p>
 <ul>
 <li><code>[ int1 -eq int2 ]</code>：如果int1等于int2，则为true。</li>
 <li><code>[ int1 -ne int2 ]</code>：如果int1不等于int2，则为true。</li>
@@ -8339,7 +8339,7 @@
 <li><code>[ int1 -ge int2 ]</code>：如果int1大于或等于int2，则为true。</li>
 <li><code>[ int1 -gt int2 ]</code>：如果int1大于int2，则为true。</li>
 </ul>
-<h4 id="逻辑判断"><a href="#逻辑判断" class="headerlink" title="逻辑判断"></a>逻辑判断</h4><ul>
+<h4 id="4-逻辑判断"><a href="#4-逻辑判断" class="headerlink" title="4) 逻辑判断"></a>4) 逻辑判断</h4><ul>
 <li><code>[ expr1 &amp;&amp; expr1 ]</code></li>
 <li><code>[ expr1 || expr1 ]</code></li>
 <li><code>[ ! expr1 ]</code>/<code>[ ! \( expr1 &amp;&amp; expr2 \) ]</code></li>
@@ -8527,6 +8527,7 @@
 <p>版本：<code>vue 3.0</code></p>
 <p>由于 JavaScript 中请求通常是异步，因此几乎无法实现先加载数据再渲染页面。</p>
 <p>但是，我们可以用 <code>v-if</code> 判断数据是否已加载，来实现加载完数据再渲染的效果。</p>
+<a id="more"></a>
 <h2 id="应用"><a href="#应用" class="headerlink" title="应用"></a>应用</h2><p>比如，有如下数据，需要请求后端获取：</p>
 <figure class="highlight js"><table><tr><td class="code"><pre><span class="line">paper: &#123;&#125;</span><br></pre></td></tr></table></figure>
 <h3 id="示例一"><a href="#示例一" class="headerlink" title="示例一"></a>示例一</h3><p>在页面中，我们可能如此使用：</p>

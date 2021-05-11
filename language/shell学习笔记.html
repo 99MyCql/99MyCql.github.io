@@ -20,15 +20,15 @@
     var CONFIG = {"hostname":"99mycql.github.io","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":"gitalk","storage":true,"lazyload":false,"nav":null,"activeClass":"gitalk"},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"./public/search.xml"};
   </script>
 
-  <meta name="description" content="[TOC] 0. 前言鉴于实习中经常使用 shell 语言，因此趁此机会好好学习一下强大的 shell 语言。">
+  <meta name="description" content="[TOC] 0. 前言鉴于实习中经常使用 shell 语言，因此趁此机会好好学习一下“强大”的 shell 语言。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="shell学习笔记">
 <meta property="og:url" content="https://99mycql.github.io/language/shell%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0.html">
 <meta property="og:site_name" content="dounine&#39;s blog">
-<meta property="og:description" content="[TOC] 0. 前言鉴于实习中经常使用 shell 语言，因此趁此机会好好学习一下强大的 shell 语言。">
+<meta property="og:description" content="[TOC] 0. 前言鉴于实习中经常使用 shell 语言，因此趁此机会好好学习一下“强大”的 shell 语言。">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2021-04-25T07:59:05.000Z">
-<meta property="article:modified_time" content="2021-05-11T12:18:07.954Z">
+<meta property="article:modified_time" content="2021-05-11T12:49:34.736Z">
 <meta property="article:author" content="dounine">
 <meta property="article:tag" content="Shell">
 <meta name="twitter:card" content="summary">
@@ -227,7 +227,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-05-11 20:18:07" itemprop="dateModified" datetime="2021-05-11T20:18:07+08:00">2021-05-11</time>
+                <time title="修改时间：2021-05-11 20:49:34" itemprop="dateModified" datetime="2021-05-11T20:49:34+08:00">2021-05-11</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -252,14 +252,14 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>8.2k</span>
+              <span>8.3k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
                 <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>7 分钟</span>
+              <span>8 分钟</span>
             </span>
 
         </div>
@@ -272,7 +272,7 @@
 
       
         <p>[TOC]</p>
-<h2 id="0-前言"><a href="#0-前言" class="headerlink" title="0. 前言"></a>0. 前言</h2><p>鉴于实习中经常使用 shell 语言，因此趁此机会好好学习一下强大的 shell 语言。</p>
+<h2 id="0-前言"><a href="#0-前言" class="headerlink" title="0. 前言"></a>0. 前言</h2><p>鉴于实习中经常使用 shell 语言，因此趁此机会好好学习一下“强大”的 shell 语言。</p>
 <a id="more"></a>
 <p>参考：</p>
 <ul>
@@ -453,7 +453,7 @@
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 写法一</span></span><br><span class="line"><span class="built_in">test</span> expr</span><br><span class="line"></span><br><span class="line"><span class="comment"># 写法二</span></span><br><span class="line">[ expr ]</span><br><span class="line"></span><br><span class="line"><span class="comment"># 写法三</span></span><br><span class="line">[[ expr ]]</span><br></pre></td></tr></table></figure>
 <p><strong>注意</strong>：中括号 <code>[ ]</code> 与表达式之间必须包含空格</p>
 <p>由于 <code>test</code> 是一个命令，它支持很多选项：</p>
-<h4 id="文件判断"><a href="#文件判断" class="headerlink" title="文件判断"></a>文件判断</h4><ul>
+<h4 id="1-文件判断"><a href="#1-文件判断" class="headerlink" title="1) 文件判断"></a>1) 文件判断</h4><ul>
 <li><code>[ -a file ]</code>：如果 file 存在，则为true。</li>
 <li><code>[ -b file ]</code>：如果 file 存在并且是一个块（设备）文件，则为true。</li>
 <li><code>[ -c file ]</code>：如果 file 存在并且是一个字符（设备）文件，则为true。</li>
@@ -462,7 +462,7 @@
 <li><code>[ -f file ]</code>：如果 file 存在并且是一个普通文件，则为true。</li>
 </ul>
 <p>更多见：<a href="https://wangdoc.com/bash/condition.html#%E6%96%87%E4%BB%B6%E5%88%A4%E6%96%AD" target="_blank" rel="noopener">条件判断</a></p>
-<h4 id="字符串判断"><a href="#字符串判断" class="headerlink" title="字符串判断"></a>字符串判断</h4><ul>
+<h4 id="2-字符串判断"><a href="#2-字符串判断" class="headerlink" title="2) 字符串判断"></a>2) 字符串判断</h4><ul>
 <li><code>[ str ]</code>：如果str不为空（长度大于0），则判断为真。</li>
 <li><code>[ -n str ]</code>：如果字符串str的长度大于零，则判断为真。</li>
 <li><code>[ -z str ]</code>：如果字符串str的长度为零，则判断为真。</li>
@@ -473,7 +473,7 @@
 <li><code>[ str1 &#39;&lt;&#39; str2 ]</code>：如果按照字典顺序str1排列在str2之前，则判断为真。</li>
 </ul>
 <p><strong>注意</strong>：test命令内部的<code>&gt;</code>和<code>&lt;</code>，必须用引号括起来（或者是用反斜杠转义），否则它们会被 shell 解释为重定向操作符。</p>
-<h4 id="整数判断"><a href="#整数判断" class="headerlink" title="整数判断"></a>整数判断</h4><p>由于 <code>&gt;</code> <code>&lt;</code> 会被误解为重定向操作法，所以有专门的整数判断指令。</p>
+<h4 id="3-整数判断"><a href="#3-整数判断" class="headerlink" title="3) 整数判断"></a>3) 整数判断</h4><p>由于 <code>&gt;</code> <code>&lt;</code> 会被误解为重定向操作法，所以有专门的整数判断指令。</p>
 <ul>
 <li><code>[ int1 -eq int2 ]</code>：如果int1等于int2，则为true。</li>
 <li><code>[ int1 -ne int2 ]</code>：如果int1不等于int2，则为true。</li>
@@ -482,7 +482,7 @@
 <li><code>[ int1 -ge int2 ]</code>：如果int1大于或等于int2，则为true。</li>
 <li><code>[ int1 -gt int2 ]</code>：如果int1大于int2，则为true。</li>
 </ul>
-<h4 id="逻辑判断"><a href="#逻辑判断" class="headerlink" title="逻辑判断"></a>逻辑判断</h4><ul>
+<h4 id="4-逻辑判断"><a href="#4-逻辑判断" class="headerlink" title="4) 逻辑判断"></a>4) 逻辑判断</h4><ul>
 <li><code>[ expr1 &amp;&amp; expr1 ]</code></li>
 <li><code>[ expr1 || expr1 ]</code></li>
 <li><code>[ ! expr1 ]</code>/<code>[ ! \( expr1 &amp;&amp; expr2 \) ]</code></li>
@@ -634,7 +634,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#0-前言"><span class="nav-text">0. 前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-简介"><span class="nav-text">1. 简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-使用命令"><span class="nav-text">2. 使用命令</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-变量"><span class="nav-text">3. 变量</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#定义变量"><span class="nav-text">定义变量</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#使用变量"><span class="nav-text">使用变量</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#修改变量值"><span class="nav-text">修改变量值</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#删除变量"><span class="nav-text">删除变量</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#环境变量"><span class="nav-text">环境变量</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#只读变量"><span class="nav-text">只读变量</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#变量默认值"><span class="nav-text">变量默认值</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#特殊变量"><span class="nav-text">特殊变量</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-字符串"><span class="nav-text">4. 字符串</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-数组"><span class="nav-text">5. 数组</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#定义数组"><span class="nav-text">定义数组</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#追加"><span class="nav-text">追加</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#使用数组"><span class="nav-text">使用数组</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-运算表达式"><span class="nav-text">6. 运算表达式</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#算术运算"><span class="nav-text">算术运算</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#位运算"><span class="nav-text">位运算</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#逻辑运算"><span class="nav-text">逻辑运算</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#赋值运算"><span class="nav-text">赋值运算</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-条件判断-if"><span class="nav-text">7. 条件判断 if</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#test"><span class="nav-text">test</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#文件判断"><span class="nav-text">文件判断</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#字符串判断"><span class="nav-text">字符串判断</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#整数判断"><span class="nav-text">整数判断</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#逻辑判断"><span class="nav-text">逻辑判断</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#运算表达式"><span class="nav-text">运算表达式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#普通命令"><span class="nav-text">普通命令</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#8-case"><span class="nav-text">8. case</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#9-循环"><span class="nav-text">9. 循环</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#while"><span class="nav-text">while</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#until"><span class="nav-text">until</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#for"><span class="nav-text">for</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#continue"><span class="nav-text">continue</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#10-函数"><span class="nav-text">10. 函数</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#参数"><span class="nav-text">参数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#return"><span class="nav-text">return</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#local-局部变量"><span class="nav-text">local 局部变量</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#其它"><span class="nav-text">其它</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#set"><span class="nav-text">set</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#read"><span class="nav-text">read</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#exit"><span class="nav-text">exit</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#source"><span class="nav-text">source</span></a></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#0-前言"><span class="nav-text">0. 前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-简介"><span class="nav-text">1. 简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-使用命令"><span class="nav-text">2. 使用命令</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-变量"><span class="nav-text">3. 变量</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#定义变量"><span class="nav-text">定义变量</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#使用变量"><span class="nav-text">使用变量</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#修改变量值"><span class="nav-text">修改变量值</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#删除变量"><span class="nav-text">删除变量</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#环境变量"><span class="nav-text">环境变量</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#只读变量"><span class="nav-text">只读变量</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#变量默认值"><span class="nav-text">变量默认值</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#特殊变量"><span class="nav-text">特殊变量</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-字符串"><span class="nav-text">4. 字符串</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-数组"><span class="nav-text">5. 数组</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#定义数组"><span class="nav-text">定义数组</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#追加"><span class="nav-text">追加</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#使用数组"><span class="nav-text">使用数组</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-运算表达式"><span class="nav-text">6. 运算表达式</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#算术运算"><span class="nav-text">算术运算</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#位运算"><span class="nav-text">位运算</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#逻辑运算"><span class="nav-text">逻辑运算</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#赋值运算"><span class="nav-text">赋值运算</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-条件判断-if"><span class="nav-text">7. 条件判断 if</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#test"><span class="nav-text">test</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-文件判断"><span class="nav-text">1) 文件判断</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-字符串判断"><span class="nav-text">2) 字符串判断</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-整数判断"><span class="nav-text">3) 整数判断</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-逻辑判断"><span class="nav-text">4) 逻辑判断</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#运算表达式"><span class="nav-text">运算表达式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#普通命令"><span class="nav-text">普通命令</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#8-case"><span class="nav-text">8. case</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#9-循环"><span class="nav-text">9. 循环</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#while"><span class="nav-text">while</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#until"><span class="nav-text">until</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#for"><span class="nav-text">for</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#continue"><span class="nav-text">continue</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#10-函数"><span class="nav-text">10. 函数</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#参数"><span class="nav-text">参数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#return"><span class="nav-text">return</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#local-局部变量"><span class="nav-text">local 局部变量</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#其它"><span class="nav-text">其它</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#set"><span class="nav-text">set</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#read"><span class="nav-text">read</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#exit"><span class="nav-text">exit</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#source"><span class="nav-text">source</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 

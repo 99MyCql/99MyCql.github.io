@@ -34,10 +34,9 @@
 <meta property="og:image" content="https://99mycql.github.io/application/grpc%E5%85%A5%E9%97%A8/6.png">
 <meta property="og:image" content="https://99mycql.github.io/application/grpc%E5%85%A5%E9%97%A8/2.png">
 <meta property="article:published_time" content="2020-07-21T11:26:19.000Z">
-<meta property="article:modified_time" content="2021-04-04T13:06:06.744Z">
+<meta property="article:modified_time" content="2021-05-11T12:55:26.650Z">
 <meta property="article:author" content="dounine">
 <meta property="article:tag" content="Backend">
-<meta property="article:tag" content="Golang">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://99mycql.github.io/application/grpc%E5%85%A5%E9%97%A8/3.jpeg">
 
@@ -235,7 +234,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-04-04 21:06:06" itemprop="dateModified" datetime="2021-04-04T21:06:06+08:00">2021-04-04</time>
+                <time title="修改时间：2021-05-11 20:55:26" itemprop="dateModified" datetime="2021-05-11T20:55:26+08:00">2021-05-11</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -260,7 +259,7 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>6.5k</span>
+              <span>6.6k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
@@ -356,7 +355,7 @@
 <p>项目目录如下：</p>
 <p><img src="grpc入门/6.png" alt="1"></p>
 <p>修改 <code>helloworld.proto</code> 接口定义文件如下（<code>google/api/annotations.proto</code> 见<a href="https://github.com/grpc-ecosystem/grpc-gateway/blob/master/third_party/googleapis/" target="_blank" rel="noopener">grpc-gateway/third_party/googleapis/</a>）：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">syntax = &quot;proto3&quot;;</span><br><span class="line"></span><br><span class="line">package api;</span><br><span class="line"></span><br><span class="line">option go_package = &quot;grpcDemo/api&quot;;</span><br><span class="line"></span><br><span class="line">// grpc-gateway api</span><br><span class="line">import &quot;google/api/annotations.proto&quot;;</span><br><span class="line"></span><br><span class="line">// The hello service definition.</span><br><span class="line">service HelloService &#123;</span><br><span class="line">  // Sends a greeting</span><br><span class="line">  rpc SayHello (HelloRequest) returns (HelloReply) &#123;</span><br><span class="line">    option (google.api.http) = &#123;</span><br><span class="line">      post: &quot;/v1/helloService/sayHello&quot;</span><br><span class="line">      body: &quot;*&quot;</span><br><span class="line">    &#125;;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// The request message containing the user&apos;s name and age.</span><br><span class="line">message HelloRequest &#123;</span><br><span class="line">  string name = 1;</span><br><span class="line">  string age = 2;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// The response message containing the greetings</span><br><span class="line">message HelloReply &#123;</span><br><span class="line">  string message = 1;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">syntax &#x3D; &quot;proto3&quot;;</span><br><span class="line"></span><br><span class="line">package api;</span><br><span class="line"></span><br><span class="line">option go_package &#x3D; &quot;grpcDemo&#x2F;api&quot;;</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F; grpc-gateway api</span><br><span class="line">import &quot;google&#x2F;api&#x2F;annotations.proto&quot;;</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F; The hello service definition.</span><br><span class="line">service HelloService &#123;</span><br><span class="line">  &#x2F;&#x2F; Sends a greeting</span><br><span class="line">  rpc SayHello (HelloRequest) returns (HelloReply) &#123;</span><br><span class="line">    option (google.api.http) &#x3D; &#123;</span><br><span class="line">      post: &quot;&#x2F;v1&#x2F;helloService&#x2F;sayHello&quot;</span><br><span class="line">      body: &quot;*&quot;</span><br><span class="line">    &#125;;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F; The request message containing the user&#39;s name and age.</span><br><span class="line">message HelloRequest &#123;</span><br><span class="line">  string name &#x3D; 1;</span><br><span class="line">  string age &#x3D; 2;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F; The response message containing the greetings</span><br><span class="line">message HelloReply &#123;</span><br><span class="line">  string message &#x3D; 1;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>生成 grpc 相关文件 <code>.pb.go</code>，其中包括 用于序列化我们请求响应数据的代码、grpc 客户端 和 grpc 服务端：</p>
 <figure class="highlight shell"><figcaption><span>script</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">protoc -I%PROTOC_INCLUDE% -I%GOPATH%\src -Ithird_party\googleapis -I. --go_out=plugins=grpc:. api\helloworld.proto</span><br></pre></td></tr></table></figure>
 <p>生成 gateway 文件 <code>.pb.gw.go</code>：</p>
@@ -384,7 +383,6 @@
           
           <div class="post-tags">
               <a href="/tags/Backend/" rel="tag"><i class="fa fa-tag"></i> Backend</a>
-              <a href="/tags/Go/" rel="tag"><i class="fa fa-tag"></i> Golang</a>
           </div>
 
         

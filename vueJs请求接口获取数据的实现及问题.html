@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/golang32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/golang16.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"99mycql.github.io","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":"gitalk","storage":true,"lazyload":false,"nav":null,"activeClass":"gitalk"},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"./public/search.xml"};
+  </script>
+
+  <meta name="description" content="[TOC] 0. 前言本文基于vue-cli3。 1. 通过api接口获取数据在vuejs中请求接口，大体分为两种方式：vue-source和axios。它们都是经过良好封装的http请求插件。 下文将简单介绍一下使用方法。 1.1. vue-source略讲，详情见这篇博客。 1.1.1. 安装首先，安装该插件： 1npm install vue-source --save 然后，在项目src&#x2F;">
+<meta property="og:type" content="article">
+<meta property="og:title" content="vue请求接口获取数据及跨域问题">
+<meta property="og:url" content="https://99mycql.github.io/vueJs%E8%AF%B7%E6%B1%82%E6%8E%A5%E5%8F%A3%E8%8E%B7%E5%8F%96%E6%95%B0%E6%8D%AE%E7%9A%84%E5%AE%9E%E7%8E%B0%E5%8F%8A%E9%97%AE%E9%A2%98.html">
+<meta property="og:site_name" content="dounine&#39;s blog">
+<meta property="og:description" content="[TOC] 0. 前言本文基于vue-cli3。 1. 通过api接口获取数据在vuejs中请求接口，大体分为两种方式：vue-source和axios。它们都是经过良好封装的http请求插件。 下文将简单介绍一下使用方法。 1.1. vue-source略讲，详情见这篇博客。 1.1.1. 安装首先，安装该插件： 1npm install vue-source --save 然后，在项目src&#x2F;">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://99mycql.github.io/vueJs%E8%AF%B7%E6%B1%82%E6%8E%A5%E5%8F%A3%E8%8E%B7%E5%8F%96%E6%95%B0%E6%8D%AE%E7%9A%84%E5%AE%9E%E7%8E%B0%E5%8F%8A%E9%97%AE%E9%A2%98/%E8%B7%A8%E5%9F%9F%E9%97%AE%E9%A2%98.png">
+<meta property="article:published_time" content="2018-11-28T08:44:08.000Z">
+<meta property="article:modified_time" content="2021-06-18T07:03:23.716Z">
+<meta property="article:author" content="dounine">
+<meta property="article:tag" content="前端">
+<meta property="article:tag" content="Vue">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://99mycql.github.io/vueJs%E8%AF%B7%E6%B1%82%E6%8E%A5%E5%8F%A3%E8%8E%B7%E5%8F%96%E6%95%B0%E6%8D%AE%E7%9A%84%E5%AE%9E%E7%8E%B0%E5%8F%8A%E9%97%AE%E9%A2%98/%E8%B7%A8%E5%9F%9F%E9%97%AE%E9%A2%98.png">
+
+<link rel="canonical" href="https://99mycql.github.io/vueJs%E8%AF%B7%E6%B1%82%E6%8E%A5%E5%8F%A3%E8%8E%B7%E5%8F%96%E6%95%B0%E6%8D%AE%E7%9A%84%E5%AE%9E%E7%8E%B0%E5%8F%8A%E9%97%AE%E9%A2%98.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>vue请求接口获取数据及跨域问题 | dounine's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">dounine's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">17</span></a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">47</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">70</span></a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://github.com/99MyCql" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://99mycql.github.io/vueJs%E8%AF%B7%E6%B1%82%E6%8E%A5%E5%8F%A3%E8%8E%B7%E5%8F%96%E6%95%B0%E6%8D%AE%E7%9A%84%E5%AE%9E%E7%8E%B0%E5%8F%8A%E9%97%AE%E9%A2%98.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/githubAvatar.jpg">
+      <meta itemprop="name" content="dounine">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dounine's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          vue请求接口获取数据及跨域问题
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2018-11-28 16:44:08" itemprop="dateCreated datePublished" datetime="2018-11-28T16:44:08+08:00">2018-11-28</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-06-18 15:03:23" itemprop="dateModified" datetime="2021-06-18T15:03:23+08:00">2021-06-18</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Dev/" itemprop="url" rel="index"><span itemprop="name">不想开滴滴的外卖骑手不是好码农</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Dev/Frontend/" itemprop="url" rel="index"><span itemprop="name">前端</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>5.1k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>5 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>[TOC]</p>
+<h2 id="0-前言"><a href="#0-前言" class="headerlink" title="0. 前言"></a>0. 前言</h2><p>本文基于<code>vue-cli3</code>。</p>
+<h2 id="1-通过api接口获取数据"><a href="#1-通过api接口获取数据" class="headerlink" title="1. 通过api接口获取数据"></a>1. 通过api接口获取数据</h2><p>在<code>vuejs</code>中请求接口，大体分为两种方式：<code>vue-source</code>和<code>axios</code>。它们都是经过良好封装的http请求插件。</p>
+<p>下文将简单介绍一下使用方法。</p>
+<h3 id="1-1-vue-source"><a href="#1-1-vue-source" class="headerlink" title="1.1. vue-source"></a>1.1. vue-source</h3><p>略讲，详情见这篇<a href="https://www.cnblogs.com/axl234/p/5899137.html" target="_blank" rel="noopener">博客</a>。</p>
+<h4 id="1-1-1-安装"><a href="#1-1-1-安装" class="headerlink" title="1.1.1. 安装"></a>1.1.1. 安装</h4><p>首先，安装该插件：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install vue-source --save</span><br></pre></td></tr></table></figure>
+<p>然后，在项目<code>src/main.js</code>中，通过全局方法<code>Vue.use()</code>使用该插件：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> VueSource <span class="keyword">from</span> <span class="string">'vue-source'</span></span><br><span class="line"></span><br><span class="line">Vue.use(VueSource)</span><br></pre></td></tr></table></figure>
+<a id="more"></a>
+<h4 id="1-1-2-使用"><a href="#1-1-2-使用" class="headerlink" title="1.1.2 使用"></a>1.1.2 使用</h4><p>在data中定义好接口和接收的数据类型，然后，调用<code>this.$http.get()</code>函数进行<code>get</code>请求即可，代码如下：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">data () &#123;</span><br><span class="line">  <span class="keyword">return</span> &#123;</span><br><span class="line">    apiUrl: <span class="string">'https://xxxxx'</span>,</span><br><span class="line">    users: []</span><br><span class="line">  &#125;</span><br><span class="line">&#125;,</span><br><span class="line">methods: &#123;</span><br><span class="line">&#125;,</span><br><span class="line">created () &#123;</span><br><span class="line">  <span class="keyword">this</span>.$http.get(<span class="keyword">this</span>.apiUrl).then(<span class="function">(<span class="params">response</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(response)</span><br><span class="line">  &#125;, (error) =&gt; &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">'error:'</span>, error)</span><br><span class="line">  &#125;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>代码解释：$http.get().then()是get函数请求返回后才调用的函数。then()函数的中两个参数是匿名函数。上述代码使用了ES6新增了箭头函数（即参数指向函数），也可以写成以下形式：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">this</span>.$http.get(<span class="keyword">this</span>.apiUrl).then(<span class="function"><span class="keyword">function</span> (<span class="params">response</span>) </span>&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(response)</span><br><span class="line">&#125;, <span class="function"><span class="keyword">function</span> (<span class="params">error</span>) </span>&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">'error:'</span>, error)</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<h3 id="1-2-axios"><a href="#1-2-axios" class="headerlink" title="1.2. axios"></a>1.2. axios</h3><h4 id="1-2-1-安装"><a href="#1-2-1-安装" class="headerlink" title="1.2.1. 安装"></a>1.2.1. 安装</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install axios</span><br></pre></td></tr></table></figure>
+<h4 id="1-2-2-使用"><a href="#1-2-2-使用" class="headerlink" title="1.2.2. 使用"></a>1.2.2. 使用</h4><p><code>axios</code>库的主要请求函数有：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">axios.request(config)</span><br><span class="line">axios.get(url[, config])  <span class="comment">// 表示 axios.get(url, config) 和 axios.get(url) 都被允许</span></span><br><span class="line">axios.delete(url[, config])</span><br><span class="line">axios.head(url[, config])</span><br><span class="line">axios.post(url[, data[, config]])</span><br><span class="line">axios.put(url[, data[, config]])</span><br><span class="line">axios.patch(url[, data[, config]])</span><br></pre></td></tr></table></figure>
+<p><code>config</code>对象的详细属性、请求的后续<code>then()/catch()</code>操作、配置的默认值/defaults等等，见 <a href="https://www.kancloud.cn/yunye/axios/234845" target="_blank" rel="noopener">Axios 中文说明</a>。</p>
+<p>（以下纯属个人观点</p>
+<p>为了更好地进行模块间的解耦，在<code>vue-cli3</code>构建的项目的<code>src\</code>目录下，创建<code>api\</code>目录，将项目所有需要进行的请求的配置<strong>封装</strong>到该目录下。</p>
+<p>此处示例只封装到一个<code>api.js</code>文件，如下：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// src/api/api.js</span></span><br><span class="line"><span class="keyword">import</span> axios <span class="keyword">from</span> <span class="string">'axios'</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 允许跨域携带cookie</span></span><br><span class="line"><span class="comment">// axios.defaults.withCredentials = true;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">const</span> uploadelf = <span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> axios.request(&#123;</span><br><span class="line">        method: <span class="string">'post'</span>,</span><br><span class="line">        url: <span class="string">'http://xxxxx.xxx/api/uploadelf'</span></span><br><span class="line">    &#125;)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">const</span> start = <span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> axios.request(&#123;</span><br><span class="line">        method: <span class="string">'get'</span>,</span><br><span class="line">        url: <span class="string">'http://xxxxx.xxx/api/start'</span></span><br><span class="line">    &#125;)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">const</span> getDisassemble = <span class="function">(<span class="params">funName = <span class="string">'main'</span></span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> axios.request(&#123;</span><br><span class="line">        method: <span class="string">'post'</span>,</span><br><span class="line">        url: <span class="string">'http://xxxxx.xxx/api/disassemble'</span>,</span><br><span class="line">        data: &#123;</span><br><span class="line">            funName</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>其中，每个函数返回一个调用请求后的对象，相当于设计模式中的<strong>工厂方法</strong>。</p>
+<p>如此封装的好处是，用户使用时，<strong>并不需要知道某个请求的请求<code>url</code>和请求方式</strong>。</p>
+<p>当你需要在其它模块中进行相应的请求时，只需要<code>import</code>导入<code>api.js</code>中相应的函数变量并调用即可，如：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// src/view/main.vue</span></span><br><span class="line"></span><br><span class="line">...</span><br><span class="line"></span><br><span class="line">&lt;script&gt;</span><br><span class="line"><span class="comment">// 导入相应的请求函数</span></span><br><span class="line"><span class="keyword">import</span> &#123;uploadelf, start, getDisassemble&#125; <span class="keyword">from</span> <span class="string">'../api/api'</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> &#123;</span><br><span class="line">  data() &#123;</span><br><span class="line">    <span class="keyword">return</span> &#123;</span><br><span class="line">      assemb: []</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;,</span><br><span class="line">  methods: &#123;</span><br><span class="line">    click_uploadelf() &#123;</span><br><span class="line">      <span class="comment">// 调用该工厂方法进行请求返回一个对象，再通过对象的then(), catch()方法进行后续操作</span></span><br><span class="line">      uploadelf().then(<span class="function"><span class="params">resp</span> =&gt;</span> &#123;</span><br><span class="line">        <span class="built_in">console</span>.log(<span class="string">'uploadelf ---&gt;'</span>, resp.data);</span><br><span class="line">      &#125;).catch(<span class="function"><span class="params">error</span> =&gt;</span> &#123;</span><br><span class="line">        <span class="built_in">console</span>.log(error);</span><br><span class="line">      &#125;);</span><br><span class="line">    &#125;,</span><br><span class="line">    click_start() &#123;</span><br><span class="line">      start().then(<span class="function"><span class="params">resp</span> =&gt;</span> &#123;</span><br><span class="line">        <span class="built_in">console</span>.log(<span class="string">'start ---&gt;'</span>, resp.data);</span><br><span class="line">      &#125;).catch(<span class="function"><span class="params">error</span> =&gt;</span> &#123;</span><br><span class="line">        <span class="built_in">console</span>.log(error);</span><br><span class="line">      &#125;);</span><br><span class="line">    &#125;,</span><br><span class="line">    click_getDisassemble() &#123;</span><br><span class="line">      getDisassemble(<span class="string">'main'</span>).then(<span class="function"><span class="params">resp</span> =&gt;</span> &#123;</span><br><span class="line">        <span class="built_in">console</span>.log(<span class="string">'getDisassemble ---&gt;'</span>, resp.data);</span><br><span class="line">        <span class="keyword">this</span>.assemb = resp.data.message;</span><br><span class="line">      &#125;).catch(<span class="function"><span class="params">error</span> =&gt;</span> &#123;</span><br><span class="line">        <span class="built_in">console</span>.log(error);</span><br><span class="line">      &#125;);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">&lt;<span class="regexp">/script&gt;</span></span><br></pre></td></tr></table></figure>
+<h4 id="1-2-3-补充"><a href="#1-2-3-补充" class="headerlink" title="1.2.3. 补充"></a>1.2.3. 补充</h4><p><code>js</code>的请求属于<strong>异步</strong>操作(不需要等请求完成，函数直接执行结束)。所以，需要通过回调函数来实现请求完成的后续操作。</p>
+<p><code>axios</code>主要利用<code>ES6 Promise</code>来实现异步请求的后续操作。</p>
+<p>同时，异步请求会导致请求并行的情况。多个请求之前不能太接近。</p>
+<h2 id="2-跨域问题"><a href="#2-跨域问题" class="headerlink" title="2. 跨域问题"></a>2. 跨域问题</h2><h3 id="2-1-问题"><a href="#2-1-问题" class="headerlink" title="2.1. 问题"></a>2.1. 问题</h3><p>如果是本机localhost:8000测试，可能会出现<strong>跨域问题</strong>，打开浏览器会看到如下报错：<br><img src="vueJs请求接口获取数据的实现及问题/跨域问题.png" alt="跨域问题"></p>
+<h3 id="2-2-补充"><a href="#2-2-补充" class="headerlink" title="2.2. 补充"></a>2.2. 补充</h3><ul>
+<li><p>当两个域具有相同的协议(如http), 相同的端口(如80)，相同的域名如<code>www.baidu.com</code>，那么我们就可以认为它们是在相同的域中（协议，域名，端口都必须相同）。</p>
+</li>
+<li><p>跨域，就是指协议、域名、端口其中一个或多个不一致的情况下，从当前域去访问另一个域。</p>
+</li>
+<li><p>出于安全考虑(防止跨域攻击 XSS、CSRF)，<strong>浏览器</strong>会禁止跨域的请求访问。其实，<strong>同源策略</strong>是一种约定，它也是浏览器最核心也最基本的安全功能。</p>
+</li>
+</ul>
+<h3 id="2-3-解决"><a href="#2-3-解决" class="headerlink" title="2.3. 解决"></a>2.3. 解决</h3><p>跨域问题解决有很多方式，主要讲以下三种。</p>
+<h4 id="2-3-1-CROS-跨域资源共享"><a href="#2-3-1-CROS-跨域资源共享" class="headerlink" title="2.3.1. CROS(跨域资源共享)"></a>2.3.1. CROS(跨域资源共享)</h4><p>前端Vue，设置<code>axios</code>允许跨域带<code>cookie</code>(默认不带cookie)，如下：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// axios全局配置，允许跨域带cookie</span></span><br><span class="line">axios.defaults.withCredentials = <span class="literal">true</span>;</span><br></pre></td></tr></table></figure>
+<p>后端：</p>
+<p>跨域请求后的<strong>响应头</strong>中需要设置：</p>
+<ul>
+<li><p><code>Access-Control-Allow-Origin</code>为发起请求的主机地址。</p>
+</li>
+<li><p><code>Access-Control-Allow-Credentials</code>，当它被设置为<code>true</code>时，允许跨域带<code>cookie</code>，但此时<code>Access-Control-Allow-Origin</code>不能为通配符<code>*</code>。</p>
+</li>
+<li><p><code>Access-Control-Allow-Headers</code>，设置跨域请求允许的请求头。</p>
+</li>
+<li><p><code>Access-Control-Allow-Methods</code>，设置跨域请求允许的请求方式。</p>
+</li>
+</ul>
+<h4 id="2-3-2-Vue代理"><a href="#2-3-2-Vue代理" class="headerlink" title="2.3.2. Vue代理"></a>2.3.2. Vue代理</h4><p><code>vue-cli</code>自带代理功能，由<code>node</code>服务器实现。</p>
+<p>在项目根目录下新增<code>vue.config.js</code>项目配置文件，然后配置代理：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 修改配置后一定要 重新npm run serve !!!</span></span><br><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">    devServer: &#123;</span><br><span class="line">        <span class="comment">// vue项目启动时的ip地址和端口</span></span><br><span class="line">        host: <span class="string">'localhost'</span>,</span><br><span class="line">        port: <span class="number">8000</span>,</span><br><span class="line">        proxy: &#123;</span><br><span class="line">            <span class="comment">// 匹配所有以 /api 开头的url</span></span><br><span class="line">            <span class="string">'/api'</span>: &#123;</span><br><span class="line">                <span class="comment">// 请求的目标主机</span></span><br><span class="line">                target: <span class="string">'http://xxx.xxx:8080'</span>,</span><br><span class="line">                changeOrigin: <span class="literal">true</span>,</span><br><span class="line">                ws: <span class="literal">true</span></span><br><span class="line">                <span class="comment">// 匹配路径中的 `/api` 替换成 `/`</span></span><br><span class="line">                <span class="comment">// pathRewrite: &#123;</span></span><br><span class="line">                <span class="comment">//   '^/api': '/api'</span></span><br><span class="line">                <span class="comment">// &#125;</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>同时需要将请求URL改成以<code>/api</code>开头，如下：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">axios.request(&#123;</span><br><span class="line">    method: <span class="string">'post'</span>,</span><br><span class="line">    url: <span class="string">'/api/uploadelf'</span></span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<p>设置代理后，本地<code>nodejs</code>服务器会将目标主机的<code>url</code>代理到<code>vue</code>项目的<code>url</code>。</p>
+<p>如：</p>
+<p>访问<code>http://dev3.airdb.io:8080</code>，会转变成访问<code>http://localhost:8080</code>，再由<code>http://localhost:8080</code>转发请求到<code>http://dev3.airdb.io:8080</code>。</p>
+<p>这样，就成了同域请求，浏览器不会进行限制。但实际上，还是请求了目标主机，只是欺骗了浏览器。</p>
+<p>由于Vue代理需要利用<code>node</code>服务器，所以<strong>只适用于本地<code>npm run serve</code>调试</strong>时。</p>
+<p>当项目部署到服务器时，可以使用<code>CROS</code>方式、<code>nginx</code>反向代理等方式。</p>
+<h4 id="2-3-3-nginx反向代理"><a href="#2-3-3-nginx反向代理" class="headerlink" title="2.3.3. nginx反向代理"></a>2.3.3. nginx反向代理</h4><p>只需要在<code>nginx.conf</code>配置文件的<code>vue</code>项目对应的<code>server</code>中，添加：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"># 匹配vue项目中所有以&#x2F;api开头的请求url</span><br><span class="line">location &#x2F;api &#123;</span><br><span class="line">    include  uwsgi_params;</span><br><span class="line">    proxy_pass   http:&#x2F;&#x2F;0.0.0.0:8081; # 要代理访问的后端url</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>完整示例如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">server &#123;</span><br><span class="line">    listen       8000;</span><br><span class="line">    listen       80;</span><br><span class="line">    server_name  _;</span><br><span class="line">    root         &#x2F;pathto&#x2F;vue_project&#x2F;;</span><br><span class="line"></span><br><span class="line">    # Load configuration files for the default server block.</span><br><span class="line">    include &#x2F;etc&#x2F;nginx&#x2F;default.d&#x2F;*.conf;</span><br><span class="line"></span><br><span class="line">    location &#x2F; &#123;</span><br><span class="line">        index index.html;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    error_page 404 &#x2F;404.html;</span><br><span class="line">        location &#x3D; &#x2F;40x.html &#123;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    error_page 500 502 503 504 &#x2F;50x.html;</span><br><span class="line">        location &#x3D; &#x2F;50x.html &#123;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    location &#x2F;api &#123;</span><br><span class="line">        include  uwsgi_params;</span><br><span class="line">        proxy_pass   http:&#x2F;&#x2F;0.0.0.0:8081;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          
+          <div class="post-tags">
+              <a href="/tags/Frontend/" rel="tag"><i class="fa fa-tag"></i> 前端</a>
+              <a href="/tags/Vue/" rel="tag"><i class="fa fa-tag"></i> Vue</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/vueJs%E5%85%A5%E9%97%A8.html" rel="prev" title="vueJs入门">
+      <i class="fa fa-chevron-left"></i> vueJs入门
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/css%E5%AE%9E%E8%B7%B5%E4%B8%AD%E7%9A%84%E4%B8%80%E4%BA%9B%E9%97%AE%E9%A2%98.html" rel="next" title="css实践总结">
+      css实践总结 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="gitalk-container"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#0-前言"><span class="nav-text">0. 前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-通过api接口获取数据"><span class="nav-text">1. 通过api接口获取数据</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-vue-source"><span class="nav-text">1.1. vue-source</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-1-1-安装"><span class="nav-text">1.1.1. 安装</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-1-2-使用"><span class="nav-text">1.1.2 使用</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-axios"><span class="nav-text">1.2. axios</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-2-1-安装"><span class="nav-text">1.2.1. 安装</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-2-2-使用"><span class="nav-text">1.2.2. 使用</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-2-3-补充"><span class="nav-text">1.2.3. 补充</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-跨域问题"><span class="nav-text">2. 跨域问题</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-问题"><span class="nav-text">2.1. 问题</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-补充"><span class="nav-text">2.2. 补充</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-解决"><span class="nav-text">2.3. 解决</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-3-1-CROS-跨域资源共享"><span class="nav-text">2.3.1. CROS(跨域资源共享)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-3-2-Vue代理"><span class="nav-text">2.3.2. Vue代理</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-3-3-nginx反向代理"><span class="nav-text">2.3.3. nginx反向代理</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="dounine"
+      src="/images/githubAvatar.jpg">
+  <p class="site-author-name" itemprop="name">dounine</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">70</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">17</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">47</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/99MyCql" title="GitHub → https://github.com/99MyCql" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      Links
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://st4ck.gitee.io" title="https://st4ck.gitee.io" rel="noopener" target="_blank">Kitty萌新的卧室</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://hitworld.github.io/" title="https://hitworld.github.io/" rel="noopener" target="_blank">hirworld</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://wyjoutstanding.github.io/" title="https://wyjoutstanding.github.io/" rel="noopener" target="_blank">wyjoutstanding</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://iwtf.github.io/" title="https://iwtf.github.io/" rel="noopener" target="_blank">IWTF</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://wood1314.github.io/" title="https://wood1314.github.io/" rel="noopener" target="_blank">wood</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://desperadoccy.github.io/" title="https://desperadoccy.github.io/" rel="noopener" target="_blank">desperadoccy</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://doudouqaq.github.io/" title="https://doudouqaq.github.io/" rel="noopener" target="_blank">doudouqaq</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://kylinnnnn.github.io/" title="https://kylinnnnn.github.io/" rel="noopener" target="_blank">kylinnnnn</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://miaotony.xyz" title="https://miaotony.xyz" rel="noopener" target="_blank">miaotony</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">dounine</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="站点总字数">374k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">5:40</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID    : '7c69ea063e9c78a72075',
+      clientSecret: 'f222b18af36b2dffda7884ce5fd77bbb9172de54',
+      repo        : '99MyCql.github.io',
+      owner       : '99MyCql',
+      admin       : ['99MyCql'],
+      id          : '3e294ebbaa97d51f283ed12e75199cf4',
+        language: 'zh-CN',
+      distractionFreeMode: false
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+});
+</script>
+
+</body>
+</html>

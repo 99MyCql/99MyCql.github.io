@@ -116,17 +116,17 @@
   </li>
         <li class="menu-item menu-item-categories">
 
-    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">4</span></a>
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">17</span></a>
 
   </li>
         <li class="menu-item menu-item-tags">
 
-    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">20</span></a>
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">47</span></a>
 
   </li>
         <li class="menu-item menu-item-archives">
 
-    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">69</span></a>
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">70</span></a>
 
   </li>
         <li class="menu-item menu-item-about">
@@ -191,7 +191,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://99mycql.github.io/application/linux%E5%91%BD%E4%BB%A4%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0.html">
+    <link itemprop="mainEntityOfPage" href="https://99mycql.github.io/git%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/githubAvatar.jpg">
@@ -205,7 +205,105 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/application/linux%E5%91%BD%E4%BB%A4%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0.html" class="post-title-link" itemprop="url">linux命令学习笔记</a>
+            <a href="/git%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0.html" class="post-title-link" itemprop="url">git学习笔记</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2018-12-21 23:57:24" itemprop="dateCreated datePublished" datetime="2018-12-21T23:57:24+08:00">2018-12-21</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-06-18 11:55:41" itemprop="dateModified" datetime="2021-06-18T11:55:41+08:00">2021-06-18</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%BA%94%E7%94%A8%E4%B8%8E%E4%B8%8D%E7%9F%A5%E9%81%93%E6%80%8E%E4%B9%88%E5%88%86%E7%B1%BB%E7%9A%84%E5%88%86%E7%B1%BB%E5%BC%80%E5%8F%91/" itemprop="url" rel="index"><span itemprop="name">应用与不知道怎么分类的分类开发</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>14k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>13 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="0-前言"><a href="#0-前言" class="headerlink" title="0. 前言"></a>0. 前言</h2><p>git在团队协作中有重要作用，是有必要进行系统学习的一门工具。本篇是笔者学习git操作的备忘笔记，主要在linux上进行。</p>
+<h2 id="1-git历史"><a href="#1-git历史" class="headerlink" title="1. git历史"></a>1. git历史</h2><blockquote>
+<p>很多人都知道，Linus在1991年创建了开源的Linux，从此，Linux系统不断发展，已经成为最大的服务器系统软件了。<br>Linus虽然创建了Linux，但Linux的壮大是靠全世界热心的志愿者参与的，这么多人在世界各地为Linux编写代码，那Linux的代码是如何管理的呢？<br>事实是，在2002年以前，世界各地的志愿者把源代码文件通过diff的方式发给Linus，然后由Linus本人通过手工方式合并代码！<br>你也许会想，为什么Linus不把Linux代码放到版本控制系统里呢？不是有CVS、SVN这些免费的版本控制系统吗？因为Linus坚定地反对CVS和SVN，这些集中式的版本控制系统不但速度慢，而且必须联网才能使用。有一些商用的版本控制系统，虽然比CVS、SVN好用，但那是付费的，和Linux的开源精神不符。<br>不过，到了2002年，Linux系统已经发展了十年了，代码库之大让Linus很难继续通过手工方式管理了，社区的弟兄们也对这种方式表达了强烈不满，于是Linus选择了一个商业的版本控制系统BitKeeper，BitKeeper的东家BitMover公司出于人道主义精神，授权Linux社区免费使用这个版本控制系统。<br>安定团结的大好局面在2005年就被打破了，原因是Linux社区牛人聚集，不免沾染了一些梁山好汉的江湖习气。开发Samba的Andrew试图破解BitKeeper的协议（这么干的其实也不只他一个），被BitMover公司发现了（监控工作做得不错！），于是BitMover公司怒了，要收回Linux社区的免费使用权。<br>Linus可以向BitMover公司道个歉，保证以后严格管教弟兄们，嗯，这是不可能的。实际情况是这样的：<br>Linus花了两周时间自己用C写了一个分布式版本控制系统，这就是Git！一个月之内，Linux系统的源码已经由Git管理了！牛是怎么定义的呢？大家可以体会一下。<br>Git迅速成为最流行的分布式版本控制系统，尤其是2008年，GitHub网站上线了，它为开源项目免费提供Git存储，无数开源项目开始迁移至GitHub，包括jQuery，PHP，Ruby等等。<br>历史就是这么偶然，如果不是当年BitMover公司威胁Linux社区，可能现在我们就没有免费而超级好用的Git了。</p>
+</blockquote>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/git%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0.html#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://99mycql.github.io/linux%E5%91%BD%E4%BB%A4%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/githubAvatar.jpg">
+      <meta itemprop="name" content="dounine">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dounine's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/linux%E5%91%BD%E4%BB%A4%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0.html" class="post-title-link" itemprop="url">linux命令学习笔记</a>
         </h2>
 
         <div class="post-meta">
@@ -222,7 +320,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-05-21 17:11:09" itemprop="dateModified" datetime="2021-05-21T17:11:09+08:00">2021-05-21</time>
+                <time title="修改时间：2021-06-18 12:03:40" itemprop="dateModified" datetime="2021-06-18T12:03:40+08:00">2021-06-18</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -230,7 +328,11 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/application/" itemprop="url" rel="index"><span itemprop="name">应用与开发</span></a>
+                  <a href="/categories/Base/" itemprop="url" rel="index"><span itemprop="name">九层之台，起于累土</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Base/System/" itemprop="url" rel="index"><span itemprop="name">计算机系统</span></a>
                 </span>
             </span>
 
@@ -265,7 +367,7 @@
 <p>以下命令格式中，略去命令选项。</p>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/application/linux%E5%91%BD%E4%BB%A4%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0.html#more" rel="contents">
+              <a class="btn" href="/linux%E5%91%BD%E4%BB%A4%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0.html#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -289,7 +391,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://99mycql.github.io/application/go%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%E5%8D%B8%E8%BD%BD-linux%E7%B3%BB%E7%BB%9F.html">
+    <link itemprop="mainEntityOfPage" href="https://99mycql.github.io/go%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%E5%8D%B8%E8%BD%BD-linux%E7%B3%BB%E7%BB%9F.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/githubAvatar.jpg">
@@ -303,7 +405,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/application/go%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%E5%8D%B8%E8%BD%BD-linux%E7%B3%BB%E7%BB%9F.html" class="post-title-link" itemprop="url">go从入门到重装(linux系统)</a>
+            <a href="/go%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%E5%8D%B8%E8%BD%BD-linux%E7%B3%BB%E7%BB%9F.html" class="post-title-link" itemprop="url">go从入门到重装(linux系统)</a>
         </h2>
 
         <div class="post-meta">
@@ -320,7 +422,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-04-04 21:06:06" itemprop="dateModified" datetime="2021-04-04T21:06:06+08:00">2021-04-04</time>
+                <time title="修改时间：2021-06-18 11:56:05" itemprop="dateModified" datetime="2021-06-18T11:56:05+08:00">2021-06-18</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -328,7 +430,7 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/application/" itemprop="url" rel="index"><span itemprop="name">应用与开发</span></a>
+                  <a href="/categories/Others/" itemprop="url" rel="index"><span itemprop="name">不知道怎么分类的分类</span></a>
                 </span>
             </span>
 
@@ -360,7 +462,7 @@
           <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>我在安装配置(非本人操作)了go的linux虚拟机上，尝试用 <code>$ go get github.com/astaxie/beego</code> 获取beego框架。但是，却出现了一个奇怪的错误： <code>go: cannot find main module; see &#39;go help modules&#39;</code> ，怎么查询都没有找到问题原因。这对于一个刚接触go和linux的新手来说，是手足无措的。于是，心生一计，卸载重装。</p>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/application/go%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%E5%8D%B8%E8%BD%BD-linux%E7%B3%BB%E7%BB%9F.html#more" rel="contents">
+              <a class="btn" href="/go%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%E5%8D%B8%E8%BD%BD-linux%E7%B3%BB%E7%BB%9F.html#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -384,7 +486,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://99mycql.github.io/cs/%E5%9B%BE.html">
+    <link itemprop="mainEntityOfPage" href="https://99mycql.github.io/%E5%9B%BE.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/githubAvatar.jpg">
@@ -398,7 +500,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/cs/%E5%9B%BE.html" class="post-title-link" itemprop="url">图-离散数学</a>
+            <a href="/%E5%9B%BE.html" class="post-title-link" itemprop="url">图-离散数学</a>
         </h2>
 
         <div class="post-meta">
@@ -415,7 +517,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-04-04 21:06:06" itemprop="dateModified" datetime="2021-04-04T21:06:06+08:00">2021-04-04</time>
+                <time title="修改时间：2021-06-17 18:24:39" itemprop="dateModified" datetime="2021-06-17T18:24:39+08:00">2021-06-17</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -423,7 +525,11 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/cs/" itemprop="url" rel="index"><span itemprop="name">计算机基础</span></a>
+                  <a href="/categories/Base/" itemprop="url" rel="index"><span itemprop="name">九层之台，起于累土</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Base/Math/" itemprop="url" rel="index"><span itemprop="name">数学</span></a>
                 </span>
             </span>
 
@@ -457,7 +563,7 @@
 <p>由 V E 构成的二元组 &lt;V, E&gt; 就是图，无向图称为 G ，有向图称为 D 。</p>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/cs/%E5%9B%BE.html#more" rel="contents">
+              <a class="btn" href="/%E5%9B%BE.html#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -481,7 +587,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://99mycql.github.io/language/javascript%E5%9F%BA%E7%A1%80%E8%AF%AD%E6%B3%95%E5%AD%A6%E4%B9%A0.html">
+    <link itemprop="mainEntityOfPage" href="https://99mycql.github.io/javascript%E5%9F%BA%E7%A1%80%E8%AF%AD%E6%B3%95%E5%AD%A6%E4%B9%A0.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/githubAvatar.jpg">
@@ -495,7 +601,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/language/javascript%E5%9F%BA%E7%A1%80%E8%AF%AD%E6%B3%95%E5%AD%A6%E4%B9%A0.html" class="post-title-link" itemprop="url">javascript基础语法学习</a>
+            <a href="/javascript%E5%9F%BA%E7%A1%80%E8%AF%AD%E6%B3%95%E5%AD%A6%E4%B9%A0.html" class="post-title-link" itemprop="url">javascript基础语法学习</a>
         </h2>
 
         <div class="post-meta">
@@ -512,7 +618,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-04-04 21:06:06" itemprop="dateModified" datetime="2021-04-04T21:06:06+08:00">2021-04-04</time>
+                <time title="修改时间：2021-06-18 11:58:47" itemprop="dateModified" datetime="2021-06-18T11:58:47+08:00">2021-06-18</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -520,7 +626,11 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/language/" itemprop="url" rel="index"><span itemprop="name">程序设计基础</span></a>
+                  <a href="/categories/Base/" itemprop="url" rel="index"><span itemprop="name">九层之台，起于累土</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Base/Language/" itemprop="url" rel="index"><span itemprop="name">程序设计语言</span></a>
                 </span>
             </span>
 
@@ -553,7 +663,7 @@
 <p>其中加入了一些<code>ES6</code>的特性。</p>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/language/javascript%E5%9F%BA%E7%A1%80%E8%AF%AD%E6%B3%95%E5%AD%A6%E4%B9%A0.html#more" rel="contents">
+              <a class="btn" href="/javascript%E5%9F%BA%E7%A1%80%E8%AF%AD%E6%B3%95%E5%AD%A6%E4%B9%A0.html#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -577,7 +687,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://99mycql.github.io/application/vueJs%E5%85%A5%E9%97%A8.html">
+    <link itemprop="mainEntityOfPage" href="https://99mycql.github.io/vueJs%E5%85%A5%E9%97%A8.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/githubAvatar.jpg">
@@ -591,7 +701,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/application/vueJs%E5%85%A5%E9%97%A8.html" class="post-title-link" itemprop="url">vueJs入门</a>
+            <a href="/vueJs%E5%85%A5%E9%97%A8.html" class="post-title-link" itemprop="url">vueJs入门</a>
         </h2>
 
         <div class="post-meta">
@@ -608,7 +718,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-04-13 14:53:31" itemprop="dateModified" datetime="2021-04-13T14:53:31+08:00">2021-04-13</time>
+                <time title="修改时间：2021-06-18 15:03:26" itemprop="dateModified" datetime="2021-06-18T15:03:26+08:00">2021-06-18</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -616,7 +726,11 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/application/" itemprop="url" rel="index"><span itemprop="name">应用与开发</span></a>
+                  <a href="/categories/Dev/" itemprop="url" rel="index"><span itemprop="name">不想开滴滴的外卖骑手不是好码农</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Dev/Frontend/" itemprop="url" rel="index"><span itemprop="name">前端</span></a>
                 </span>
             </span>
 
@@ -650,7 +764,7 @@
 <p>（3）安装vue和vue-cli，控制台分别输入：<code>cnpm install -g vue</code> 和 <code>cnpm install -g vue-cli</code> 。（由于新版的vue-cli已经集成了webpack 所以下载了这个脚手架之后就不需要在下载webpack了）</p>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/application/vueJs%E5%85%A5%E9%97%A8.html#more" rel="contents">
+              <a class="btn" href="/vueJs%E5%85%A5%E9%97%A8.html#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -674,7 +788,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://99mycql.github.io/application/vueJs%E8%AF%B7%E6%B1%82%E6%8E%A5%E5%8F%A3%E8%8E%B7%E5%8F%96%E6%95%B0%E6%8D%AE%E7%9A%84%E5%AE%9E%E7%8E%B0%E5%8F%8A%E9%97%AE%E9%A2%98.html">
+    <link itemprop="mainEntityOfPage" href="https://99mycql.github.io/vueJs%E8%AF%B7%E6%B1%82%E6%8E%A5%E5%8F%A3%E8%8E%B7%E5%8F%96%E6%95%B0%E6%8D%AE%E7%9A%84%E5%AE%9E%E7%8E%B0%E5%8F%8A%E9%97%AE%E9%A2%98.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/githubAvatar.jpg">
@@ -688,7 +802,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/application/vueJs%E8%AF%B7%E6%B1%82%E6%8E%A5%E5%8F%A3%E8%8E%B7%E5%8F%96%E6%95%B0%E6%8D%AE%E7%9A%84%E5%AE%9E%E7%8E%B0%E5%8F%8A%E9%97%AE%E9%A2%98.html" class="post-title-link" itemprop="url">vue请求接口获取数据及跨域问题</a>
+            <a href="/vueJs%E8%AF%B7%E6%B1%82%E6%8E%A5%E5%8F%A3%E8%8E%B7%E5%8F%96%E6%95%B0%E6%8D%AE%E7%9A%84%E5%AE%9E%E7%8E%B0%E5%8F%8A%E9%97%AE%E9%A2%98.html" class="post-title-link" itemprop="url">vue请求接口获取数据及跨域问题</a>
         </h2>
 
         <div class="post-meta">
@@ -705,7 +819,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-04-04 21:06:06" itemprop="dateModified" datetime="2021-04-04T21:06:06+08:00">2021-04-04</time>
+                <time title="修改时间：2021-06-18 15:03:23" itemprop="dateModified" datetime="2021-06-18T15:03:23+08:00">2021-06-18</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -713,7 +827,11 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/application/" itemprop="url" rel="index"><span itemprop="name">应用与开发</span></a>
+                  <a href="/categories/Dev/" itemprop="url" rel="index"><span itemprop="name">不想开滴滴的外卖骑手不是好码农</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Dev/Frontend/" itemprop="url" rel="index"><span itemprop="name">前端</span></a>
                 </span>
             </span>
 
@@ -723,7 +841,7 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>5k</span>
+              <span>5.1k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
@@ -753,7 +871,7 @@
 <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> VueSource <span class="keyword">from</span> <span class="string">'vue-source'</span></span><br><span class="line"></span><br><span class="line">Vue.use(VueSource)</span><br></pre></td></tr></table></figure>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/application/vueJs%E8%AF%B7%E6%B1%82%E6%8E%A5%E5%8F%A3%E8%8E%B7%E5%8F%96%E6%95%B0%E6%8D%AE%E7%9A%84%E5%AE%9E%E7%8E%B0%E5%8F%8A%E9%97%AE%E9%A2%98.html#more" rel="contents">
+              <a class="btn" href="/vueJs%E8%AF%B7%E6%B1%82%E6%8E%A5%E5%8F%A3%E8%8E%B7%E5%8F%96%E6%95%B0%E6%8D%AE%E7%9A%84%E5%AE%9E%E7%8E%B0%E5%8F%8A%E9%97%AE%E9%A2%98.html#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -777,7 +895,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://99mycql.github.io/application/css%E5%AE%9E%E8%B7%B5%E4%B8%AD%E7%9A%84%E4%B8%80%E4%BA%9B%E9%97%AE%E9%A2%98.html">
+    <link itemprop="mainEntityOfPage" href="https://99mycql.github.io/css%E5%AE%9E%E8%B7%B5%E4%B8%AD%E7%9A%84%E4%B8%80%E4%BA%9B%E9%97%AE%E9%A2%98.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/githubAvatar.jpg">
@@ -791,7 +909,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/application/css%E5%AE%9E%E8%B7%B5%E4%B8%AD%E7%9A%84%E4%B8%80%E4%BA%9B%E9%97%AE%E9%A2%98.html" class="post-title-link" itemprop="url">css实践总结</a>
+            <a href="/css%E5%AE%9E%E8%B7%B5%E4%B8%AD%E7%9A%84%E4%B8%80%E4%BA%9B%E9%97%AE%E9%A2%98.html" class="post-title-link" itemprop="url">css实践总结</a>
         </h2>
 
         <div class="post-meta">
@@ -808,7 +926,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-04-04 21:06:06" itemprop="dateModified" datetime="2021-04-04T21:06:06+08:00">2021-04-04</time>
+                <time title="修改时间：2021-06-17 20:33:06" itemprop="dateModified" datetime="2021-06-17T20:33:06+08:00">2021-06-17</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -816,7 +934,11 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/application/" itemprop="url" rel="index"><span itemprop="name">应用与开发</span></a>
+                  <a href="/categories/Dev/" itemprop="url" rel="index"><span itemprop="name">不想开滴滴的外卖骑手不是好码农</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Dev/Frontend/" itemprop="url" rel="index"><span itemprop="name">前端</span></a>
                 </span>
             </span>
 
@@ -848,7 +970,7 @@
           <h3 id="1-块元素-如div-独占一行"><a href="#1-块元素-如div-独占一行" class="headerlink" title="1. 块元素(如div)独占一行"></a>1. 块元素(如div)独占一行</h3><h4 id="1-1-问题"><a href="#1-1-问题" class="headerlink" title="1.1. 问题"></a>1.1. 问题</h4><p>当笔者最初接触div盒模型来给界面进行布局时，遇到过这样一个问题：</p>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/application/css%E5%AE%9E%E8%B7%B5%E4%B8%AD%E7%9A%84%E4%B8%80%E4%BA%9B%E9%97%AE%E9%A2%98.html#more" rel="contents">
+              <a class="btn" href="/css%E5%AE%9E%E8%B7%B5%E4%B8%AD%E7%9A%84%E4%B8%80%E4%BA%9B%E9%97%AE%E9%A2%98.html#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -872,7 +994,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://99mycql.github.io/cs/%E5%9B%BE%E7%9A%84%E6%9C%80%E5%B0%8F%E7%94%9F%E6%88%90%E6%A0%91%E7%AE%97%E6%B3%95.html">
+    <link itemprop="mainEntityOfPage" href="https://99mycql.github.io/%E5%9B%BE%E7%9A%84%E6%9C%80%E5%B0%8F%E7%94%9F%E6%88%90%E6%A0%91%E7%AE%97%E6%B3%95.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/githubAvatar.jpg">
@@ -886,7 +1008,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/cs/%E5%9B%BE%E7%9A%84%E6%9C%80%E5%B0%8F%E7%94%9F%E6%88%90%E6%A0%91%E7%AE%97%E6%B3%95.html" class="post-title-link" itemprop="url">图的最小生成树算法</a>
+            <a href="/%E5%9B%BE%E7%9A%84%E6%9C%80%E5%B0%8F%E7%94%9F%E6%88%90%E6%A0%91%E7%AE%97%E6%B3%95.html" class="post-title-link" itemprop="url">图的最小生成树算法</a>
         </h2>
 
         <div class="post-meta">
@@ -903,7 +1025,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-04-04 21:06:06" itemprop="dateModified" datetime="2021-04-04T21:06:06+08:00">2021-04-04</time>
+                <time title="修改时间：2021-06-17 18:25:45" itemprop="dateModified" datetime="2021-06-17T18:25:45+08:00">2021-06-17</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -911,7 +1033,11 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/cs/" itemprop="url" rel="index"><span itemprop="name">计算机基础</span></a>
+                  <a href="/categories/Base/" itemprop="url" rel="index"><span itemprop="name">九层之台，起于累土</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Base/DataStructure-Algorithm/" itemprop="url" rel="index"><span itemprop="name">数据结构与算法</span></a>
                 </span>
             </span>
 
@@ -944,7 +1070,7 @@
 <h3 id="1-最小生成树"><a href="#1-最小生成树" class="headerlink" title="1. 最小生成树"></a>1. 最小生成树</h3><p>什么是最小生成树？<del>一个<strong>连通图</strong>的极小连通子图</del> 对不起，请先学好黄老师的离散数学。</p>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/cs/%E5%9B%BE%E7%9A%84%E6%9C%80%E5%B0%8F%E7%94%9F%E6%88%90%E6%A0%91%E7%AE%97%E6%B3%95.html#more" rel="contents">
+              <a class="btn" href="/%E5%9B%BE%E7%9A%84%E6%9C%80%E5%B0%8F%E7%94%9F%E6%88%90%E6%A0%91%E7%AE%97%E6%B3%95.html#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -968,7 +1094,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://99mycql.github.io/cs/%E9%80%92%E5%BD%92%E4%B8%8E%E9%9D%9E%E9%80%92%E5%BD%92%E7%9A%84%E8%BD%AC%E6%8D%A2.html">
+    <link itemprop="mainEntityOfPage" href="https://99mycql.github.io/%E9%80%92%E5%BD%92%E4%B8%8E%E9%9D%9E%E9%80%92%E5%BD%92%E7%9A%84%E8%BD%AC%E6%8D%A2.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/githubAvatar.jpg">
@@ -982,7 +1108,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/cs/%E9%80%92%E5%BD%92%E4%B8%8E%E9%9D%9E%E9%80%92%E5%BD%92%E7%9A%84%E8%BD%AC%E6%8D%A2.html" class="post-title-link" itemprop="url">递归与非递归的转换（树的非递归遍历）</a>
+            <a href="/%E9%80%92%E5%BD%92%E4%B8%8E%E9%9D%9E%E9%80%92%E5%BD%92%E7%9A%84%E8%BD%AC%E6%8D%A2.html" class="post-title-link" itemprop="url">递归与非递归的转换（树的非递归遍历）</a>
         </h2>
 
         <div class="post-meta">
@@ -999,7 +1125,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-04-04 21:06:07" itemprop="dateModified" datetime="2021-04-04T21:06:07+08:00">2021-04-04</time>
+                <time title="修改时间：2021-06-15 20:43:26" itemprop="dateModified" datetime="2021-06-15T20:43:26+08:00">2021-06-15</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -1007,7 +1133,11 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/cs/" itemprop="url" rel="index"><span itemprop="name">计算机基础</span></a>
+                  <a href="/categories/Base/" itemprop="url" rel="index"><span itemprop="name">九层之台，起于累土</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Base/DataStructure-Algorithm/" itemprop="url" rel="index"><span itemprop="name">数据结构与算法</span></a>
                 </span>
             </span>
 
@@ -1044,104 +1174,7 @@
 <p>那如何快速地将一个递归程序转化为一个非递归程序呢？我想用<code>树的先、中、后序遍历</code>的求解，来简单表述我的一己之见。</p>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/cs/%E9%80%92%E5%BD%92%E4%B8%8E%E9%9D%9E%E9%80%92%E5%BD%92%E7%9A%84%E8%BD%AC%E6%8D%A2.html#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://99mycql.github.io/cs/STL%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/githubAvatar.jpg">
-      <meta itemprop="name" content="dounine">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dounine's blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/cs/STL%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0.html" class="post-title-link" itemprop="url">STL学习笔记</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2018-11-23 19:49:39" itemprop="dateCreated datePublished" datetime="2018-11-23T19:49:39+08:00">2018-11-23</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-04-13 14:49:43" itemprop="dateModified" datetime="2021-04-13T14:49:43+08:00">2021-04-13</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/cs/" itemprop="url" rel="index"><span itemprop="name">计算机基础</span></a>
-                </span>
-            </span>
-
-          <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>8.7k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>8 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="0-前言"><a href="#0-前言" class="headerlink" title="0. 前言"></a>0. 前言</h2><p>STL是C++中的一个类库，提供常用的数据结构(如栈、队列等)和算法(如排序、查找等)。</p>
-<p>灵活运用STL中的数据结构，可以帮助你有效解决很多算法问题。</p>
-<p>简单记载STL中的常用内容。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/cs/STL%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0.html#more" rel="contents">
+              <a class="btn" href="/%E9%80%92%E5%BD%92%E4%B8%8E%E9%9D%9E%E9%80%92%E5%BD%92%E7%9A%84%E8%BD%AC%E6%8D%A2.html#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -1232,20 +1265,20 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">69</span>
+          <span class="site-state-item-count">70</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-count">17</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">20</span>
+        <span class="site-state-item-count">47</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -1320,12 +1353,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">373k</span>
+    <span title="站点总字数">374k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">5:39</span>
+    <span title="站点阅读时长">5:40</span>
 </div>
   <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
   </div>
@@ -1400,59 +1433,6 @@
   
 
   
-      
-
-<script>
-  if (typeof MathJax === 'undefined') {
-    window.MathJax = {
-      loader: {
-        source: {
-          '[tex]/amsCd': '[tex]/amscd',
-          '[tex]/AMScd': '[tex]/amscd'
-        }
-      },
-      tex: {
-        inlineMath: {'[+]': [['$', '$']]},
-        tags: 'ams'
-      },
-      options: {
-        renderActions: {
-          findScript: [10, doc => {
-            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
-              const display = !!node.type.match(/; *mode=display/);
-              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
-              const text = document.createTextNode('');
-              node.parentNode.replaceChild(text, node);
-              math.start = {node: text, delim: '', n: 0};
-              math.end = {node: text, delim: '', n: 0};
-              doc.math.push(math);
-            });
-          }, '', false],
-          insertedScript: [200, () => {
-            document.querySelectorAll('mjx-container').forEach(node => {
-              let target = node.parentNode;
-              if (target.nodeName.toLowerCase() === 'li') {
-                target.parentNode.classList.add('has-jax');
-              }
-            });
-          }, '', false]
-        }
-      }
-    };
-    (function () {
-      var script = document.createElement('script');
-      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
-      script.defer = true;
-      document.head.appendChild(script);
-    })();
-  } else {
-    MathJax.startup.document.state(0);
-    MathJax.texReset();
-    MathJax.typeset();
-  }
-</script>
-
-    
 
   
 

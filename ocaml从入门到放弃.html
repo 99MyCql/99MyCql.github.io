@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.2.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/golang32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/golang16.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="baidu-site-verification" content="code-RpvRDWfflk">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" integrity="sha256-DfWjNxDkM94fVBWx1H5BMMp0Zq7luBlV8QRcSES7s+0=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"blog.dounine.live","root":"/","images":"/images","scheme":"Mist","darkmode":false,"version":"8.11.1","exturl":false,"sidebar":{"position":"right","display":"always","padding":18,"offset":12},"copycode":{"enable":true,"style":"flat"},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":"gitalk","storage":true,"lazyload":false,"nav":null,"activeClass":"gitalk"},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="[TOC] 0. 前言学习函数式语言">
+<meta property="og:type" content="article">
+<meta property="og:title" content="OCaml从入门到放弃">
+<meta property="og:url" content="https://blog.dounine.live/ocaml%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%E6%94%BE%E5%BC%83.html">
+<meta property="og:site_name" content="dounine&#39;s blog">
+<meta property="og:description" content="[TOC] 0. 前言学习函数式语言">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-01-04T05:28:47.000Z">
+<meta property="article:modified_time" content="2020-01-04T05:28:47.000Z">
+<meta property="article:author" content="dounine">
+<meta property="article:tag" content="OCaml">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://blog.dounine.live/ocaml%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%E6%94%BE%E5%BC%83.html">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://blog.dounine.live/ocaml%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%E6%94%BE%E5%BC%83.html","path":"ocaml从入门到放弃.html","title":"OCaml从入门到放弃"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>OCaml从入门到放弃 | dounine's blog</title>
+  
+
+  <script src="/js/third-party/analytics/baidu-analytics.js"></script>
+  <script async src="https://hm.baidu.com/hm.js?66c7065aa71681df47eb23eff557978b"></script>
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">dounine's blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">18</span></a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">48</span></a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">75</span></a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#0-%E5%89%8D%E8%A8%80"><span class="nav-text">0. 前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E6%B3%A8%E9%87%8A%E4%B8%8E%E8%BE%93%E5%85%A5%E8%BE%93%E5%87%BA"><span class="nav-text">1. 注释与输入输出</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E7%BC%96%E8%AF%91%E4%B8%8E%E8%BF%90%E8%A1%8C"><span class="nav-text">2. 编译与运行</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E5%8F%98%E9%87%8F"><span class="nav-text">3. 变量</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-%E5%9F%BA%E6%9C%AC%E7%B1%BB%E5%9E%8B"><span class="nav-text">3.1. 基本类型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-let-%E5%AE%9A%E4%B9%89"><span class="nav-text">3.2. let 定义</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-3-%E5%A4%9A%E6%80%81%E7%B1%BB%E5%9E%8B"><span class="nav-text">3.3. 多态类型</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-%E8%A1%A8%E8%BE%BE%E5%BC%8F"><span class="nav-text">4. 表达式</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-1-%E7%AE%97%E6%9C%AF%E8%BF%90%E7%AE%97"><span class="nav-text">4.1. 算术运算</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-%E9%80%BB%E8%BE%91%E8%BF%90%E7%AE%97"><span class="nav-text">4.2. 逻辑运算</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-3-%E6%AF%94%E8%BE%83%E8%BF%90%E7%AE%97"><span class="nav-text">4.3. 比较运算</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-4-%E4%BD%8D%E8%BF%90%E7%AE%97"><span class="nav-text">4.4. 位运算</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-5-if-%E8%A1%A8%E8%BE%BE%E5%BC%8F"><span class="nav-text">4.5. if 表达式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-6-while-%E8%A1%A8%E8%BE%BE%E5%BC%8F"><span class="nav-text">4.6. while 表达式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-7-%E6%A8%A1%E5%BC%8F%E5%8C%B9%E9%85%8D%E8%A1%A8%E8%BE%BE%E5%BC%8F"><span class="nav-text">4.7. 模式匹配表达式</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-%E5%87%BD%E6%95%B0"><span class="nav-text">5. 函数</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#5-1-%E7%AE%80%E5%8D%95%E5%87%BD%E6%95%B0"><span class="nav-text">5.1. 简单函数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-2-function-%E5%92%8C-fun"><span class="nav-text">5.2. function 和 fun</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-3-%E9%AB%98%E9%98%B6%E5%87%BD%E6%95%B0"><span class="nav-text">5.3. 高阶函数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-4-%E9%80%92%E5%BD%92%E5%87%BD%E6%95%B0"><span class="nav-text">5.4. 递归函数</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84"><span class="nav-text">6. 数据结构</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#6-1-%E7%B1%BB%E5%9E%8B%E7%9A%84%E6%98%BE%E5%BC%8F%E5%AE%9A%E4%B9%89-type"><span class="nav-text">6.1. 类型的显式定义(type)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-2-%E5%85%83%E7%BB%84%E7%B1%BB%E5%9E%8B-tuple"><span class="nav-text">6.2. 元组类型(tuple)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-3-%E8%AE%B0%E5%BD%95%E7%B1%BB%E5%9E%8B-%E7%BB%93%E6%9E%84%E4%BD%93-record"><span class="nav-text">6.3. 记录类型(结构体 record)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-4-%E8%81%94%E5%90%88%E7%B1%BB%E5%9E%8B-x2F-%E5%8F%98%E4%BD%93-%E5%8A%A0%E5%BC%BA%E7%89%88-union"><span class="nav-text">6.4. 联合类型&#x2F;变体(加强版 union)</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#6-4-1-%E6%97%A0%E5%8F%82%E6%9E%84%E9%80%A0%E5%AD%90-%E6%9E%9A%E4%B8%BE%E7%B1%BB%E5%9E%8B"><span class="nav-text">6.4.1. 无参构造子(枚举类型)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#6-4-2-%E5%B8%A6%E5%8F%82%E6%9E%84%E9%80%A0%E5%AD%90"><span class="nav-text">6.4.2. 带参构造子</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#6-4-3-%E9%80%92%E5%BD%92%E7%B1%BB%E5%9E%8B"><span class="nav-text">6.4.3. 递归类型</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#6-4-4-%E5%B8%A6%E5%A4%9A%E6%80%81%E5%8F%98%E9%87%8F%E7%9A%84%E8%81%94%E5%90%88%E7%B1%BB%E5%9E%8B"><span class="nav-text">6.4.4. 带多态变量的联合类型</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#6-4-5-%E5%A4%9A%E6%80%81%E5%8F%98%E4%BD%93"><span class="nav-text">6.4.5. 多态变体</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-5-%E8%A1%A8-list-%E4%B8%8D%E5%8F%AF%E4%BB%A5%E4%BF%AE%E6%94%B9"><span class="nav-text">6.5. 表(list 不可以修改)</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#6-5-1-%E5%88%9B%E5%BB%BA"><span class="nav-text">6.5.1. 创建</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#6-5-2-%E6%B7%BB%E5%8A%A0"><span class="nav-text">6.5.2. 添加</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#6-5-3-%E5%8F%96%E8%A1%A8%E5%A4%B4%E8%A1%A8%E5%B0%BE"><span class="nav-text">6.5.3. 取表头表尾</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-6-%E6%B1%87%E6%80%BB"><span class="nav-text">6.6. 汇总</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-%E6%A8%A1%E5%9D%97"><span class="nav-text">7. 模块</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#7-1-%E6%96%87%E4%BB%B6%E5%8D%B3%E6%A8%A1%E5%9D%97"><span class="nav-text">7.1. 文件即模块</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-2-%E6%8E%A5%E5%8F%A3%E5%92%8C%E6%A8%A1%E5%9D%97%E5%AE%9A%E4%B9%89"><span class="nav-text">7.2. 接口和模块定义</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#8-%E5%91%BD%E4%BB%A4%E5%BC%8F%E7%A8%8B%E5%BA%8F%E8%AE%BE%E8%AE%A1"><span class="nav-text">8. 命令式程序设计</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#8-1-%E5%8F%AF%E6%9B%B4%E6%94%B9%E5%8F%98%E9%87%8F"><span class="nav-text">8.1. 可更改变量</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#8-2-%E5%8F%AF%E6%9B%B4%E6%94%B9%E8%AE%B0%E5%BD%95"><span class="nav-text">8.2. 可更改记录</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#8-3-%E5%8F%AF%E4%BF%AE%E6%94%B9%E7%9A%84%E6%95%B0%E7%BB%84-Array"><span class="nav-text">8.3. 可修改的数组(Array)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#8-4-for%E5%BE%AA%E7%8E%AF"><span class="nav-text">8.4. for循环</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="dounine"
+      src="https://avatars.githubusercontent.com/u/41814469?s=400&u=48bf60a3428a3cb86a84a110c8688930cf6ceb08&v=4">
+  <p class="site-author-name" itemprop="name">dounine</p>
+  <div class="site-description" itemprop="description">回首向来萧瑟处</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">75</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">18</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">48</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/99MyCql" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;99MyCql" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+
+  <div class="links-of-blogroll site-overview-item animated">
+    <div class="links-of-blogroll-title"><i class="fa fa-globe fa-fw"></i>
+      Links
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://bkfish.gitee.io/" title="https:&#x2F;&#x2F;bkfish.gitee.io&#x2F;" rel="noopener" target="_blank">Kitty萌新的卧室</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://hitworld.github.io/" title="https:&#x2F;&#x2F;hitworld.github.io&#x2F;" rel="noopener" target="_blank">hirworld</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://wyjoutstanding.github.io/" title="https:&#x2F;&#x2F;wyjoutstanding.github.io&#x2F;" rel="noopener" target="_blank">wyjoutstanding</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://iwtf.github.io/" title="https:&#x2F;&#x2F;iwtf.github.io&#x2F;" rel="noopener" target="_blank">IWTF</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://wood1314.github.io/" title="https:&#x2F;&#x2F;wood1314.github.io&#x2F;" rel="noopener" target="_blank">wood</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://desperadoccy.github.io/" title="https:&#x2F;&#x2F;desperadoccy.github.io&#x2F;" rel="noopener" target="_blank">desperadoccy</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://doudouqaq.github.io/" title="https:&#x2F;&#x2F;doudouqaq.github.io&#x2F;" rel="noopener" target="_blank">doudouqaq</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://kylinnnnn.github.io/" title="https:&#x2F;&#x2F;kylinnnnn.github.io&#x2F;" rel="noopener" target="_blank">kylinnnnn</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://miaotony.xyz/" title="https:&#x2F;&#x2F;miaotony.xyz" rel="noopener" target="_blank">miaotony</a>
+        </li>
+    </ul>
+  </div>
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://github.com/99MyCql" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.dounine.live/ocaml%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%E6%94%BE%E5%BC%83.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://avatars.githubusercontent.com/u/41814469?s=400&u=48bf60a3428a3cb86a84a110c8688930cf6ceb08&v=4">
+      <meta itemprop="name" content="dounine">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dounine's blog">
+      <meta itemprop="description" content="回首向来萧瑟处">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="OCaml从入门到放弃 | dounine's blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          OCaml从入门到放弃
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-01-04 13:28:47" itemprop="dateCreated datePublished" datetime="2020-01-04T13:28:47+08:00">2020-01-04</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Base/" itemprop="url" rel="index"><span itemprop="name">九层之台，起于累土</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Base/Language/" itemprop="url" rel="index"><span itemprop="name">程序设计语言</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p>[TOC]</p>
+<h2 id="0-前言"><a href="#0-前言" class="headerlink" title="0. 前言"></a>0. 前言</h2><p>学习函数式语言</p>
+<span id="more"></span>
+
+<h2 id="1-注释与输入输出"><a href="#1-注释与输入输出" class="headerlink" title="1. 注释与输入输出"></a>1. 注释与输入输出</h2><p>OCaml注释如下：</p>
+<figure class="highlight ocaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">(* hello world *)</span></span><br></pre></td></tr></table></figure>
+
+<p>输入输出如下：</p>
+<ul>
+<li><p>输入</p>
+<ul>
+<li><code>read_int()</code>: 读入一个整数</li>
+<li><code>read_float()</code>: 读入一个浮点数</li>
+<li><code>read_line()</code>: 读入一个字符串</li>
+</ul>
+</li>
+<li><p>输出</p>
+<ul>
+<li><code>print_char &#39;a&#39;</code>: 打印字符</li>
+<li><code>print_int 2</code>: 打印数字</li>
+<li><code>print_float 3.4</code>: 打印浮点数</li>
+<li><code>print_newline()</code>: 打印换行</li>
+<li><code>print_string &quot;hello world&quot;</code>: 打印字符串</li>
+<li><code>print_endline &quot;hello world&quot;</code>: 打印字符串，并换行</li>
+<li><code>Printf.printf &quot;int %i, float %f, char %c, string %s\n&quot; 3 3.2 &#39;a&#39; &quot;ok&quot;;;</code>: 打印格式化字符串</li>
+</ul>
+</li>
+</ul>
+<p>(注：OCaml中的函数调用：不需要括号，除非无参数时才需要；各参数之间用空格隔开。)</p>
+<h2 id="2-编译与运行"><a href="#2-编译与运行" class="headerlink" title="2. 编译与运行"></a>2. 编译与运行</h2><p>OCaml代码文件以<code>.ml</code>结尾。</p>
+<ul>
+<li>解释运行：<code>ocaml xxx.ml</code></li>
+<li>编译运行<ul>
+<li>编译生成可重定位文件：<ul>
+<li>字节码：<code>ocamlc -c xxx.ml -o xxx.cmo</code></li>
+<li>目标码：<code>ocamlc -c xxx.ml -o xxx.o</code></li>
+</ul>
+</li>
+<li>链接生成目标文件：<code>ocamlc -o xxx xxx.cmo</code></li>
+<li>直接生成目标文件：<ul>
+<li>字节码：<code>ocamlc -o xxx xxx.ml</code></li>
+<li>目标码：<code>ocamlopt -o xxx xxx.ml</code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="3-变量"><a href="#3-变量" class="headerlink" title="3. 变量"></a>3. 变量</h2><p>变量名开头字母不能大写，若大写则会被当作联合类型中的构造子。</p>
+<h3 id="3-1-基本类型"><a href="#3-1-基本类型" class="headerlink" title="3.1. 基本类型"></a>3.1. 基本类型</h3><ul>
+<li><code>int</code>: 整数类型</li>
+<li><code>float</code>: 浮点类型，浮点常数必须带小数点<code>.</code>，否则会被视为<code>int</code>类型</li>
+<li><code>char</code>: 字符类型</li>
+<li><code>string</code>: 字符串类型</li>
+<li><code>unit</code>: 啥都不是类型</li>
+</ul>
+<p>在OCaml中，没有强制类型转换，整型只能与整型变量做运算。</p>
+<p>若要类型转换，需使用相应函数，如下：</p>
+<ul>
+<li><code>float_of_int 1</code>: int &#x3D;&gt; float</li>
+<li><code>int_of_float 2.6</code>: float &#x3D;&gt; int</li>
+<li><code>int_of_string &quot;-23&quot;</code>: string &#x3D;&gt; int</li>
+<li><code>float_of_string &quot;1.2e3&quot;</code>: string &#x3D;&gt; float</li>
+<li><code>string_of_int 12</code>: int &#x3D;&gt; string</li>
+<li><code>string_of_float (-2.3)</code>: float &#x3D;&gt; string</li>
+</ul>
+<p>字符与ASCII码：</p>
+<ul>
+<li><code>int_of_char &#39;x&#39;</code>: 获取字符<code>x</code>的ASCII码值</li>
+<li><code>char_of_int 120</code>: 把ASCII码转换到字符</li>
+</ul>
+<h3 id="3-2-let-定义"><a href="#3-2-let-定义" class="headerlink" title="3.2. let 定义"></a>3.2. let 定义</h3><ul>
+<li><p><code>let &lt;变量1&gt; = &lt;表达式1&gt; and &lt;变量2&gt; = &lt;表达式2&gt;</code>: 全局定义</p>
+<ul>
+<li><strong>必须赋初值</strong></li>
+<li>可重复定义一个变量</li>
+<li>不能在表达式内部使用</li>
+</ul>
+</li>
+<li><p><code>let &lt;变量1&gt; = &lt;表达式1&gt; and &lt;变量2&gt; = &lt;表达式2&gt; in &lt;表达式3&gt;</code>: 局部定义</p>
+<ul>
+<li><strong>必须赋初值</strong></li>
+<li>可重复定义一个变量</li>
+<li>可在表达式内部使用</li>
+<li>变量1,2作用域局限于表达式3</li>
+</ul>
+</li>
+</ul>
+<p><strong>注意：let定义的变量是无法修改！！！修改需要使用命令式的方式，后文细说。</strong></p>
+<h3 id="3-3-多态类型"><a href="#3-3-多态类型" class="headerlink" title="3.3. 多态类型"></a>3.3. 多态类型</h3><h2 id="4-表达式"><a href="#4-表达式" class="headerlink" title="4. 表达式"></a>4. 表达式</h2><h3 id="4-1-算术运算"><a href="#4-1-算术运算" class="headerlink" title="4.1. 算术运算"></a>4.1. 算术运算</h3><ul>
+<li><code>(a/b) * b + (a mod b)</code>: 整型运算<code>+</code>, <code>-</code>, <code>*</code>, <code>/</code>, <code>mod</code></li>
+<li><code>4e2 *. 2. /. 3. +. 1.</code>: 浮点型运算，运算符必须带小数点<code>.</code></li>
+</ul>
+<h3 id="4-2-逻辑运算"><a href="#4-2-逻辑运算" class="headerlink" title="4.2. 逻辑运算"></a>4.2. 逻辑运算</h3><ul>
+<li><code>not true</code>: 非</li>
+<li><code>true &amp;&amp; false</code>: 与</li>
+<li><code>true || false</code>: 或</li>
+</ul>
+<h3 id="4-3-比较运算"><a href="#4-3-比较运算" class="headerlink" title="4.3. 比较运算"></a>4.3. 比较运算</h3><p><code>&gt;</code>, <code>&lt;</code>, <code>&gt;=</code>, <code>&lt;=</code>如常</p>
+<p>相等与不等：</p>
+<ul>
+<li><code>=</code> and <code>&lt;&gt;</code>: 结构化比较，对比结构内部的子元素</li>
+<li><code>==</code> and <code>!=</code>: 物理比较，比较变量在内存中的存储地址(即比较地址)</li>
+</ul>
+<p>对于非结构化数据，两种相等于不等相同。基本类型中，<strong>整型和字符</strong>是<strong>非结构化数据</strong>，<strong>浮点型和字符串</strong>都是<strong>结构化数据</strong>。</p>
+<h3 id="4-4-位运算"><a href="#4-4-位运算" class="headerlink" title="4.4. 位运算"></a>4.4. 位运算</h3><ul>
+<li><code>op1 land op2</code>: 按位与</li>
+<li><code>op1 lor op2</code>: 按位或</li>
+<li><code>op1 lxor op2</code>: 按位异或</li>
+<li><code>op1 lsl op2</code>: op1左移op2位</li>
+<li><code>op1 lsr op2</code>: op1右移op2位</li>
+<li><code>op1 asr op2</code>: op1算术右移op2位</li>
+</ul>
+<h3 id="4-5-if-表达式"><a href="#4-5-if-表达式" class="headerlink" title="4.5. if 表达式"></a>4.5. if 表达式</h3><p>格式：</p>
+<figure class="highlight ocaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> &lt;条件表达式&gt; <span class="keyword">then</span> &lt;表达式<span class="number">1</span>&gt; [ <span class="keyword">else</span> &lt;表达式<span class="number">2</span>&gt; ]</span><br></pre></td></tr></table></figure>
+
+<p>示例：</p>
+<figure class="highlight ocaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"># <span class="keyword">if</span> <span class="number">1</span>&lt;<span class="number">2</span> <span class="keyword">then</span></span><br><span class="line">    <span class="literal">true</span> &amp;&amp; <span class="literal">false</span></span><br><span class="line">  <span class="keyword">else</span></span><br><span class="line">    <span class="literal">true</span> || <span class="literal">false</span>;;</span><br><span class="line">- : <span class="built_in">bool</span> = <span class="literal">false</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="4-6-while-表达式"><a href="#4-6-while-表达式" class="headerlink" title="4.6. while 表达式"></a>4.6. while 表达式</h3><p>纯函数式语言没有循环。惊不惊喜，意不意外。</p>
+<p>需要循环完成的工作，可以通过<strong>递归函数</strong>来完成。</p>
+<h3 id="4-7-模式匹配表达式"><a href="#4-7-模式匹配表达式" class="headerlink" title="4.7. 模式匹配表达式"></a>4.7. 模式匹配表达式</h3><p>强大至极</p>
+<p>格式：</p>
+<figure class="highlight ocaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">match</span> &lt;表达式&gt; <span class="keyword">with</span></span><br><span class="line">  | &lt;模式<span class="number">1</span>&gt; [<span class="keyword">when</span> &lt;条件<span class="number">1</span>&gt;] -&gt; &lt;表达式<span class="number">1</span>&gt;  <span class="comment">(* 第一个 | 可以省略 *)</span></span><br><span class="line">  | &lt;模式<span class="number">2</span>&gt; [<span class="keyword">when</span> &lt;条件<span class="number">2</span>&gt;] -&gt; &lt;表达式<span class="number">2</span>&gt;</span><br><span class="line">    ...</span><br><span class="line">  | &lt;模式n&gt; [<span class="keyword">when</span> &lt;条件n&gt;] -&gt; &lt;表达式n&gt;</span><br></pre></td></tr></table></figure>
+
+<p>基础使用示例：</p>
+<figure class="highlight ocaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">(* 取反 *)</span></span><br><span class="line"><span class="keyword">let</span> neg x =</span><br><span class="line">  <span class="keyword">match</span> x <span class="keyword">with</span></span><br><span class="line">    | <span class="literal">true</span> -&gt; <span class="literal">false</span></span><br><span class="line">    | <span class="literal">false</span> -&gt; <span class="literal">true</span></span><br><span class="line">;;</span><br><span class="line"><span class="comment">(* 类型：val neg : bool -&gt; bool = &lt;fun&gt; *)</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">(* 是否为零 *)</span></span><br><span class="line"><span class="keyword">let</span> is_zero x =</span><br><span class="line">  <span class="keyword">match</span> x <span class="keyword">with</span></span><br><span class="line">    | <span class="number">0</span> -&gt; <span class="literal">true</span></span><br><span class="line">    | _ -&gt; <span class="literal">false</span>  <span class="comment">(* 可以使用通配符 *)</span></span><br><span class="line">;;</span><br><span class="line"><span class="comment">(* 类型：val is_zero : int -&gt; bool = &lt;fun&gt; *)</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">(* 异或 *)</span></span><br><span class="line"><span class="keyword">let</span> xor z =</span><br><span class="line">  <span class="keyword">match</span> z <span class="keyword">with</span></span><br><span class="line">      (<span class="literal">false</span>, <span class="literal">false</span>) -&gt; <span class="literal">false</span> <span class="comment">(* 第一个 | 可以省略 *)</span></span><br><span class="line">    | (<span class="literal">false</span>, <span class="literal">true</span>) -&gt; <span class="literal">true</span></span><br><span class="line">    | (<span class="literal">true</span>, <span class="literal">false</span>) -&gt; <span class="literal">true</span></span><br><span class="line">    | (<span class="literal">true</span>, <span class="literal">true</span>) -&gt; <span class="literal">false</span></span><br><span class="line">;;</span><br><span class="line"><span class="comment">(* 类型：val xor : bool * bool -&gt; bool = &lt;fun&gt; *)</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> xor x y =</span><br><span class="line">  <span class="keyword">match</span> x,y <span class="keyword">with</span></span><br><span class="line">      (<span class="literal">false</span>, u) -&gt; u     <span class="comment">(* 在模式中可以使用变量 *)</span></span><br><span class="line">    | (<span class="literal">true</span>, u) -&gt; not u</span><br><span class="line">;;</span><br><span class="line"><span class="comment">(* 类型：val xor : bool -&gt; bool -&gt; bool = &lt;fun&gt; *)</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> f (c:<span class="built_in">char</span>) : <span class="built_in">string</span> =</span><br><span class="line">  <span class="keyword">match</span> c <span class="keyword">with</span></span><br><span class="line">      <span class="string">&#x27;0&#x27;</span>..<span class="string">&#x27;9&#x27;</span> -&gt; <span class="string">&quot;digit&quot;</span>       <span class="comment">(* 可以使用 &lt;字符&gt;..&lt;字符&gt; 字符区间模式 *)</span></span><br><span class="line">    | <span class="string">&#x27;a&#x27;</span>..<span class="string">&#x27;z&#x27;</span> -&gt; <span class="string">&quot;lower char&quot;</span></span><br><span class="line">    | <span class="string">&#x27;A&#x27;</span>..<span class="string">&#x27;Z&#x27;</span> -&gt; <span class="string">&quot;upper char&quot;</span></span><br><span class="line">    | _        -&gt; <span class="string">&quot;other char&quot;</span></span><br><span class="line">;;</span><br><span class="line"><span class="comment">(* val f : char -&gt; string = &lt;fun&gt; *)</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> int_of_bool = <span class="keyword">function</span>    <span class="comment">(* function 可以直接做模式匹配，函数不带参数 *)</span></span><br><span class="line">    <span class="literal">true</span> -&gt; <span class="number">1</span></span><br><span class="line">  | <span class="literal">false</span> -&gt; <span class="number">0</span></span><br><span class="line">;;</span><br><span class="line"><span class="comment">(* val int_of_bool : bool -&gt; int = &lt;fun&gt; *)</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="5-函数"><a href="#5-函数" class="headerlink" title="5. 函数"></a>5. 函数</h2><p>First of all, 函数是变量。</p>
+<h3 id="5-1-简单函数"><a href="#5-1-简单函数" class="headerlink" title="5.1. 简单函数"></a>5.1. 简单函数</h3><ul>
+<li><p><code>let &lt;fun_name&gt; &lt;参数1&gt; &lt;参数2&gt;...&lt;参数n&gt; = &lt;表达式&gt;</code></p>
+</li>
+<li><p><code>let &lt;fun_name&gt; (&lt;参数1&gt;, &lt;参数2&gt;, ...&lt;参数n&gt;) = &lt;表达式&gt;</code>: 将多个参数合并到一个元组中</p>
+</li>
+</ul>
+<p>示例：</p>
+<figure class="highlight ocaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> add x y =</span><br><span class="line">  x + y ;;</span><br><span class="line"><span class="comment">(* 类型：val add : int -&gt; int -&gt; int = &lt;fun&gt; *)</span></span><br><span class="line"></span><br><span class="line">print_int (add <span class="number">1</span> <span class="number">2</span>) ;;  <span class="comment">(* 3- : unit = () *)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">(* 部分作用/部分求值 *)</span></span><br><span class="line"><span class="keyword">let</span> inc x =</span><br><span class="line">  add x <span class="number">1</span> ;;</span><br><span class="line"><span class="comment">(* val inc : int -&gt; int = &lt;fun&gt; *)</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">(* 将多个参数合并到一个元组中，但这种方式不能部分求值 *)</span></span><br><span class="line"><span class="keyword">let</span> plus3 (a, b, c) =</span><br><span class="line">  a + b + c ;;</span><br><span class="line"><span class="comment">(* val plus3 : int * int * int -&gt; int = &lt;fun&gt; *)</span></span><br><span class="line"></span><br><span class="line">print_int (plus3 (<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>)) ;;  <span class="comment">(* 6- : unit = () *)</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="5-2-function-和-fun"><a href="#5-2-function-和-fun" class="headerlink" title="5.2. function 和 fun"></a>5.2. function 和 fun</h3><ul>
+<li><p><code>let &lt;fun_name&gt; = function &lt;参数&gt; -&gt; &lt;表达式&gt;</code>: 只能有一个参数，可用于模式匹配</p>
+</li>
+<li><p><code>let &lt;fun_name&gt; = fun &lt;参数1&gt; &lt;参数2&gt;...&lt;参数n&gt; -&gt; &lt;表达式&gt;</code>: 多参数</p>
+</li>
+</ul>
+<h3 id="5-3-高阶函数"><a href="#5-3-高阶函数" class="headerlink" title="5.3. 高阶函数"></a>5.3. 高阶函数</h3><p>函数作参和作返回值</p>
+<h3 id="5-4-递归函数"><a href="#5-4-递归函数" class="headerlink" title="5.4. 递归函数"></a>5.4. 递归函数</h3><p>在函数名前添加<code>rec</code>关键字，指定是递归函数。</p>
+<figure class="highlight ocaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> <span class="keyword">rec</span> &lt;fun_name&gt; &lt;参数<span class="number">1</span>&gt; &lt;参数<span class="number">2</span>&gt;...&lt;参数n&gt; = &lt;表达式&gt;</span><br></pre></td></tr></table></figure>
+
+<p>示例：</p>
+<figure class="highlight ocaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">(* 普通递归 *)</span></span><br><span class="line"><span class="keyword">let</span> <span class="keyword">rec</span> factorial n =</span><br><span class="line">  <span class="keyword">if</span> n = <span class="number">0</span> <span class="keyword">then</span></span><br><span class="line">    <span class="number">1</span></span><br><span class="line">  <span class="keyword">else</span></span><br><span class="line">    n * factorial (n-<span class="number">1</span>) ;;</span><br><span class="line"><span class="comment">(* val factorial : int -&gt; int = &lt;fun&gt; *)</span></span><br></pre></td></tr></table></figure>
+
+<p>尾递归实现循环，在参数中加入辅助函数。</p>
+<figure class="highlight ocaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">(* 尾递归实现循环 *)</span></span><br><span class="line"><span class="keyword">let</span> fib n =</span><br><span class="line">  <span class="keyword">if</span> n &lt; <span class="number">3</span> <span class="keyword">then</span></span><br><span class="line">    <span class="number">0</span></span><br><span class="line">  <span class="keyword">else</span></span><br><span class="line">    <span class="keyword">let</span> <span class="keyword">rec</span> fib_tail n n_1 n_2 =</span><br><span class="line">      <span class="keyword">if</span> n = <span class="number">3</span> <span class="keyword">then</span></span><br><span class="line">        n_1+n_2</span><br><span class="line">      <span class="keyword">else</span></span><br><span class="line">        fib_tail (n-<span class="number">1</span>) (n_1+n_2) n_1</span><br><span class="line">    <span class="keyword">in</span> fib_tail n <span class="number">1</span> <span class="number">1</span></span><br><span class="line">;;</span><br><span class="line"><span class="comment">(* val fib : int -&gt; int = &lt;fun&gt; *)</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="6-数据结构"><a href="#6-数据结构" class="headerlink" title="6. 数据结构"></a>6. 数据结构</h2><h3 id="6-1-类型的显式定义-type"><a href="#6-1-类型的显式定义-type" class="headerlink" title="6.1. 类型的显式定义(type)"></a>6.1. 类型的显式定义(type)</h3><p>格式：</p>
+<figure class="highlight ocaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> [&lt;类型参数&gt;] &lt;类型标识符&gt; = &lt;类型定义表达式&gt;</span><br></pre></td></tr></table></figure>
+
+<h3 id="6-2-元组类型-tuple"><a href="#6-2-元组类型-tuple" class="headerlink" title="6.2. 元组类型(tuple)"></a>6.2. 元组类型(tuple)</h3><p>格式：</p>
+<p><code>&lt;元素1&gt;, &lt;元素2&gt;...&lt;元素n&gt;</code></p>
+<p>每个元素的类型可以不相同。</p>
+<p>元组的类型描述为：</p>
+<p><code>&lt;元素1类型&gt; * &lt;元素2类型&gt; *...&lt;元素n类型&gt;</code></p>
+<p>示例：</p>
+<figure class="highlight ocaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"># <span class="keyword">let</span> a = <span class="string">&quot;Number&quot;</span>, <span class="number">1</span>;;</span><br><span class="line"><span class="keyword">val</span> a : <span class="built_in">string</span> * <span class="built_in">int</span> = (<span class="string">&quot;Number&quot;</span>, <span class="number">1</span>)</span><br><span class="line"># <span class="keyword">let</span> b = <span class="string">&quot;pi&quot;</span>, <span class="number">3.14</span>, <span class="number">5</span> ;;</span><br><span class="line"><span class="keyword">val</span> b : <span class="built_in">string</span> * <span class="built_in">float</span> * <span class="built_in">int</span> = (<span class="string">&quot;pi&quot;</span>, <span class="number">3.14</span>, <span class="number">5</span>)</span><br><span class="line"># <span class="keyword">let</span> c = <span class="number">1</span>, (<span class="number">2</span>,<span class="number">3</span>), ((<span class="number">4</span>,<span class="number">5</span>), <span class="number">6</span>) ;;</span><br><span class="line"><span class="keyword">val</span> c : <span class="built_in">int</span> * (<span class="built_in">int</span> * <span class="built_in">int</span>) * ((<span class="built_in">int</span> * <span class="built_in">int</span>) * <span class="built_in">int</span>) = (<span class="number">1</span>, (<span class="number">2</span>, <span class="number">3</span>), ((<span class="number">4</span>, <span class="number">5</span>), <span class="number">6</span>))</span><br></pre></td></tr></table></figure>
+
+<p>只有二个元素的元组也称作<strong>对偶</strong>。</p>
+<p>函数<code>fst</code>和<code>snd</code>分别取对偶的第一个和第二个分量。</p>
+<h3 id="6-3-记录类型-结构体-record"><a href="#6-3-记录类型-结构体-record" class="headerlink" title="6.3. 记录类型(结构体 record)"></a>6.3. 记录类型(结构体 record)</h3><p>定义一个记录类型：</p>
+<figure class="highlight ocaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> &lt;类型标识符&gt; = &#123; &lt;字段名<span class="number">1</span>&gt;:&lt;类型<span class="number">1</span>&gt;; ... ; &lt;字段名n&gt;:&lt;类型n&gt; &#125;</span><br></pre></td></tr></table></figure>
+
+<p>创建一个记录类型变量：</p>
+<figure class="highlight ocaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123; &lt;字段名<span class="number">1</span>&gt; = &lt;表达式<span class="number">1</span>&gt;; ... ; &lt;字段名n&gt; = &lt;表达式n&gt; &#125;</span><br></pre></td></tr></table></figure>
+
+<p>访问记录类型中的字段：</p>
+<figure class="highlight ocaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;记录类型变量&gt;.&lt;字段名&gt;</span><br></pre></td></tr></table></figure>
+
+<p><strong>注意：上述记录类型不可修改！！！</strong></p>
+<h3 id="6-4-联合类型-x2F-变体-加强版-union"><a href="#6-4-联合类型-x2F-变体-加强版-union" class="headerlink" title="6.4. 联合类型&#x2F;变体(加强版 union)"></a>6.4. 联合类型&#x2F;变体(加强版 union)</h3><p>格式：</p>
+<figure class="highlight ocaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> [&lt;多态类型变量&gt;] &lt;类型标识符&gt; =</span><br><span class="line">  &lt;构造子名<span class="number">1</span>&gt; [<span class="keyword">of</span> &lt;参数类型<span class="number">1</span>&gt;]</span><br><span class="line">  ...</span><br><span class="line">  &lt;构造子名n&gt; [<span class="keyword">of</span> &lt;参数类型n&gt;]</span><br></pre></td></tr></table></figure>
+
+<p><strong>注：构造子名首字母必须大写</strong>。</p>
+<h4 id="6-4-1-无参构造子-枚举类型"><a href="#6-4-1-无参构造子-枚举类型" class="headerlink" title="6.4.1. 无参构造子(枚举类型)"></a>6.4.1. 无参构造子(枚举类型)</h4><p>无参构造子。类似于枚举类型，构造子能和常数或者布尔值一样使用</p>
+<p>示例：</p>
+<figure class="highlight ocaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> seasons = <span class="type">Spring</span> | <span class="type">Summer</span> | <span class="type">Autumn</span> | <span class="type">Winter</span> ;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> int_of_seasons = <span class="keyword">function</span></span><br><span class="line">    <span class="type">Spring</span> -&gt; <span class="number">1</span></span><br><span class="line">  | <span class="type">Summer</span> -&gt; <span class="number">2</span></span><br><span class="line">  | <span class="type">Autumn</span> -&gt; <span class="number">3</span></span><br><span class="line">  | <span class="type">Winter</span> -&gt; <span class="number">4</span></span><br><span class="line">;;</span><br><span class="line"><span class="comment">(* val int_of_seasons : seasons -&gt; int = &lt;fun&gt; *)</span></span><br><span class="line"></span><br><span class="line">int_of_seasons <span class="type">Autumn</span> ;;  <span class="comment">(* - : int = 3 *)</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="6-4-2-带参构造子"><a href="#6-4-2-带参构造子" class="headerlink" title="6.4.2. 带参构造子"></a>6.4.2. 带参构造子</h4><p>带参构造子。构造子相当于类型，可以用于定义变量</p>
+<p>示例：</p>
+<figure class="highlight ocaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> num = <span class="type">Int</span> <span class="keyword">of</span> <span class="built_in">int</span> | <span class="type">Float</span> <span class="keyword">of</span> <span class="built_in">float</span> ;;</span><br><span class="line"></span><br><span class="line"><span class="type">Int</span> <span class="number">3</span> ;;  <span class="comment">(* - : num = Int 3 *)</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> add_num = <span class="keyword">function</span></span><br><span class="line">    (<span class="type">Int</span> m, <span class="type">Int</span> n) -&gt; <span class="type">Int</span> (m+n)</span><br><span class="line">  | (<span class="type">Int</span> m, <span class="type">Float</span> n) -&gt; <span class="type">Float</span> ((float_of_int m) +. n)</span><br><span class="line">  | (<span class="type">Float</span> m, <span class="type">Int</span> n) -&gt; <span class="type">Float</span> (m +. (float_of_int n))</span><br><span class="line">  | (<span class="type">Float</span> m, <span class="type">Float</span> n) -&gt; <span class="type">Float</span> (m +. n)</span><br><span class="line">;;</span><br><span class="line"><span class="comment">(* val add_num : num * num -&gt; num = &lt;fun&gt; *)</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="6-4-3-递归类型"><a href="#6-4-3-递归类型" class="headerlink" title="6.4.3. 递归类型"></a>6.4.3. 递归类型</h4><p>示例，定义一个二叉树：</p>
+<figure class="highlight ocaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> inttree =</span><br><span class="line">    <span class="type">Leaf</span> <span class="keyword">of</span> <span class="built_in">int</span></span><br><span class="line">  | <span class="type">Node</span> <span class="keyword">of</span> inttree * inttree <span class="comment">(* *号表明是元组类型，不是乘号 *)</span></span><br><span class="line">;;</span><br></pre></td></tr></table></figure>
+
+<h4 id="6-4-4-带多态变量的联合类型"><a href="#6-4-4-带多态变量的联合类型" class="headerlink" title="6.4.4. 带多态变量的联合类型"></a>6.4.4. 带多态变量的联合类型</h4><h4 id="6-4-5-多态变体"><a href="#6-4-5-多态变体" class="headerlink" title="6.4.5. 多态变体"></a>6.4.5. 多态变体</h4><h3 id="6-5-表-list-不可以修改"><a href="#6-5-表-list-不可以修改" class="headerlink" title="6.5. 表(list 不可以修改)"></a>6.5. 表(list 不可以修改)</h3><p>类型描述：</p>
+<figure class="highlight ocaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;类型&gt; <span class="built_in">list</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="6-5-1-创建"><a href="#6-5-1-创建" class="headerlink" title="6.5.1. 创建"></a>6.5.1. 创建</h4><figure class="highlight ocaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[ e1; e2; ... en;]</span><br></pre></td></tr></table></figure>
+
+<p><code>ei</code>可以是变量或者常量，但类型必须相同。</p>
+<h4 id="6-5-2-添加"><a href="#6-5-2-添加" class="headerlink" title="6.5.2. 添加"></a>6.5.2. 添加</h4><p>头插：</p>
+<figure class="highlight ocaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># <span class="number">1</span>::[<span class="number">2</span>;<span class="number">3</span>];;</span><br><span class="line">- : <span class="built_in">int</span> <span class="built_in">list</span> = [<span class="number">1</span>; <span class="number">2</span>; <span class="number">3</span>]</span><br></pre></td></tr></table></figure>
+
+<p>追加：</p>
+<figure class="highlight ocaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"># <span class="type">List</span>.append [<span class="number">1</span>;<span class="number">2</span>] [<span class="number">3</span>;<span class="number">4</span>] ;;</span><br><span class="line">- : <span class="built_in">int</span> <span class="built_in">list</span> = [<span class="number">1</span>; <span class="number">2</span>; <span class="number">3</span>; <span class="number">4</span>]</span><br><span class="line"># [<span class="number">1</span>;<span class="number">2</span>] @ [<span class="number">3</span>;<span class="number">4</span>] ;;</span><br><span class="line">- : <span class="built_in">int</span> <span class="built_in">list</span> = [<span class="number">1</span>; <span class="number">2</span>; <span class="number">3</span>; <span class="number">4</span>]</span><br></pre></td></tr></table></figure>
+
+<h4 id="6-5-3-取表头表尾"><a href="#6-5-3-取表头表尾" class="headerlink" title="6.5.3. 取表头表尾"></a>6.5.3. 取表头表尾</h4><p>表头是第一个元素，表尾是除第一个元素外的子表。</p>
+<figure class="highlight ocaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"># <span class="type">List</span>.hd [<span class="number">1</span>;<span class="number">2</span>;<span class="number">3</span>] ;;</span><br><span class="line">- : <span class="built_in">int</span> = <span class="number">1</span></span><br><span class="line"># <span class="type">List</span>.tl [<span class="number">1</span>;<span class="number">2</span>;<span class="number">3</span>] ;;</span><br><span class="line">- : <span class="built_in">int</span> <span class="built_in">list</span> = [<span class="number">2</span>; <span class="number">3</span>]</span><br></pre></td></tr></table></figure>
+
+<p><strong>注意：表中元素也不可以修改！！！</strong></p>
+<h3 id="6-6-汇总"><a href="#6-6-汇总" class="headerlink" title="6.6. 汇总"></a>6.6. 汇总</h3><figure class="highlight ocaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">OCaml</span> 名字     类型定义的例子                    用法</span><br><span class="line"></span><br><span class="line"><span class="built_in">list</span>            <span class="built_in">int</span> <span class="built_in">list</span>                       [<span class="number">1</span>; <span class="number">2</span>; <span class="number">3</span>]</span><br><span class="line">tuple          <span class="built_in">int</span> * <span class="built_in">string</span>                   (<span class="number">3</span>, <span class="string">&quot;hello&quot;</span>)</span><br><span class="line">record         <span class="keyword">type</span> pair =                    &#123; a = <span class="number">3</span>; b = <span class="string">&quot;hello&quot;</span> &#125;</span><br><span class="line">                 &#123; a: <span class="built_in">int</span>; b: <span class="built_in">string</span> &#125;</span><br><span class="line">变体            <span class="keyword">type</span> foo =</span><br><span class="line">                 | <span class="type">Int</span> <span class="keyword">of</span> <span class="built_in">int</span>                 <span class="type">Int</span> <span class="number">3</span></span><br><span class="line">                 | <span class="type">Pair</span> <span class="keyword">of</span> <span class="built_in">int</span> * <span class="built_in">string</span></span><br><span class="line">变体            <span class="keyword">type</span> sign =</span><br><span class="line">                 | <span class="type">Positive</span>                   <span class="type">Positive</span></span><br><span class="line">                 | <span class="type">Zero</span>                       <span class="type">Zero</span></span><br><span class="line">                 | <span class="type">Negative</span></span><br><span class="line">参数化变体       <span class="keyword">type</span> <span class="symbol">&#x27;a</span> my_list =</span><br><span class="line">                 | <span class="type">Empty</span>                      <span class="type">Cons</span> (<span class="number">1</span>, <span class="type">Cons</span> (<span class="number">2</span>, <span class="type">Empty</span>))</span><br><span class="line">                 | <span class="type">Cons</span> <span class="keyword">of</span> <span class="symbol">&#x27;a</span> * <span class="symbol">&#x27;a</span> my_list</span><br></pre></td></tr></table></figure>
+
+<h2 id="7-模块"><a href="#7-模块" class="headerlink" title="7. 模块"></a>7. 模块</h2><h3 id="7-1-文件即模块"><a href="#7-1-文件即模块" class="headerlink" title="7.1. 文件即模块"></a>7.1. 文件即模块</h3><p>如果有一个<code>util.ml</code>文件：</p>
+<figure class="highlight ocaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">(* util.ml *)</span></span><br><span class="line"><span class="keyword">let</span> msg = <span class="string">&quot;helloworld&quot;</span> ;;</span><br><span class="line"><span class="keyword">let</span> printMsg =</span><br><span class="line">  print_endline msg</span><br><span class="line">;;</span><br></pre></td></tr></table></figure>
+
+<p>那么，可以在另一个<code>main.ml</code>文件中：</p>
+<figure class="highlight ocaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">print_endline <span class="type">Util</span>.msg ;;</span><br></pre></td></tr></table></figure>
+
+<p>调用<code>Util</code>模块(即<code>util.ml</code>文件)中的变量或者函数。</p>
+<p>如果还存在一个<code>util.mli</code>文件，那它就是<code>util.ml</code>模块的接口。未在<code>util.mli</code>中出现的变量或函数，都不能被调用。同时，<code>util.mli</code>文件需要在<code>util.ml</code>文件编译前编译，如下：</p>
+<figure class="highlight ocaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ocamlc -c util.mli -o util.cmi</span><br></pre></td></tr></table></figure>
+
+<h3 id="7-2-接口和模块定义"><a href="#7-2-接口和模块定义" class="headerlink" title="7.2. 接口和模块定义"></a>7.2. 接口和模块定义</h3><p>接口定义</p>
+<figure class="highlight ocaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">module</span> <span class="keyword">type</span> &lt;接口名&gt; =</span><br><span class="line">  <span class="keyword">sig</span></span><br><span class="line">    &lt;接口定义体&gt;</span><br><span class="line">  <span class="keyword">end</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>&lt;接口名&gt;是一个大写字母开头的标识符，&lt;接口定义体&gt;中包括了 type 定义、函数的类型描述等内容。</strong></p>
+<p>模块定义：</p>
+<figure class="highlight ocaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">module</span> &lt;模块名&gt; [:&lt;模块接口&gt;] =</span><br><span class="line">  <span class="keyword">struct</span></span><br><span class="line">    &lt;模块体&gt;</span><br><span class="line">  <span class="keyword">end</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>&lt;模块名&gt;是一个大写字母开头的标识符，&lt;模块体&gt;中包括了 type 定义和 let 定义。</strong></p>
+<h2 id="8-命令式程序设计"><a href="#8-命令式程序设计" class="headerlink" title="8. 命令式程序设计"></a>8. 命令式程序设计</h2><h3 id="8-1-可更改变量"><a href="#8-1-可更改变量" class="headerlink" title="8.1. 可更改变量"></a>8.1. 可更改变量</h3><p>定义：</p>
+<figure class="highlight ocaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> &lt;变量&gt; = <span class="built_in">ref</span> &lt;表达式&gt; ;;</span><br></pre></td></tr></table></figure>
+
+<p>引用：</p>
+<figure class="highlight ocaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">!&lt;变量&gt;</span><br></pre></td></tr></table></figure>
+
+<p>赋值：</p>
+<figure class="highlight ocaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;变量&gt; := &lt;表达式&gt;</span><br></pre></td></tr></table></figure>
+
+<h3 id="8-2-可更改记录"><a href="#8-2-可更改记录" class="headerlink" title="8.2. 可更改记录"></a>8.2. 可更改记录</h3><p>定义：</p>
+<figure class="highlight ocaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> &lt;记录类型&gt; = &#123;</span><br><span class="line">  ...</span><br><span class="line">  <span class="keyword">mutable</span> &lt;分量名&gt; : &lt;分量类型&gt;;</span><br><span class="line">  ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>赋值：</p>
+<figure class="highlight ocaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;记录&gt;.&lt;分量&gt; &lt;- &lt;表达式&gt;</span><br></pre></td></tr></table></figure>
+
+<h3 id="8-3-可修改的数组-Array"><a href="#8-3-可修改的数组-Array" class="headerlink" title="8.3. 可修改的数组(Array)"></a>8.3. 可修改的数组(Array)</h3><p>定义：</p>
+<figure class="highlight ocaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> arr = [|<span class="number">1</span>;<span class="number">2</span>;<span class="number">3</span>|] ;;</span><br></pre></td></tr></table></figure>
+
+<p>访问：</p>
+<figure class="highlight ocaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;数组&gt;.(&lt;下标&gt;) <span class="comment">(* 如：mart.(1).(2) *)</span></span><br></pre></td></tr></table></figure>
+
+<p>赋值：</p>
+<figure class="highlight ocaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;数组&gt;.(&lt;下标&gt;) &lt;- &lt;表达式&gt;</span><br></pre></td></tr></table></figure>
+
+<p>常用函数：</p>
+<figure class="highlight ocaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">Array</span>.make <span class="number">4</span> <span class="number">1</span>; <span class="comment">(* 创建长度为4的一维数组，都初始化为1 *)</span></span><br><span class="line"><span class="type">Array</span>.make_matrix <span class="number">2</span> <span class="number">3</span> <span class="number">0</span>; <span class="comment">(* 创建行为2列为3的二维数组，都初始化为0 *)</span></span><br><span class="line"><span class="type">Array</span>.length arr; <span class="comment">(* 返回数组长度 *)</span></span><br><span class="line"><span class="type">Array</span>.iter print_int [|<span class="number">1</span>;<span class="number">2</span>;<span class="number">3</span>|]; <span class="comment">(* 把一个函数作用于数组每个元素上 *)</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="8-4-for循环"><a href="#8-4-for循环" class="headerlink" title="8.4. for循环"></a>8.4. for循环</h3><figure class="highlight ocaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> &lt;变量&gt;=&lt;初始表达式&gt; <span class="keyword">to</span> &lt;终止表达式&gt; <span class="keyword">do</span></span><br><span class="line">  &lt;表达式<span class="number">1</span>&gt;;</span><br><span class="line">  ...</span><br><span class="line">  &lt;表达式n&gt;;</span><br><span class="line"><span class="keyword">done</span></span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/OCaml/" rel="tag"><i class="fa fa-tag"></i> OCaml</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC1%E7%AB%A0%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E5%92%8C%E5%9B%A0%E7%89%B9%E7%BD%91.html" rel="prev" title="《计算机网络》笔记-第1章计算机网络和因特网">
+                  <i class="fa fa-chevron-left"></i> 《计算机网络》笔记-第1章计算机网络和因特网
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/%E4%B8%AD%E6%96%AD%E4%B8%8E%E5%B9%B6%E5%8F%91.html" rel="next" title="中断、异常与并发">
+                  中断、异常与并发 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments gitalk-container"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">dounine</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/mist/" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+<script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.0/search.js" integrity="sha256-vXZMYLEqsROAXkEw93GGIvaB2ab+QW6w3+1ahD9nXXA=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">false</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.0/es5/tex-mml-chtml.js","integrity":"sha256-r+3itOMtGGjap0x+10hu6jW/gZCzxHsoKrOd7gyRSGY="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/gitalk/1.7.2/gitalk.css" integrity="sha256-AJnUHL7dBv6PGaeyPQJcgQPDjt/Hn/PvYZde1iqfp8U=" crossorigin="anonymous">
+
+<script class="next-config" data-name="gitalk" type="application/json">{"enable":true,"github_id":"99MyCql","repo":"99MyCql.github.io","client_id":"7c69ea063e9c78a72075","client_secret":"f222b18af36b2dffda7884ce5fd77bbb9172de54","admin_user":"99MyCql","distraction_free_mode":false,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token","language":"zh-CN","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/gitalk/1.7.2/gitalk.min.js","integrity":"sha256-Pmj85ojLaPOWwRtlMJwmezB/Qg8BzvJp5eTzvXaYAfA="},"path_md5":"47f0cedd5d37af0d05cedc76d4d2f5f8"}</script>
+<script src="/js/third-party/comments/gitalk.js"></script>
+
+</body>
+</html>

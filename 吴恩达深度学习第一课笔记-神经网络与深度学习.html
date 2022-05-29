@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.2.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/golang32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/golang16.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="baidu-site-verification" content="code-RpvRDWfflk">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" integrity="sha256-DfWjNxDkM94fVBWx1H5BMMp0Zq7luBlV8QRcSES7s+0=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"blog.dounine.live","root":"/","images":"/images","scheme":"Mist","darkmode":false,"version":"8.11.1","exturl":false,"sidebar":{"position":"right","display":"always","padding":18,"offset":12},"copycode":{"enable":true,"style":"flat"},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":"gitalk","storage":true,"lazyload":false,"nav":null,"activeClass":"gitalk"},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="0. 前言观看吴恩达深度学习视频的学习笔记。 此为第一课——神经网络与深度学习，共四周。 最后，B站牛逼。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="吴恩达深度学习第一课笔记 - 神经网络与深度学习">
+<meta property="og:url" content="https://blog.dounine.live/%E5%90%B4%E6%81%A9%E8%BE%BE%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E7%AC%AC%E4%B8%80%E8%AF%BE%E7%AC%94%E8%AE%B0-%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E4%B8%8E%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0.html">
+<meta property="og:site_name" content="dounine&#39;s blog">
+<meta property="og:description" content="0. 前言观看吴恩达深度学习视频的学习笔记。 此为第一课——神经网络与深度学习，共四周。 最后，B站牛逼。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://blog.dounine.live/.%5C%E5%90%B4%E6%81%A9%E8%BE%BE%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E7%AC%AC%E4%B8%80%E8%AF%BE%E7%AC%94%E8%AE%B0-%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E4%B8%8E%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%5C1-1.png">
+<meta property="og:image" content="https://blog.dounine.live/.%5C%E5%90%B4%E6%81%A9%E8%BE%BE%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E7%AC%AC%E4%B8%80%E8%AF%BE%E7%AC%94%E8%AE%B0-%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E4%B8%8E%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%5C1-3-1.png">
+<meta property="og:image" content="https://blog.dounine.live/.%5C%E5%90%B4%E6%81%A9%E8%BE%BE%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E7%AC%AC%E4%B8%80%E8%AF%BE%E7%AC%94%E8%AE%B0-%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E4%B8%8E%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%5C1-3-2.png">
+<meta property="og:image" content="https://blog.dounine.live/.%5C%E5%90%B4%E6%81%A9%E8%BE%BE%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E7%AC%AC%E4%B8%80%E8%AF%BE%E7%AC%94%E8%AE%B0-%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E4%B8%8E%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%5C1-3-3.png">
+<meta property="og:image" content="https://blog.dounine.live/.%5C%E5%90%B4%E6%81%A9%E8%BE%BE%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E7%AC%AC%E4%B8%80%E8%AF%BE%E7%AC%94%E8%AE%B0-%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E4%B8%8E%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%5C1-4-1.png">
+<meta property="og:image" content="https://blog.dounine.live/.%5C%E5%90%B4%E6%81%A9%E8%BE%BE%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E7%AC%AC%E4%B8%80%E8%AF%BE%E7%AC%94%E8%AE%B0-%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E4%B8%8E%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%5C2-1-2.png">
+<meta property="og:image" content="https://blog.dounine.live/.%5C%E5%90%B4%E6%81%A9%E8%BE%BE%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E7%AC%AC%E4%B8%80%E8%AF%BE%E7%AC%94%E8%AE%B0-%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E4%B8%8E%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%5C2-1-1.png">
+<meta property="og:image" content="https://blog.dounine.live/.%5C%E5%90%B4%E6%81%A9%E8%BE%BE%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E7%AC%AC%E4%B8%80%E8%AF%BE%E7%AC%94%E8%AE%B0-%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E4%B8%8E%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%5C2-2-1.png">
+<meta property="og:image" content="https://blog.dounine.live/.%5C%E5%90%B4%E6%81%A9%E8%BE%BE%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E7%AC%AC%E4%B8%80%E8%AF%BE%E7%AC%94%E8%AE%B0-%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E4%B8%8E%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%5C2-2-2.png">
+<meta property="og:image" content="https://blog.dounine.live/.%5C%E5%90%B4%E6%81%A9%E8%BE%BE%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E7%AC%AC%E4%B8%80%E8%AF%BE%E7%AC%94%E8%AE%B0-%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E4%B8%8E%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%5C2-3-1.png">
+<meta property="og:image" content="https://blog.dounine.live/.%5C%E5%90%B4%E6%81%A9%E8%BE%BE%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E7%AC%AC%E4%B8%80%E8%AF%BE%E7%AC%94%E8%AE%B0-%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E4%B8%8E%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%5C2-4-1.png">
+<meta property="og:image" content="https://blog.dounine.live/.%5C%E5%90%B4%E6%81%A9%E8%BE%BE%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E7%AC%AC%E4%B8%80%E8%AF%BE%E7%AC%94%E8%AE%B0-%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E4%B8%8E%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%5C2-4-2.png">
+<meta property="og:image" content="https://blog.dounine.live/.%5C%E5%90%B4%E6%81%A9%E8%BE%BE%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E7%AC%AC%E4%B8%80%E8%AF%BE%E7%AC%94%E8%AE%B0-%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E4%B8%8E%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%5C2-7-1.png">
+<meta property="og:image" content="https://blog.dounine.live/.%5C%E5%90%B4%E6%81%A9%E8%BE%BE%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E7%AC%AC%E4%B8%80%E8%AF%BE%E7%AC%94%E8%AE%B0-%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E4%B8%8E%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%5C2-8-1.png">
+<meta property="og:image" content="https://blog.dounine.live/.%5C%E5%90%B4%E6%81%A9%E8%BE%BE%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E7%AC%AC%E4%B8%80%E8%AF%BE%E7%AC%94%E8%AE%B0-%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E4%B8%8E%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%5C2-8-2.png">
+<meta property="og:image" content="https://blog.dounine.live/.%5C%E5%90%B4%E6%81%A9%E8%BE%BE%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E7%AC%AC%E4%B8%80%E8%AF%BE%E7%AC%94%E8%AE%B0-%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E4%B8%8E%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%5C2-9-1.png">
+<meta property="og:image" content="https://blog.dounine.live/.%5C%E5%90%B4%E6%81%A9%E8%BE%BE%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E7%AC%AC%E4%B8%80%E8%AF%BE%E7%AC%94%E8%AE%B0-%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E4%B8%8E%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%5C2-10-1.png">
+<meta property="og:image" content="https://blog.dounine.live/.%5C%E5%90%B4%E6%81%A9%E8%BE%BE%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E7%AC%AC%E4%B8%80%E8%AF%BE%E7%AC%94%E8%AE%B0-%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E4%B8%8E%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%5C2-11-1.png">
+<meta property="og:image" content="https://blog.dounine.live/.%5C%E5%90%B4%E6%81%A9%E8%BE%BE%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E7%AC%AC%E4%B8%80%E8%AF%BE%E7%AC%94%E8%AE%B0-%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E4%B8%8E%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%5C2-12-1.png">
+<meta property="og:image" content="https://blog.dounine.live/.%5C%E5%90%B4%E6%81%A9%E8%BE%BE%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E7%AC%AC%E4%B8%80%E8%AF%BE%E7%AC%94%E8%AE%B0-%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E4%B8%8E%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%5C2-13-1.png">
+<meta property="og:image" content="https://blog.dounine.live/.%5C%E5%90%B4%E6%81%A9%E8%BE%BE%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E7%AC%AC%E4%B8%80%E8%AF%BE%E7%AC%94%E8%AE%B0-%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E4%B8%8E%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%5C2-14-1.png">
+<meta property="og:image" content="https://blog.dounine.live/.%5C%E5%90%B4%E6%81%A9%E8%BE%BE%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E7%AC%AC%E4%B8%80%E8%AF%BE%E7%AC%94%E8%AE%B0-%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E4%B8%8E%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%5C2-18-1.png">
+<meta property="og:image" content="https://blog.dounine.live/.%5C%E5%90%B4%E6%81%A9%E8%BE%BE%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E7%AC%AC%E4%B8%80%E8%AF%BE%E7%AC%94%E8%AE%B0-%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E4%B8%8E%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%5C2-18-2.png">
+<meta property="og:image" content="https://blog.dounine.live/.%5C%E5%90%B4%E6%81%A9%E8%BE%BE%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E7%AC%AC%E4%B8%80%E8%AF%BE%E7%AC%94%E8%AE%B0-%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E4%B8%8E%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%5C3-1-1.png">
+<meta property="article:published_time" content="2020-04-14T12:57:02.000Z">
+<meta property="article:modified_time" content="2020-04-14T12:57:02.000Z">
+<meta property="article:author" content="dounine">
+<meta property="article:tag" content="深度学习">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://blog.dounine.live/.%5C%E5%90%B4%E6%81%A9%E8%BE%BE%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E7%AC%AC%E4%B8%80%E8%AF%BE%E7%AC%94%E8%AE%B0-%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E4%B8%8E%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%5C1-1.png">
+
+
+<link rel="canonical" href="https://blog.dounine.live/%E5%90%B4%E6%81%A9%E8%BE%BE%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E7%AC%AC%E4%B8%80%E8%AF%BE%E7%AC%94%E8%AE%B0-%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E4%B8%8E%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0.html">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://blog.dounine.live/%E5%90%B4%E6%81%A9%E8%BE%BE%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E7%AC%AC%E4%B8%80%E8%AF%BE%E7%AC%94%E8%AE%B0-%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E4%B8%8E%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0.html","path":"吴恩达深度学习第一课笔记-神经网络与深度学习.html","title":"吴恩达深度学习第一课笔记 - 神经网络与深度学习"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>吴恩达深度学习第一课笔记 - 神经网络与深度学习 | dounine's blog</title>
+  
+
+  <script src="/js/third-party/analytics/baidu-analytics.js"></script>
+  <script async src="https://hm.baidu.com/hm.js?66c7065aa71681df47eb23eff557978b"></script>
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">dounine's blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">18</span></a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">48</span></a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">75</span></a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#0-%E5%89%8D%E8%A8%80"><span class="nav-text">0. 前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E7%AC%AC%E4%B8%80%E5%91%A8-%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E6%A6%82%E8%AE%BA"><span class="nav-text">1. 第一周 - 深度学习概论</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-%E6%AC%A2%E8%BF%8E"><span class="nav-text">1.1. 欢迎</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-%E4%BB%80%E4%B9%88%E6%98%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C"><span class="nav-text">1.2. 什么是神经网络</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-3-%E7%94%A8%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E8%BF%9B%E8%A1%8C%E7%9B%91%E7%9D%A3%E5%AD%A6%E4%B9%A0"><span class="nav-text">1.3. 用神经网络进行监督学习</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-4-%E4%B8%BA%E4%BB%80%E4%B9%88%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E4%BC%9A%E5%85%B4%E8%B5%B7"><span class="nav-text">1.4. 为什么深度学习会兴起</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-5-%E5%85%B3%E4%BA%8E%E8%BF%99%E9%97%A8%E8%AF%BE"><span class="nav-text">1.5. 关于这门课</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-6-%E8%AF%BE%E7%A8%8B%E8%B5%84%E6%BA%90"><span class="nav-text">1.6. 课程资源</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E7%AC%AC%E4%BA%8C%E5%91%A8-%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80"><span class="nav-text">2. 第二周 - 神经网络基础</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-%E4%BA%8C%E5%88%86%E5%88%86%E7%B1%BB"><span class="nav-text">2.1. 二分分类</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-logistic-%E5%9B%9E%E5%BD%92"><span class="nav-text">2.2. logistic 回归</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-logistic-%E5%9B%9E%E5%BD%92%E6%8D%9F%E5%A4%B1%E5%87%BD%E6%95%B0"><span class="nav-text">2.3. logistic 回归损失函数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-4-%E6%A2%AF%E5%BA%A6%E4%B8%8B%E9%99%8D%E6%B3%95"><span class="nav-text">2.4. 梯度下降法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-5-%E5%AF%BC%E6%95%B0"><span class="nav-text">2.5. 导数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-6-%E6%9B%B4%E5%A4%9A%E5%AF%BC%E6%95%B0%E7%9A%84%E4%BE%8B%E5%AD%90"><span class="nav-text">2.6. 更多导数的例子</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-7-%E8%AE%A1%E7%AE%97%E5%9B%BE"><span class="nav-text">2.7. 计算图</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-8-%E8%AE%A1%E7%AE%97%E5%9B%BE%E7%9A%84%E5%AF%BC%E6%95%B0%E8%AE%A1%E7%AE%97"><span class="nav-text">2.8. 计算图的导数计算</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-9-logistics-%E5%9B%9E%E5%BD%92%E4%B8%AD%E7%9A%84%E6%A2%AF%E5%BA%A6%E4%B8%8B%E9%99%8D%E6%B3%95"><span class="nav-text">2.9. logistics 回归中的梯度下降法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-10-m-%E4%B8%AA%E6%A0%B7%E6%9C%AC%E7%9A%84%E6%A2%AF%E5%BA%A6%E4%B8%8B%E9%99%8D"><span class="nav-text">2.10. m 个样本的梯度下降</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-11-%E5%90%91%E9%87%8F%E5%8C%96"><span class="nav-text">2.11. 向量化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-12-%E5%90%91%E9%87%8F%E5%8C%96%E7%9A%84%E6%9B%B4%E5%A4%9A%E4%BE%8B%E5%AD%90"><span class="nav-text">2.12. 向量化的更多例子</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-13-%E5%90%91%E9%87%8F%E5%8C%96-logistic-%E5%9B%9E%E5%BD%92"><span class="nav-text">2.13. 向量化 logistic 回归</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-14-%E5%90%91%E9%87%8F%E5%8C%96-logistic-%E5%9B%9E%E5%BD%92%E4%B8%AD%E7%9A%84%E6%A2%AF%E5%BA%A6%E8%BE%93%E5%87%BA"><span class="nav-text">2.14. 向量化 logistic 回归中的梯度输出</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-15-python-%E4%B8%AD%E7%9A%84%E5%B9%BF%E6%92%AD"><span class="nav-text">2.15. python 中的广播</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-16-%E5%85%B3%E4%BA%8E-python-numpy-%E5%90%91%E9%87%8F%E7%9A%84%E8%AF%B4%E6%98%8E"><span class="nav-text">2.16. 关于 python_numpy 向量的说明</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-17-Jupyter-Ipython-%E7%AC%94%E8%AE%B0%E6%9C%AC%E7%9A%84%E5%BF%AB%E9%80%9F%E6%8C%87%E5%8D%97"><span class="nav-text">2.17. Jupyter Ipython 笔记本的快速指南</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-18-logistic-%E6%8D%9F%E5%A4%B1%E5%87%BD%E6%95%B0%E7%9A%84%E8%A7%A3%E9%87%8A"><span class="nav-text">2.18. logistic 损失函数的解释</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E7%AC%AC%E4%B8%89%E5%91%A8-%E6%B5%85%E5%B1%82%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C"><span class="nav-text">3. 第三周 - 浅层神经网络</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E6%A6%82%E8%A7%88"><span class="nav-text">3.1. 神经网络概览</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="dounine"
+      src="https://avatars.githubusercontent.com/u/41814469?s=400&u=48bf60a3428a3cb86a84a110c8688930cf6ceb08&v=4">
+  <p class="site-author-name" itemprop="name">dounine</p>
+  <div class="site-description" itemprop="description">回首向来萧瑟处</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">75</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">18</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">48</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/99MyCql" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;99MyCql" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+
+  <div class="links-of-blogroll site-overview-item animated">
+    <div class="links-of-blogroll-title"><i class="fa fa-globe fa-fw"></i>
+      Links
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://bkfish.gitee.io/" title="https:&#x2F;&#x2F;bkfish.gitee.io&#x2F;" rel="noopener" target="_blank">Kitty萌新的卧室</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://hitworld.github.io/" title="https:&#x2F;&#x2F;hitworld.github.io&#x2F;" rel="noopener" target="_blank">hirworld</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://wyjoutstanding.github.io/" title="https:&#x2F;&#x2F;wyjoutstanding.github.io&#x2F;" rel="noopener" target="_blank">wyjoutstanding</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://iwtf.github.io/" title="https:&#x2F;&#x2F;iwtf.github.io&#x2F;" rel="noopener" target="_blank">IWTF</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://wood1314.github.io/" title="https:&#x2F;&#x2F;wood1314.github.io&#x2F;" rel="noopener" target="_blank">wood</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://desperadoccy.github.io/" title="https:&#x2F;&#x2F;desperadoccy.github.io&#x2F;" rel="noopener" target="_blank">desperadoccy</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://doudouqaq.github.io/" title="https:&#x2F;&#x2F;doudouqaq.github.io&#x2F;" rel="noopener" target="_blank">doudouqaq</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://kylinnnnn.github.io/" title="https:&#x2F;&#x2F;kylinnnnn.github.io&#x2F;" rel="noopener" target="_blank">kylinnnnn</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://miaotony.xyz/" title="https:&#x2F;&#x2F;miaotony.xyz" rel="noopener" target="_blank">miaotony</a>
+        </li>
+    </ul>
+  </div>
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://github.com/99MyCql" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.dounine.live/%E5%90%B4%E6%81%A9%E8%BE%BE%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E7%AC%AC%E4%B8%80%E8%AF%BE%E7%AC%94%E8%AE%B0-%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E4%B8%8E%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://avatars.githubusercontent.com/u/41814469?s=400&u=48bf60a3428a3cb86a84a110c8688930cf6ceb08&v=4">
+      <meta itemprop="name" content="dounine">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dounine's blog">
+      <meta itemprop="description" content="回首向来萧瑟处">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="吴恩达深度学习第一课笔记 - 神经网络与深度学习 | dounine's blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          吴恩达深度学习第一课笔记 - 神经网络与深度学习
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-04-14 20:57:02" itemprop="dateCreated datePublished" datetime="2020-04-14T20:57:02+08:00">2020-04-14</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Pro/" itemprop="url" rel="index"><span itemprop="name">欲穷千里目，更上一层楼</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Pro/AI/" itemprop="url" rel="index"><span itemprop="name">人工智能</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h2 id="0-前言"><a href="#0-前言" class="headerlink" title="0. 前言"></a>0. 前言</h2><p>观看吴恩达深度学习视频的学习笔记。</p>
+<p>此为第一课——神经网络与深度学习，共四周。</p>
+<p>最后，B站牛逼。</p>
+<span id="more"></span>
+
+<h2 id="1-第一周-深度学习概论"><a href="#1-第一周-深度学习概论" class="headerlink" title="1. 第一周 - 深度学习概论"></a>1. 第一周 - 深度学习概论</h2><h3 id="1-1-欢迎"><a href="#1-1-欢迎" class="headerlink" title="1.1. 欢迎"></a>1.1. 欢迎</h3><p>课程简介，共5课：</p>
+<p><img src="/.%5C%E5%90%B4%E6%81%A9%E8%BE%BE%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E7%AC%AC%E4%B8%80%E8%AF%BE%E7%AC%94%E8%AE%B0-%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E4%B8%8E%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%5C1-1.png" alt="1-1"></p>
+<h3 id="1-2-什么是神经网络"><a href="#1-2-什么是神经网络" class="headerlink" title="1.2. 什么是神经网络"></a>1.2. 什么是神经网络</h3><p>略</p>
+<h3 id="1-3-用神经网络进行监督学习"><a href="#1-3-用神经网络进行监督学习" class="headerlink" title="1.3. 用神经网络进行监督学习"></a>1.3. 用神经网络进行监督学习</h3><p>神经网络在监督学习中的应用：</p>
+<p><img src="/.%5C%E5%90%B4%E6%81%A9%E8%BE%BE%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E7%AC%AC%E4%B8%80%E8%AF%BE%E7%AC%94%E8%AE%B0-%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E4%B8%8E%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%5C1-3-1.png" alt="1-3-1"></p>
+<p>几种神经网络的图例：</p>
+<ul>
+<li><code>Standard NN</code>：标准神经网络</li>
+<li><code>Convolution NN(CNN)</code>：卷积神经网络</li>
+<li><code>Recurrent NN(RNN)</code>：递归神经网络</li>
+</ul>
+<p><img src="/.%5C%E5%90%B4%E6%81%A9%E8%BE%BE%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E7%AC%AC%E4%B8%80%E8%AF%BE%E7%AC%94%E8%AE%B0-%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E4%B8%8E%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%5C1-3-2.png" alt="1-3-2"></p>
+<p>结构化数据（数据库数据）与非结构化数据（音频、图片、文字）：</p>
+<p><img src="/.%5C%E5%90%B4%E6%81%A9%E8%BE%BE%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E7%AC%AC%E4%B8%80%E8%AF%BE%E7%AC%94%E8%AE%B0-%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E4%B8%8E%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%5C1-3-3.png" alt="1-3-3"></p>
+<h3 id="1-4-为什么深度学习会兴起"><a href="#1-4-为什么深度学习会兴起" class="headerlink" title="1.4. 为什么深度学习会兴起"></a>1.4. 为什么深度学习会兴起</h3><p>当训练集较小时，各算法难分高下；当训练集足够大时，神经网络算法的性能要优于大部分机器学习算法。</p>
+<p>随着数据规模和计算能力的发展，深度网络兴起了。</p>
+<p>注：训练集<code>(x, y)</code>是由输入<code>x</code>和标签<code>y</code>组成的，<code>m</code>表示训练集大小。</p>
+<p><img src="/.%5C%E5%90%B4%E6%81%A9%E8%BE%BE%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E7%AC%AC%E4%B8%80%E8%AF%BE%E7%AC%94%E8%AE%B0-%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E4%B8%8E%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%5C1-4-1.png" alt="1-4-1"></p>
+<h3 id="1-5-关于这门课"><a href="#1-5-关于这门课" class="headerlink" title="1.5. 关于这门课"></a>1.5. 关于这门课</h3><p>略</p>
+<h3 id="1-6-课程资源"><a href="#1-6-课程资源" class="headerlink" title="1.6. 课程资源"></a>1.6. 课程资源</h3><p>略</p>
+<h2 id="2-第二周-神经网络基础"><a href="#2-第二周-神经网络基础" class="headerlink" title="2. 第二周 - 神经网络基础"></a>2. 第二周 - 神经网络基础</h2><h3 id="2-1-二分分类"><a href="#2-1-二分分类" class="headerlink" title="2.1. 二分分类"></a>2.1. 二分分类</h3><p>二分类：标签值 $y$ 要么为 0 要么为 1</p>
+<p><img src="/.%5C%E5%90%B4%E6%81%A9%E8%BE%BE%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E7%AC%AC%E4%B8%80%E8%AF%BE%E7%AC%94%E8%AE%B0-%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E4%B8%8E%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%5C2-1-2.png" alt="2-1-2"></p>
+<p>一些符号的定义：</p>
+<ul>
+<li>$n$ 或 $n_x$：表示输入特征向量的维度</li>
+<li>$x \in R^{n_x}$：输入的特征向量</li>
+<li>$y \in {0, 1}$：标签值为0或1</li>
+<li>$(x, y)$：一个训练样本</li>
+<li>$m$：训练集的大小</li>
+<li>$(x^{(i)}, y^{(i)})$：表示训练集中第i个训练样本</li>
+<li>$X$：整个训练集的输入特征向量构成的矩阵，矩阵的维度为$(n_x, m)$</li>
+<li>$Y$：整个训练集的输出标签构成的矩阵，矩阵的维度为$(1, m)$</li>
+</ul>
+<p><img src="/.%5C%E5%90%B4%E6%81%A9%E8%BE%BE%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E7%AC%AC%E4%B8%80%E8%AF%BE%E7%AC%94%E8%AE%B0-%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E4%B8%8E%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%5C2-1-1.png" alt="2-1-1"></p>
+<h3 id="2-2-logistic-回归"><a href="#2-2-logistic-回归" class="headerlink" title="2.2. logistic 回归"></a>2.2. logistic 回归</h3><p>用 logistic 回归（逻辑回归）解决二分类问题：$\hat{y} &#x3D; sigmoid(w^Tx+b)$。注意：此处使用 $w^Tx+b$，而不使用 $\theta^Tx$。</p>
+<p><img src="/.%5C%E5%90%B4%E6%81%A9%E8%BE%BE%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E7%AC%AC%E4%B8%80%E8%AF%BE%E7%AC%94%E8%AE%B0-%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E4%B8%8E%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%5C2-2-1.png" alt="2-2-1"></p>
+<p>sigmoid 函数（是一种 logistics 函数）相关定义如下：</p>
+<p><img src="/.%5C%E5%90%B4%E6%81%A9%E8%BE%BE%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E7%AC%AC%E4%B8%80%E8%AF%BE%E7%AC%94%E8%AE%B0-%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E4%B8%8E%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%5C2-2-2.png" alt="2-2-2"></p>
+<h3 id="2-3-logistic-回归损失函数"><a href="#2-3-logistic-回归损失函数" class="headerlink" title="2.3. logistic 回归损失函数"></a>2.3. logistic 回归损失函数</h3><p>由上可知：$\hat{y}^{(i)} &#x3D; sigmoid(w^Tx+b)$：第i个样本的预测值。</p>
+<p><strong>损失函数（Loss function）</strong> 使用：</p>
+<p>$L(\hat{y}, y) &#x3D; -[y log\hat{y} + (1-y) log(1-\hat{y})]$</p>
+<p><strong>注意</strong>：此处不使用平方差：$L(\hat{y}, y) &#x3D; \frac{1}{2}(\hat{y}-y)^2$，因为这是个二次函数，容易得到多个局部最优解，使用梯度下降法可能找不到全局最优值。</p>
+<p>损失函数在单个训练样本中定义，它衡量了参数 w 和 b 在单个训练样本上的表现。</p>
+<p><strong>成本函数（cost function）</strong> 则衡量参数 w 和 b 在全体训练样本上的表现，如下：</p>
+<p>$J(w,b) &#x3D; \frac{1}{m} \displaystyle \sum_{i&#x3D;0}^nL(\hat{y}^{(i)}, y^{(i)})$</p>
+<p>在训练 logistics 回归模型时，我们就是要找到合适的 w 和 b，让成本函数尽可能地小。</p>
+<p><img src="/.%5C%E5%90%B4%E6%81%A9%E8%BE%BE%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E7%AC%AC%E4%B8%80%E8%AF%BE%E7%AC%94%E8%AE%B0-%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E4%B8%8E%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%5C2-3-1.png" alt="2-3-1"></p>
+<h3 id="2-4-梯度下降法"><a href="#2-4-梯度下降法" class="headerlink" title="2.4. 梯度下降法"></a>2.4. 梯度下降法</h3><p>我们训练模型的目的是：找到合适的 w 和 b 使得 $J(w, b)$ 最小。</p>
+<p>假设 w 和 b 是一维变量，$J(w, b)$ 的图像如图，它是一个凸函数，只有一个全局最小值。而我们的目的，就是找到这个最小值。</p>
+<p><img src="/.%5C%E5%90%B4%E6%81%A9%E8%BE%BE%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E7%AC%AC%E4%B8%80%E8%AF%BE%E7%AC%94%E8%AE%B0-%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E4%B8%8E%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%5C2-4-1.png" alt="2-4-1"></p>
+<p>假设 $J(w)$ 是一个一维函数，且是一个凸函数。</p>
+<p>我们可以通过<strong>梯度下降法</strong>找到最小值。$w$ 初始位置任意，为了找到 $w$ 使得 $J(w)$ 最小，我们只需要重复如下步骤：</p>
+<p>$w :&#x3D; w-\alpha \frac{dJ(w)}{dw}$</p>
+<ul>
+<li>$\alpha$：学习率，表示每一步 $w$ 变化的步长，决定 $J(w)$ 下降的速度。</li>
+<li>$\frac{dJ(w)}{dw}$：导数，$(w, J(w))$ 处的斜率。</li>
+</ul>
+<p>在曲线越陡峭的地方，导数越大，$w$ 变化得越大，$J(w)$ 下降得越快；在曲线较缓和的地方，导数较小，$w$ 变化得小，$J(w)$ 下降得也慢。</p>
+<p><img src="/.%5C%E5%90%B4%E6%81%A9%E8%BE%BE%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E7%AC%AC%E4%B8%80%E8%AF%BE%E7%AC%94%E8%AE%B0-%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E4%B8%8E%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%5C2-4-2.png" alt="2-4-2"></p>
+<h3 id="2-5-导数"><a href="#2-5-导数" class="headerlink" title="2.5. 导数"></a>2.5. 导数</h3><p>略</p>
+<h3 id="2-6-更多导数的例子"><a href="#2-6-更多导数的例子" class="headerlink" title="2.6. 更多导数的例子"></a>2.6. 更多导数的例子</h3><p>略</p>
+<h3 id="2-7-计算图"><a href="#2-7-计算图" class="headerlink" title="2.7. 计算图"></a>2.7. 计算图</h3><p><img src="/.%5C%E5%90%B4%E6%81%A9%E8%BE%BE%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E7%AC%AC%E4%B8%80%E8%AF%BE%E7%AC%94%E8%AE%B0-%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E4%B8%8E%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%5C2-7-1.png" alt="2-7-1"></p>
+<h3 id="2-8-计算图的导数计算"><a href="#2-8-计算图的导数计算" class="headerlink" title="2.8. 计算图的导数计算"></a>2.8. 计算图的导数计算</h3><p>注：$\frac{dFinalOutputVar}{dvar}$ 可看成 $dvar$</p>
+<p><img src="/.%5C%E5%90%B4%E6%81%A9%E8%BE%BE%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E7%AC%AC%E4%B8%80%E8%AF%BE%E7%AC%94%E8%AE%B0-%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E4%B8%8E%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%5C2-8-1.png" alt="2-8-1"></p>
+<p><img src="/.%5C%E5%90%B4%E6%81%A9%E8%BE%BE%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E7%AC%AC%E4%B8%80%E8%AF%BE%E7%AC%94%E8%AE%B0-%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E4%B8%8E%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%5C2-8-2.png" alt="2-8-2"></p>
+<h3 id="2-9-logistics-回归中的梯度下降法"><a href="#2-9-logistics-回归中的梯度下降法" class="headerlink" title="2.9. logistics 回归中的梯度下降法"></a>2.9. logistics 回归中的梯度下降法</h3><p>注：$L(a, y) &#x3D; -[y loga + (1-y) log(1-a)]$</p>
+<p><img src="/.%5C%E5%90%B4%E6%81%A9%E8%BE%BE%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E7%AC%AC%E4%B8%80%E8%AF%BE%E7%AC%94%E8%AE%B0-%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E4%B8%8E%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%5C2-9-1.png" alt="2-9-1"></p>
+<h3 id="2-10-m-个样本的梯度下降"><a href="#2-10-m-个样本的梯度下降" class="headerlink" title="2.10. m 个样本的梯度下降"></a>2.10. m 个样本的梯度下降</h3><p>注：$J &#x3D; \frac{1}{m} \displaystyle \sum_{i&#x3D;0}^nL(\hat{y}^{(i)}, y^{(i)})$</p>
+<p>在计算完 m 个样本上的累计误差&#x2F;成本函数 $J$ 和得到参数的累计梯度 $dw_i$ 之后，再进行参数更新。</p>
+<p><img src="/.%5C%E5%90%B4%E6%81%A9%E8%BE%BE%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E7%AC%AC%E4%B8%80%E8%AF%BE%E7%AC%94%E8%AE%B0-%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E4%B8%8E%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%5C2-10-1.png" alt="2-10-1"></p>
+<p>在之后的课程中，将提到用向量化<code>Vectorization</code>改善for循环。</p>
+<h3 id="2-11-向量化"><a href="#2-11-向量化" class="headerlink" title="2.11. 向量化"></a>2.11. 向量化</h3><p>向量化：用 np.dot() 代替 for 循环。（其实，这是因为 numpy 底层用 C 实现，所以比 python 的 for 循环快很多，归根到底还是循环实现）</p>
+<p><img src="/.%5C%E5%90%B4%E6%81%A9%E8%BE%BE%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E7%AC%AC%E4%B8%80%E8%AF%BE%E7%AC%94%E8%AE%B0-%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E4%B8%8E%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%5C2-11-1.png" alt="2-11-1"></p>
+<h3 id="2-12-向量化的更多例子"><a href="#2-12-向量化的更多例子" class="headerlink" title="2.12. 向量化的更多例子"></a>2.12. 向量化的更多例子</h3><p><img src="/.%5C%E5%90%B4%E6%81%A9%E8%BE%BE%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E7%AC%AC%E4%B8%80%E8%AF%BE%E7%AC%94%E8%AE%B0-%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E4%B8%8E%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%5C2-12-1.png" alt="2-12-1"></p>
+<h3 id="2-13-向量化-logistic-回归"><a href="#2-13-向量化-logistic-回归" class="headerlink" title="2.13. 向量化 logistic 回归"></a>2.13. 向量化 logistic 回归</h3><p><img src="/.%5C%E5%90%B4%E6%81%A9%E8%BE%BE%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E7%AC%AC%E4%B8%80%E8%AF%BE%E7%AC%94%E8%AE%B0-%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E4%B8%8E%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%5C2-13-1.png" alt="2-13-1"></p>
+<h3 id="2-14-向量化-logistic-回归中的梯度输出"><a href="#2-14-向量化-logistic-回归中的梯度输出" class="headerlink" title="2.14. 向量化 logistic 回归中的梯度输出"></a>2.14. 向量化 logistic 回归中的梯度输出</h3><p>下图左边是未使用向量化的代码，右边是使用了向量化的代码（其实就是 <code>numpy</code> 库）。</p>
+<p><img src="/.%5C%E5%90%B4%E6%81%A9%E8%BE%BE%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E7%AC%AC%E4%B8%80%E8%AF%BE%E7%AC%94%E8%AE%B0-%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E4%B8%8E%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%5C2-14-1.png" alt="2-14-1"></p>
+<h3 id="2-15-python-中的广播"><a href="#2-15-python-中的广播" class="headerlink" title="2.15. python 中的广播"></a>2.15. python 中的广播</h3><p><code>numpy</code> 的广播。</p>
+<h3 id="2-16-关于-python-numpy-向量的说明"><a href="#2-16-关于-python-numpy-向量的说明" class="headerlink" title="2.16. 关于 python_numpy 向量的说明"></a>2.16. 关于 python_numpy 向量的说明</h3><p>略</p>
+<h3 id="2-17-Jupyter-Ipython-笔记本的快速指南"><a href="#2-17-Jupyter-Ipython-笔记本的快速指南" class="headerlink" title="2.17. Jupyter Ipython 笔记本的快速指南"></a>2.17. Jupyter Ipython 笔记本的快速指南</h3><p>略</p>
+<h3 id="2-18-logistic-损失函数的解释"><a href="#2-18-logistic-损失函数的解释" class="headerlink" title="2.18. logistic 损失函数的解释"></a>2.18. logistic 损失函数的解释</h3><p>在 logistic 回归中，可以把预测值 $\hat{y}$ 看作在 $x$ 条件下 $y$ 取 1 的概率；而 $1-\hat{y}$ 可以看作在 $x$ 条件下 $y$ 取 0 的概率。</p>
+<p>注：在二分类问题中，$y$ 只有 1 或 0 两种取值。</p>
+<p>综合两种情况，在 $x$ 条件下 $y$ 取 0 或 1 的概率为 $p(y|x) &#x3D; \hat{y}^y (1-\hat{y})^{(1-y)}$ （下图中有解释）。</p>
+<p>如果想让 $p(y|x)$ 最大，可以先让 $log p(y|x)$ 最大（log 是单调函数）。</p>
+<p>而 $log p(y|x) &#x3D; ylog\hat{y} + (1-y)log(1-\hat{y})$ 。</p>
+<p>同时，结合上文提到的损失函数，我们可以发现： $log p(y|x) &#x3D; -L(\hat{y}, y)$ ，当损失函数最小时，$y$ 取期望值的概率就越大。</p>
+<p><img src="/.%5C%E5%90%B4%E6%81%A9%E8%BE%BE%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E7%AC%AC%E4%B8%80%E8%AF%BE%E7%AC%94%E8%AE%B0-%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E4%B8%8E%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%5C2-18-1.png" alt="2-18-1"></p>
+<p>如果想获得 m 个样本都取到期望值的概率 $P$，那应该将每个样本的概率相乘，即：$P &#x3D; \displaystyle\prod_{i&#x3D;1}^m p(y^{(i)}|x^{(i)})$。</p>
+<p>如果使用<strong>最大似然估计</strong>，那需要找到一组参数使得 $P$ 的值最大。而令 $P$ 值最大，等价于令 $logP$ 最大。</p>
+<p>由于 $logP &#x3D; \displaystyle\sum_{i&#x3D;1}^m log p(y^{(i)}|x^{(i)})$ ，进而可得：$logP &#x3D; -\displaystyle\sum_{i&#x3D;1}^mL(\hat{y}, y)$。</p>
+<p>最后，当成本函数 $J(w,b) &#x3D; \frac{1}{m} \displaystyle\sum_{i&#x3D;0}^nL(\hat{y}^{(i)}, y^{(i)})$ 取最小值时，$logP$ 取最大值，也就是 $P$ 取最大值（m 个样本都取到期望值的概率最大）。</p>
+<p><img src="/.%5C%E5%90%B4%E6%81%A9%E8%BE%BE%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E7%AC%AC%E4%B8%80%E8%AF%BE%E7%AC%94%E8%AE%B0-%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E4%B8%8E%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%5C2-18-2.png" alt="2-18-2"></p>
+<h2 id="3-第三周-浅层神经网络"><a href="#3-第三周-浅层神经网络" class="headerlink" title="3. 第三周 - 浅层神经网络"></a>3. 第三周 - 浅层神经网络</h2><h3 id="3-1-神经网络概览"><a href="#3-1-神经网络概览" class="headerlink" title="3.1. 神经网络概览"></a>3.1. 神经网络概览</h3><p>约定：用 $W^{[i]}$ 上标表示第 $i$ 层的参数。</p>
+<p><img src="/.%5C%E5%90%B4%E6%81%A9%E8%BE%BE%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E7%AC%AC%E4%B8%80%E8%AF%BE%E7%AC%94%E8%AE%B0-%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E4%B8%8E%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%5C3-1-1.png" alt="3-1-1"></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/DeepLearning/" rel="tag"><i class="fa fa-tag"></i> 深度学习</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/%E5%90%B4%E6%81%A9%E8%BE%BE%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E7%AC%AC%E5%9B%9B%E8%AF%BE%E7%AC%94%E8%AE%B0-%E5%8D%B7%E7%A7%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C.html" rel="prev" title="吴恩达深度学习第四课笔记 - 卷积神经网络">
+                  <i class="fa fa-chevron-left"></i> 吴恩达深度学习第四课笔记 - 卷积神经网络
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC3%E7%AB%A0%E8%BF%90%E8%BE%93%E5%B1%82.html" rel="next" title="《计算机网络》笔记-第3章运输层">
+                  《计算机网络》笔记-第3章运输层 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments gitalk-container"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">dounine</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/mist/" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+<script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.0/search.js" integrity="sha256-vXZMYLEqsROAXkEw93GGIvaB2ab+QW6w3+1ahD9nXXA=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.0/es5/tex-mml-chtml.js","integrity":"sha256-r+3itOMtGGjap0x+10hu6jW/gZCzxHsoKrOd7gyRSGY="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/gitalk/1.7.2/gitalk.css" integrity="sha256-AJnUHL7dBv6PGaeyPQJcgQPDjt/Hn/PvYZde1iqfp8U=" crossorigin="anonymous">
+
+<script class="next-config" data-name="gitalk" type="application/json">{"enable":true,"github_id":"99MyCql","repo":"99MyCql.github.io","client_id":"7c69ea063e9c78a72075","client_secret":"f222b18af36b2dffda7884ce5fd77bbb9172de54","admin_user":"99MyCql","distraction_free_mode":false,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token","language":"zh-CN","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/gitalk/1.7.2/gitalk.min.js","integrity":"sha256-Pmj85ojLaPOWwRtlMJwmezB/Qg8BzvJp5eTzvXaYAfA="},"path_md5":"e38f4fb66cbb34ad7c57cfd2c64b8ca7"}</script>
+<script src="/js/third-party/comments/gitalk.js"></script>
+
+</body>
+</html>

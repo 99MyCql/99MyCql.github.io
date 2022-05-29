@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.2.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/golang32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/golang16.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="baidu-site-verification" content="code-RpvRDWfflk">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" integrity="sha256-DfWjNxDkM94fVBWx1H5BMMp0Zq7luBlV8QRcSES7s+0=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"blog.dounine.live","root":"/","images":"/images","scheme":"Mist","darkmode":false,"version":"8.11.1","exturl":false,"sidebar":{"position":"right","display":"always","padding":18,"offset":12},"copycode":{"enable":true,"style":"flat"},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":"gitalk","storage":true,"lazyload":false,"nav":null,"activeClass":"gitalk"},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="1. 块元素(如div)独占一行1.1. 问题当笔者最初接触div盒模型来给界面进行布局时，遇到过这样一个问题：">
+<meta property="og:type" content="article">
+<meta property="og:title" content="css实践总结">
+<meta property="og:url" content="https://blog.dounine.live/css%E5%AE%9E%E8%B7%B5%E4%B8%AD%E7%9A%84%E4%B8%80%E4%BA%9B%E9%97%AE%E9%A2%98.html">
+<meta property="og:site_name" content="dounine&#39;s blog">
+<meta property="og:description" content="1. 块元素(如div)独占一行1.1. 问题当笔者最初接触div盒模型来给界面进行布局时，遇到过这样一个问题：">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://blog.dounine.live/css%E5%AE%9E%E8%B7%B5%E4%B8%AD%E7%9A%84%E4%B8%80%E4%BA%9B%E9%97%AE%E9%A2%98-%E6%8C%81%E7%BB%AD%E6%9B%B4%E6%96%B0/div%E5%B8%83%E5%B1%80%E9%97%AE%E9%A2%98.png">
+<meta property="og:image" content="https://blog.dounine.live/css%E5%AE%9E%E8%B7%B5%E4%B8%AD%E7%9A%84%E4%B8%80%E4%BA%9B%E9%97%AE%E9%A2%98-%E6%8C%81%E7%BB%AD%E6%9B%B4%E6%96%B0/div%E5%B8%83%E5%B1%80%E9%97%AE%E9%A2%98%E8%A7%A3%E5%86%B3.png">
+<meta property="article:published_time" content="2018-11-27T12:54:35.000Z">
+<meta property="article:modified_time" content="2018-11-27T12:54:35.000Z">
+<meta property="article:author" content="dounine">
+<meta property="article:tag" content="前端">
+<meta property="article:tag" content="CSS">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://blog.dounine.live/css%E5%AE%9E%E8%B7%B5%E4%B8%AD%E7%9A%84%E4%B8%80%E4%BA%9B%E9%97%AE%E9%A2%98-%E6%8C%81%E7%BB%AD%E6%9B%B4%E6%96%B0/div%E5%B8%83%E5%B1%80%E9%97%AE%E9%A2%98.png">
+
+
+<link rel="canonical" href="https://blog.dounine.live/css%E5%AE%9E%E8%B7%B5%E4%B8%AD%E7%9A%84%E4%B8%80%E4%BA%9B%E9%97%AE%E9%A2%98.html">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://blog.dounine.live/css%E5%AE%9E%E8%B7%B5%E4%B8%AD%E7%9A%84%E4%B8%80%E4%BA%9B%E9%97%AE%E9%A2%98.html","path":"css实践中的一些问题.html","title":"css实践总结"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>css实践总结 | dounine's blog</title>
+  
+
+  <script src="/js/third-party/analytics/baidu-analytics.js"></script>
+  <script async src="https://hm.baidu.com/hm.js?66c7065aa71681df47eb23eff557978b"></script>
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">dounine's blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">18</span></a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">48</span></a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">75</span></a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E5%9D%97%E5%85%83%E7%B4%A0-%E5%A6%82div-%E7%8B%AC%E5%8D%A0%E4%B8%80%E8%A1%8C"><span class="nav-text">1. 块元素(如div)独占一行</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-1-%E9%97%AE%E9%A2%98"><span class="nav-text">1.1. 问题</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-2-%E5%8E%9F%E5%9B%A0"><span class="nav-text">1.2. 原因</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-3-%E8%A1%A5%E5%85%85"><span class="nav-text">1.3. 补充</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-4-%E8%A7%A3%E5%86%B3"><span class="nav-text">1.4. 解决</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E6%96%87%E6%9C%AC%E8%BF%87%E9%95%BF%E6%97%B6%E6%98%BE%E7%A4%BA%E7%9C%81%E7%95%A5%E5%8F%B7"><span class="nav-text">2. 文本过长时显示省略号</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E5%B0%86%E7%9F%A9%E5%BD%A2%E5%9B%BE%E7%89%87%E5%8F%98%E4%B8%BA%E5%9C%86%E5%BD%A2"><span class="nav-text">3. 将矩形图片变为圆形</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-%E5%9B%BE%E7%89%87-img%E5%85%83%E7%B4%A0-%E8%87%AA%E9%80%82%E5%BA%94%E5%8C%BA%E5%9F%9F-div%E5%85%83%E7%B4%A0-%E5%A4%A7%E5%B0%8F"><span class="nav-text">4. 图片(img元素)自适应区域(div元素)大小</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-div%E4%B8%AD%E6%96%87%E5%AD%97%E5%A4%AA%E5%A4%9A%E8%87%AA%E5%8A%A8%E6%8D%A2%E8%A1%8C"><span class="nav-text">5. div中文字太多自动换行</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-%E5%AD%97%E4%BD%93%E5%A4%A7%E5%B0%8F%E9%80%82%E5%BA%94%E5%B1%8F%E5%B9%95"><span class="nav-text">6. 字体大小适应屏幕</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-flex%E5%B8%83%E5%B1%80"><span class="nav-text">7. flex布局</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#8-%E7%94%B5%E8%84%91%E3%80%81%E6%89%8B%E6%9C%BA%E7%AB%AF%E8%87%AA%E9%80%82%E5%BA%94"><span class="nav-text">8. 电脑、手机端自适应</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="dounine"
+      src="https://avatars.githubusercontent.com/u/41814469?s=400&u=48bf60a3428a3cb86a84a110c8688930cf6ceb08&v=4">
+  <p class="site-author-name" itemprop="name">dounine</p>
+  <div class="site-description" itemprop="description">回首向来萧瑟处</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">75</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">18</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">48</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/99MyCql" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;99MyCql" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+
+  <div class="links-of-blogroll site-overview-item animated">
+    <div class="links-of-blogroll-title"><i class="fa fa-globe fa-fw"></i>
+      Links
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://bkfish.gitee.io/" title="https:&#x2F;&#x2F;bkfish.gitee.io&#x2F;" rel="noopener" target="_blank">Kitty萌新的卧室</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://hitworld.github.io/" title="https:&#x2F;&#x2F;hitworld.github.io&#x2F;" rel="noopener" target="_blank">hirworld</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://wyjoutstanding.github.io/" title="https:&#x2F;&#x2F;wyjoutstanding.github.io&#x2F;" rel="noopener" target="_blank">wyjoutstanding</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://iwtf.github.io/" title="https:&#x2F;&#x2F;iwtf.github.io&#x2F;" rel="noopener" target="_blank">IWTF</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://wood1314.github.io/" title="https:&#x2F;&#x2F;wood1314.github.io&#x2F;" rel="noopener" target="_blank">wood</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://desperadoccy.github.io/" title="https:&#x2F;&#x2F;desperadoccy.github.io&#x2F;" rel="noopener" target="_blank">desperadoccy</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://doudouqaq.github.io/" title="https:&#x2F;&#x2F;doudouqaq.github.io&#x2F;" rel="noopener" target="_blank">doudouqaq</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://kylinnnnn.github.io/" title="https:&#x2F;&#x2F;kylinnnnn.github.io&#x2F;" rel="noopener" target="_blank">kylinnnnn</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://miaotony.xyz/" title="https:&#x2F;&#x2F;miaotony.xyz" rel="noopener" target="_blank">miaotony</a>
+        </li>
+    </ul>
+  </div>
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://github.com/99MyCql" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.dounine.live/css%E5%AE%9E%E8%B7%B5%E4%B8%AD%E7%9A%84%E4%B8%80%E4%BA%9B%E9%97%AE%E9%A2%98.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://avatars.githubusercontent.com/u/41814469?s=400&u=48bf60a3428a3cb86a84a110c8688930cf6ceb08&v=4">
+      <meta itemprop="name" content="dounine">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dounine's blog">
+      <meta itemprop="description" content="回首向来萧瑟处">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="css实践总结 | dounine's blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          css实践总结
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2018-11-27 20:54:35" itemprop="dateCreated datePublished" datetime="2018-11-27T20:54:35+08:00">2018-11-27</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Dev/" itemprop="url" rel="index"><span itemprop="name">开发</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Dev/Frontend/" itemprop="url" rel="index"><span itemprop="name">前端</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h3 id="1-块元素-如div-独占一行"><a href="#1-块元素-如div-独占一行" class="headerlink" title="1. 块元素(如div)独占一行"></a>1. 块元素(如div)独占一行</h3><h4 id="1-1-问题"><a href="#1-1-问题" class="headerlink" title="1.1. 问题"></a>1.1. 问题</h4><p>当笔者最初接触div盒模型来给界面进行布局时，遇到过这样一个问题：</p>
+<span id="more"></span>
+
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;!DOCTYPE <span class="keyword">html</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">html</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">head</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">meta</span> <span class="attr">charset</span>=<span class="string">&quot;utf-8&quot;</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">title</span>&gt;</span>test_div<span class="tag">&lt;/<span class="name">title</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">style</span>&gt;</span><span class="language-css"></span></span><br><span class="line"><span class="language-css"><span class="selector-id">#father</span> &#123;</span></span><br><span class="line"><span class="language-css">    <span class="attribute">background-color</span>: blue;</span></span><br><span class="line"><span class="language-css">    <span class="attribute">height</span>: <span class="number">400px</span>;</span></span><br><span class="line"><span class="language-css">    <span class="attribute">border</span>: <span class="number">2px</span> solid black;</span></span><br><span class="line"><span class="language-css">&#125;</span></span><br><span class="line"><span class="language-css"><span class="selector-id">#son1</span> &#123;</span></span><br><span class="line"><span class="language-css">    <span class="attribute">background-color</span>: yellow;</span></span><br><span class="line"><span class="language-css">    <span class="attribute">width</span>: <span class="number">300px</span>;</span></span><br><span class="line"><span class="language-css">    <span class="attribute">height</span>: <span class="number">200px</span>;</span></span><br><span class="line"><span class="language-css">    <span class="attribute">border</span>: <span class="number">25px</span> solid green;</span></span><br><span class="line"><span class="language-css">    <span class="attribute">padding</span>: <span class="number">25px</span>;</span></span><br><span class="line"><span class="language-css">    <span class="attribute">margin</span>: <span class="number">25px</span>;</span></span><br><span class="line"><span class="language-css">&#125;</span></span><br><span class="line"><span class="language-css"><span class="selector-id">#son2</span> &#123;</span></span><br><span class="line"><span class="language-css">    <span class="attribute">background-color</span>: red;</span></span><br><span class="line"><span class="language-css">    <span class="attribute">width</span>: <span class="number">300px</span>;</span></span><br><span class="line"><span class="language-css">    <span class="attribute">height</span>: <span class="number">200px</span>;</span></span><br><span class="line"><span class="language-css">    <span class="attribute">border</span>: <span class="number">25px</span> solid black;</span></span><br><span class="line"><span class="language-css">    <span class="attribute">padding</span>: <span class="number">25px</span>;</span></span><br><span class="line"><span class="language-css">    <span class="attribute">margin</span>: <span class="number">25px</span>;</span></span><br><span class="line"><span class="language-css">&#125;</span></span><br><span class="line"><span class="language-css"></span><span class="tag">&lt;/<span class="name">style</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">&quot;father&quot;</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">&quot;son1&quot;</span>&gt;</span>这里是盒子test1内的实际内容。盒子:300px 宽，200px 高，25px 内间距，25px 外间距，25px 绿色边框。<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">&quot;son2&quot;</span>&gt;</span>这里是盒子test2内的实际内容。盒子:300px 宽，200px 高，25px 内间距，25px 外间距，25px 黑色边框。<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>在以上代码中，笔者原本是想让 id为son1的div 和 id为son2的div 两块区域，并排显示在它们的父元素id为father的div区域中，但是结果却是这样的：<br><img src="/css%E5%AE%9E%E8%B7%B5%E4%B8%AD%E7%9A%84%E4%B8%80%E4%BA%9B%E9%97%AE%E9%A2%98-%E6%8C%81%E7%BB%AD%E6%9B%B4%E6%96%B0/div%E5%B8%83%E5%B1%80%E9%97%AE%E9%A2%98.png" alt="div布局问题"></p>
+<h4 id="1-2-原因"><a href="#1-2-原因" class="headerlink" title="1.2. 原因"></a>1.2. 原因</h4><p>显然，两个div子区域的宽并没有撑满整一行，那为什么会第二个div区域会换行呢？这是因为，div元素属于<strong>块元素</strong>，块级元素默认是充满整一行的。因此，两个块级元素是不能并列在同一行的。</p>
+<h4 id="1-3-补充"><a href="#1-3-补充" class="headerlink" title="1.3. 补充"></a>1.3. 补充</h4><p>1）HTML的元素(即标签)按布局特性，分为<strong>块元素</strong>和**行内元素(也称内联元素或内嵌元素)**：</p>
+<p>块元素</p>
+<p>块元素在页面中以区域块的形式出现，其特点是，每个块元素通常都会<strong>独自占据一整行或多整行</strong>，可以对其设置宽度、高度、对齐等属性，常用于网页布局和网页结构的搭建。<br>常见的块元素有<code>&lt;h1&gt;~&lt;h6&gt;、&lt;p&gt;、&lt;div&gt;、&lt;ul&gt;、&lt;ol&gt;、&lt;li&gt;</code>等，其中div是最典型的块元素。</p>
+<p>行内元素</p>
+<p>行内元素也称内联元素或内嵌元素，其特点是，不必在新的一行开始，同时，也不强迫其他的元素在新的一行显示。一个行内元素通常会和它前后的其他行内元素显示在同一行中，它们不占有独立的区域，仅仅靠自身的字体大小和图像尺寸来支撑结构，一般不可以设置宽度、高度、对齐等属性，常用于控制页面中文本的样式。<br>常见的行内元素有<code>&lt;strong&gt;、&lt;b&gt;、&lt;em&gt;、&lt;i&gt;、&lt;del&gt;、&lt;s&gt;、&lt;ins&gt;、&lt;u&gt;、&lt;a&gt;、&lt;span&gt;</code>等，其中span是最典型的行内元素。</p>
+<p>2）而对于块元素和行内元素之间，是可以用css中的display属性来转换的。display属性常用的属性值及含义如下：</p>
+<ul>
+<li>inline：此元素将显示为行内元素（行内元素默认的display属性值）。</li>
+<li>block：此元素将显示为块元素（块元素默认的display属性值）。</li>
+<li>inline-block：此元素将显示为<strong>行内块元素</strong>，可以对其设置宽高和对齐等属性，但是该元素不会独占一行。</li>
+<li>none：此元素将被隐藏，不显示，也不占用页面空间，相当于该元素不存在。</li>
+</ul>
+<h4 id="1-4-解决"><a href="#1-4-解决" class="headerlink" title="1.4. 解决"></a>1.4. 解决</h4><p>因此，对于这个问题，我们只需要对 #son1 和 #son2 的css属性进行以下修改就能解决：</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-id">#son1</span> &#123;</span><br><span class="line">    <span class="attribute">background-color</span>: yellow;</span><br><span class="line">    <span class="attribute">width</span>: <span class="number">300px</span>;</span><br><span class="line">    <span class="attribute">height</span>: <span class="number">200px</span>;</span><br><span class="line">    <span class="attribute">border</span>: <span class="number">25px</span> solid green;</span><br><span class="line">    <span class="attribute">padding</span>: <span class="number">25px</span>;</span><br><span class="line">    <span class="attribute">margin</span>: <span class="number">25px</span>;</span><br><span class="line">    <span class="attribute">display</span>: inline-block;      <span class="comment">/*让该元素变成行内块级元素*/</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="selector-id">#son2</span> &#123;</span><br><span class="line">    <span class="attribute">background-color</span>: red;</span><br><span class="line">    <span class="attribute">width</span>: <span class="number">300px</span>;</span><br><span class="line">    <span class="attribute">height</span>: <span class="number">200px</span>;</span><br><span class="line">    <span class="attribute">border</span>: <span class="number">25px</span> solid black;</span><br><span class="line">    <span class="attribute">padding</span>: <span class="number">25px</span>;</span><br><span class="line">    <span class="attribute">margin</span>: <span class="number">25px</span>;</span><br><span class="line">    <span class="attribute">display</span>: inline-block;      <span class="comment">/*让该元素变成行内块级元素*/</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>修改后页面变为如下：<br><img src="/css%E5%AE%9E%E8%B7%B5%E4%B8%AD%E7%9A%84%E4%B8%80%E4%BA%9B%E9%97%AE%E9%A2%98-%E6%8C%81%E7%BB%AD%E6%9B%B4%E6%96%B0/div%E5%B8%83%E5%B1%80%E9%97%AE%E9%A2%98%E8%A7%A3%E5%86%B3.png" alt="div布局问题解决"></p>
+<h3 id="2-文本过长时显示省略号"><a href="#2-文本过长时显示省略号" class="headerlink" title="2. 文本过长时显示省略号"></a>2. 文本过长时显示省略号</h3><p>只需要对包含该文本的元素的css属性进行如下设置即可：</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-class">.text</span> &#123;</span><br><span class="line">    <span class="attribute">overflow</span>: hidden;           <span class="comment">/*超过宽度的文本隐藏*/</span></span><br><span class="line">    <span class="attribute">white-space</span>: nowrap;        <span class="comment">/*规定段落中的文本不进行换行*/</span></span><br><span class="line">    <span class="attribute">text-overflow</span>: ellipsis;    <span class="comment">/*当元素内文本溢出时显示省略标记（...）*/</span></span><br><span class="line">    <span class="attribute">width</span>: <span class="number">300px</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-将矩形图片变为圆形"><a href="#3-将矩形图片变为圆形" class="headerlink" title="3. 将矩形图片变为圆形"></a>3. 将矩形图片变为圆形</h3><p>css代码如下：</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-class">.round_icon</span>&#123;</span><br><span class="line">  <span class="attribute">width</span>: <span class="number">34px</span>;</span><br><span class="line">  <span class="attribute">height</span>: <span class="number">34px</span>;</span><br><span class="line">  <span class="attribute">border-radius</span>: <span class="number">50%</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>html代码如下：<br><code>&lt;img src=&quot;../assets/userImg.jpg&quot; class=&quot;round_icon&quot; alt=&quot;&quot;&gt;</code></p>
+<p>若图片为长方形，则可以如下修改：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">span</span> <span class="attr">style</span>=<span class="string">&quot;width:2.8rem;height:2.8rem;&quot;</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">img</span> <span class="attr">:src</span>=<span class="string">&quot;user.avatarImg&quot;</span> <span class="attr">style</span>=<span class="string">&quot;border-radius:50%;width:100%;height:100%;&quot;</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">span</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="4-图片-img元素-自适应区域-div元素-大小"><a href="#4-图片-img元素-自适应区域-div元素-大小" class="headerlink" title="4. 图片(img元素)自适应区域(div元素)大小"></a>4. 图片(img元素)自适应区域(div元素)大小</h3><p>css代码如下：</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">img</span>&#123;</span><br><span class="line">  <span class="attribute">width</span>: auto;</span><br><span class="line">  <span class="attribute">height</span>: auto;</span><br><span class="line">  <span class="attribute">max-width</span>: <span class="number">100%</span>;</span><br><span class="line">  <span class="attribute">max-height</span>: <span class="number">100%</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>html代码如下：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">style</span>=<span class="string">&quot;width:60px;height:60px&quot;</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">img</span> <span class="attr">src</span>=<span class="string">&quot;../../assets/img1.jpg&quot;</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>相关博客：<a target="_blank" rel="noopener" href="https://www.lisa33xiaoq.net/359.html">https://www.lisa33xiaoq.net/359.html</a></p>
+<h3 id="5-div中文字太多自动换行"><a href="#5-div中文字太多自动换行" class="headerlink" title="5. div中文字太多自动换行"></a>5. div中文字太多自动换行</h3><p>设置div样式为：<code>word-break:break-all;word-wrap:break-all;</code> 即可。</p>
+<p>示例如下：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">style</span>=<span class="string">&quot;word-break:break-all;word-wrap:break-all;&quot;</span>&gt;</span></span><br><span class="line">    &#123;&#123;message&#125;&#125;</span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+为vue中语法，不必理会。
+
+<h3 id="6-字体大小适应屏幕"><a href="#6-字体大小适应屏幕" class="headerlink" title="6. 字体大小适应屏幕"></a>6. 字体大小适应屏幕</h3><p>css3提供了一些与当前viewpoint相关的元素，vw，vh等。</p>
+<figure class="highlight d"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">1</span>vw = <span class="number">1</span>% of viewport width</span><br><span class="line"><span class="number">1</span>vh = <span class="number">1</span>% of viewport height</span><br></pre></td></tr></table></figure>
+
+<p>兼容性：chrome 20+&#x2F; safari 6+&#x2F; IE 10+ &#x2F; FF 19+ &#x2F; IOS 6+</p>
+<p>使用：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">style</span>=<span class="string">&quot;font-size:4vw&quot;</span>&gt;</span>hello<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>慎用！</p>
+<h3 id="7-flex布局"><a href="#7-flex布局" class="headerlink" title="7. flex布局"></a>7. flex布局</h3><p>flex，CSS3提出的新概念，可以极其方便地用于布局，易学好用。</p>
+<p>轻松实现子元素水平、垂直居中，换行包裹等布局。</p>
+<p>使用说明：<a target="_blank" rel="noopener" href="https://www.cnblogs.com/qcloud1001/p/9848619.html">https://www.cnblogs.com/qcloud1001/p/9848619.html</a></p>
+<p>在线演示网站：<a target="_blank" rel="noopener" href="https://www.html.cn/demo/flexbox-playground/">https://www.html.cn/demo/flexbox-playground/</a></p>
+<h3 id="8-电脑、手机端自适应"><a href="#8-电脑、手机端自适应" class="headerlink" title="8. 电脑、手机端自适应"></a>8. 电脑、手机端自适应</h3><figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">@media</span> (<span class="attribute">min-width</span>: <span class="number">900px</span>) &#123;</span><br><span class="line">  <span class="selector-class">.home-main</span> &#123;</span><br><span class="line">    <span class="attribute">width</span>: <span class="number">1000px</span>;</span><br><span class="line">    <span class="attribute">height</span>: <span class="number">100%</span>;</span><br><span class="line">    <span class="attribute">margin</span>: <span class="number">20px</span> auto;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>@media(min-width: 900px)</code> 可以使其中作用的css样式，只适用于屏幕宽度大于<code>900px</code>的设备。</p>
+<p>同理，<code>@media (max-width: 900px)</code> 使css样式只适用于小于<code>900px</code>的设备。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Frontend/" rel="tag"><i class="fa fa-tag"></i> 前端</a>
+              <a href="/tags/CSS/" rel="tag"><i class="fa fa-tag"></i> CSS</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/vueJs%E8%AF%B7%E6%B1%82%E6%8E%A5%E5%8F%A3%E8%8E%B7%E5%8F%96%E6%95%B0%E6%8D%AE%E7%9A%84%E5%AE%9E%E7%8E%B0%E5%8F%8A%E9%97%AE%E9%A2%98.html" rel="prev" title="vue请求接口获取数据及跨域问题">
+                  <i class="fa fa-chevron-left"></i> vue请求接口获取数据及跨域问题
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/%E9%80%92%E5%BD%92%E4%B8%8E%E9%9D%9E%E9%80%92%E5%BD%92%E7%9A%84%E8%BD%AC%E6%8D%A2.html" rel="next" title="递归与非递归的转换（树的非递归遍历）">
+                  递归与非递归的转换（树的非递归遍历） <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments gitalk-container"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">dounine</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/mist/" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+<script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.0/search.js" integrity="sha256-vXZMYLEqsROAXkEw93GGIvaB2ab+QW6w3+1ahD9nXXA=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">false</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.0/es5/tex-mml-chtml.js","integrity":"sha256-r+3itOMtGGjap0x+10hu6jW/gZCzxHsoKrOd7gyRSGY="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/gitalk/1.7.2/gitalk.css" integrity="sha256-AJnUHL7dBv6PGaeyPQJcgQPDjt/Hn/PvYZde1iqfp8U=" crossorigin="anonymous">
+
+<script class="next-config" data-name="gitalk" type="application/json">{"enable":true,"github_id":"99MyCql","repo":"99MyCql.github.io","client_id":"7c69ea063e9c78a72075","client_secret":"f222b18af36b2dffda7884ce5fd77bbb9172de54","admin_user":"99MyCql","distraction_free_mode":false,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token","language":"zh-CN","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/gitalk/1.7.2/gitalk.min.js","integrity":"sha256-Pmj85ojLaPOWwRtlMJwmezB/Qg8BzvJp5eTzvXaYAfA="},"path_md5":"0c473bd022c2f13ffe7390e93f56a1ed"}</script>
+<script src="/js/third-party/comments/gitalk.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.2.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/golang32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/golang16.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="baidu-site-verification" content="code-RpvRDWfflk">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" integrity="sha256-DfWjNxDkM94fVBWx1H5BMMp0Zq7luBlV8QRcSES7s+0=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"blog.dounine.live","root":"/","images":"/images","scheme":"Mist","darkmode":false,"version":"8.11.1","exturl":false,"sidebar":{"position":"right","display":"always","padding":18,"offset":12},"copycode":{"enable":true,"style":"flat"},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":"gitalk","storage":true,"lazyload":false,"nav":null,"activeClass":"gitalk"},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="论文：夏清,窦文生,郭凯文,梁赓,左春,张凤军.区块链共识协议综述.软件学报,2021,32(2):277−299. http:&#x2F;&#x2F;www.jos.org.cn&#x2F;1000-9825&#x2F;6150.htm 前言共识是指：群体中各个独立的参与者，就某件事情达成一致。比如：公司的董事会根据某个决策，进行讨论、投票、最终达成一致的过程，就是一种共识。根据是否存在恶意参与者 ，共识可分为崩溃容错（crash f">
+<meta property="og:type" content="article">
+<meta property="og:title" content="区块链之共识——解读《区块链共识协议综述》">
+<meta property="og:url" content="https://blog.dounine.live/%E5%8C%BA%E5%9D%97%E9%93%BE%E4%B9%8B%E5%85%B1%E8%AF%86%E2%80%94%E2%80%94%E8%A7%A3%E8%AF%BB%E3%80%8A%E5%8C%BA%E5%9D%97%E9%93%BE%E5%85%B1%E8%AF%86%E5%8D%8F%E8%AE%AE%E7%BB%BC%E8%BF%B0%E3%80%8B.html">
+<meta property="og:site_name" content="dounine&#39;s blog">
+<meta property="og:description" content="论文：夏清,窦文生,郭凯文,梁赓,左春,张凤军.区块链共识协议综述.软件学报,2021,32(2):277−299. http:&#x2F;&#x2F;www.jos.org.cn&#x2F;1000-9825&#x2F;6150.htm 前言共识是指：群体中各个独立的参与者，就某件事情达成一致。比如：公司的董事会根据某个决策，进行讨论、投票、最终达成一致的过程，就是一种共识。根据是否存在恶意参与者 ，共识可分为崩溃容错（crash f">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://blog.dounine.live/%E5%8C%BA%E5%9D%97%E9%93%BE%E4%B9%8B%E5%85%B1%E8%AF%86%E2%80%94%E2%80%94%E8%A7%A3%E8%AF%BB%E3%80%8A%E5%8C%BA%E5%9D%97%E9%93%BE%E5%85%B1%E8%AF%86%E5%8D%8F%E8%AE%AE%E7%BB%BC%E8%BF%B0%E3%80%8B/image.png">
+<meta property="og:image" content="https://blog.dounine.live/%E5%8C%BA%E5%9D%97%E9%93%BE%E4%B9%8B%E5%85%B1%E8%AF%86%E2%80%94%E2%80%94%E8%A7%A3%E8%AF%BB%E3%80%8A%E5%8C%BA%E5%9D%97%E9%93%BE%E5%85%B1%E8%AF%86%E5%8D%8F%E8%AE%AE%E7%BB%BC%E8%BF%B0%E3%80%8B/image_1.png">
+<meta property="og:image" content="https://blog.dounine.live/%E5%8C%BA%E5%9D%97%E9%93%BE%E4%B9%8B%E5%85%B1%E8%AF%86%E2%80%94%E2%80%94%E8%A7%A3%E8%AF%BB%E3%80%8A%E5%8C%BA%E5%9D%97%E9%93%BE%E5%85%B1%E8%AF%86%E5%8D%8F%E8%AE%AE%E7%BB%BC%E8%BF%B0%E3%80%8B/image_2.png">
+<meta property="og:image" content="https://blog.dounine.live/%E5%8C%BA%E5%9D%97%E9%93%BE%E4%B9%8B%E5%85%B1%E8%AF%86%E2%80%94%E2%80%94%E8%A7%A3%E8%AF%BB%E3%80%8A%E5%8C%BA%E5%9D%97%E9%93%BE%E5%85%B1%E8%AF%86%E5%8D%8F%E8%AE%AE%E7%BB%BC%E8%BF%B0%E3%80%8B/image_3.png">
+<meta property="og:image" content="https://blog.dounine.live/%E5%8C%BA%E5%9D%97%E9%93%BE%E4%B9%8B%E5%85%B1%E8%AF%86%E2%80%94%E2%80%94%E8%A7%A3%E8%AF%BB%E3%80%8A%E5%8C%BA%E5%9D%97%E9%93%BE%E5%85%B1%E8%AF%86%E5%8D%8F%E8%AE%AE%E7%BB%BC%E8%BF%B0%E3%80%8B/image_4.png">
+<meta property="og:image" content="https://blog.dounine.live/%E5%8C%BA%E5%9D%97%E9%93%BE%E4%B9%8B%E5%85%B1%E8%AF%86%E2%80%94%E2%80%94%E8%A7%A3%E8%AF%BB%E3%80%8A%E5%8C%BA%E5%9D%97%E9%93%BE%E5%85%B1%E8%AF%86%E5%8D%8F%E8%AE%AE%E7%BB%BC%E8%BF%B0%E3%80%8B/image_5.png">
+<meta property="og:image" content="https://blog.dounine.live/%E5%8C%BA%E5%9D%97%E9%93%BE%E4%B9%8B%E5%85%B1%E8%AF%86%E2%80%94%E2%80%94%E8%A7%A3%E8%AF%BB%E3%80%8A%E5%8C%BA%E5%9D%97%E9%93%BE%E5%85%B1%E8%AF%86%E5%8D%8F%E8%AE%AE%E7%BB%BC%E8%BF%B0%E3%80%8B/image_6.png">
+<meta property="og:image" content="https://blog.dounine.live/%E5%8C%BA%E5%9D%97%E9%93%BE%E4%B9%8B%E5%85%B1%E8%AF%86%E2%80%94%E2%80%94%E8%A7%A3%E8%AF%BB%E3%80%8A%E5%8C%BA%E5%9D%97%E9%93%BE%E5%85%B1%E8%AF%86%E5%8D%8F%E8%AE%AE%E7%BB%BC%E8%BF%B0%E3%80%8B/image_7.png">
+<meta property="og:image" content="https://blog.dounine.live/%E5%8C%BA%E5%9D%97%E9%93%BE%E4%B9%8B%E5%85%B1%E8%AF%86%E2%80%94%E2%80%94%E8%A7%A3%E8%AF%BB%E3%80%8A%E5%8C%BA%E5%9D%97%E9%93%BE%E5%85%B1%E8%AF%86%E5%8D%8F%E8%AE%AE%E7%BB%BC%E8%BF%B0%E3%80%8B/image_8.png">
+<meta property="og:image" content="https://blog.dounine.live/%E5%8C%BA%E5%9D%97%E9%93%BE%E4%B9%8B%E5%85%B1%E8%AF%86%E2%80%94%E2%80%94%E8%A7%A3%E8%AF%BB%E3%80%8A%E5%8C%BA%E5%9D%97%E9%93%BE%E5%85%B1%E8%AF%86%E5%8D%8F%E8%AE%AE%E7%BB%BC%E8%BF%B0%E3%80%8B/image_9.png">
+<meta property="og:image" content="https://blog.dounine.live/%E5%8C%BA%E5%9D%97%E9%93%BE%E4%B9%8B%E5%85%B1%E8%AF%86%E2%80%94%E2%80%94%E8%A7%A3%E8%AF%BB%E3%80%8A%E5%8C%BA%E5%9D%97%E9%93%BE%E5%85%B1%E8%AF%86%E5%8D%8F%E8%AE%AE%E7%BB%BC%E8%BF%B0%E3%80%8B/image_10.png">
+<meta property="og:image" content="https://blog.dounine.live/%E5%8C%BA%E5%9D%97%E9%93%BE%E4%B9%8B%E5%85%B1%E8%AF%86%E2%80%94%E2%80%94%E8%A7%A3%E8%AF%BB%E3%80%8A%E5%8C%BA%E5%9D%97%E9%93%BE%E5%85%B1%E8%AF%86%E5%8D%8F%E8%AE%AE%E7%BB%BC%E8%BF%B0%E3%80%8B/image_11.png">
+<meta property="article:published_time" content="2021-12-15T05:25:42.000Z">
+<meta property="article:modified_time" content="2021-12-15T05:25:42.000Z">
+<meta property="article:author" content="dounine">
+<meta property="article:tag" content="区块链">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://blog.dounine.live/%E5%8C%BA%E5%9D%97%E9%93%BE%E4%B9%8B%E5%85%B1%E8%AF%86%E2%80%94%E2%80%94%E8%A7%A3%E8%AF%BB%E3%80%8A%E5%8C%BA%E5%9D%97%E9%93%BE%E5%85%B1%E8%AF%86%E5%8D%8F%E8%AE%AE%E7%BB%BC%E8%BF%B0%E3%80%8B/image.png">
+
+
+<link rel="canonical" href="https://blog.dounine.live/%E5%8C%BA%E5%9D%97%E9%93%BE%E4%B9%8B%E5%85%B1%E8%AF%86%E2%80%94%E2%80%94%E8%A7%A3%E8%AF%BB%E3%80%8A%E5%8C%BA%E5%9D%97%E9%93%BE%E5%85%B1%E8%AF%86%E5%8D%8F%E8%AE%AE%E7%BB%BC%E8%BF%B0%E3%80%8B.html">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://blog.dounine.live/%E5%8C%BA%E5%9D%97%E9%93%BE%E4%B9%8B%E5%85%B1%E8%AF%86%E2%80%94%E2%80%94%E8%A7%A3%E8%AF%BB%E3%80%8A%E5%8C%BA%E5%9D%97%E9%93%BE%E5%85%B1%E8%AF%86%E5%8D%8F%E8%AE%AE%E7%BB%BC%E8%BF%B0%E3%80%8B.html","path":"区块链之共识——解读《区块链共识协议综述》.html","title":"区块链之共识——解读《区块链共识协议综述》"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>区块链之共识——解读《区块链共识协议综述》 | dounine's blog</title>
+  
+
+  <script src="/js/third-party/analytics/baidu-analytics.js"></script>
+  <script async src="https://hm.baidu.com/hm.js?66c7065aa71681df47eb23eff557978b"></script>
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">dounine's blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">18</span></a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">48</span></a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">75</span></a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-text">前言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%AE%BA%E6%96%87%E8%A7%A3%E8%AF%BB"><span class="nav-text">论文解读</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E5%8C%BA%E5%9D%97%E9%93%BE%E5%85%B1%E8%AF%86%E5%8D%8F%E8%AE%AE"><span class="nav-text">1 区块链共识协议</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E5%87%BA%E5%9D%97%E8%8A%82%E7%82%B9%E9%80%89%E4%B8%BE%E6%9C%BA%E5%88%B6"><span class="nav-text">2 出块节点选举机制</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-%E5%B7%A5%E4%BD%9C%E9%87%8F%E8%AF%81%E6%98%8E%E6%9C%BA%E5%88%B6"><span class="nav-text">2.1 工作量证明机制</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-1-%E7%AE%97%E5%8A%9B%E4%B8%AD%E5%BF%83%E5%8C%96"><span class="nav-text">2.1.1 算力中心化</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-2-%E8%B5%84%E6%BA%90%E6%B5%AA%E8%B4%B9"><span class="nav-text">2.1.2 资源浪费</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-3-%E6%80%A7%E8%83%BD"><span class="nav-text">2.1.3 性能</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-4-%E6%80%BB%E7%BB%93"><span class="nav-text">2.1.4 总结</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-%E6%9D%83%E7%9B%8A%E8%AF%81%E6%98%8E%E6%9C%BA%E5%88%B6"><span class="nav-text">2.2 权益证明机制</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-1-%E5%9F%BA%E4%BA%8E%E9%9A%8F%E6%9C%BA%E5%87%BD%E6%95%B0%E7%9A%84%E6%9D%83%E7%9B%8A%E8%AF%81%E6%98%8E"><span class="nav-text">2.2.1 基于随机函数的权益证明</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-2-%E9%97%AE%E9%A2%98%E5%8F%8A%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88"><span class="nav-text">2.2.2 问题及解决方案</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-3-%E6%80%BB%E7%BB%93"><span class="nav-text">2.2.3 总结</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E4%B8%BB%E9%93%BE%E5%85%B1%E8%AF%86"><span class="nav-text">3 主链共识</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-%E6%A6%82%E7%8E%87%E6%80%A7%E5%85%B1%E8%AF%86"><span class="nav-text">3.1 概率性共识</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#3-1-1-%E6%9C%80%E9%95%BF%E9%93%BE%E8%A7%84%E5%88%99"><span class="nav-text">3.1.1 最长链规则</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-1-2-GHOST%E8%A7%84%E5%88%99"><span class="nav-text">3.1.2 GHOST规则</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-1-3-%E5%8C%85%E5%AE%B9%E6%80%A7%E5%8D%8F%E8%AE%AE"><span class="nav-text">3.1.3 包容性协议</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-1-4-SPECTRE%E5%8D%8F%E8%AE%AE"><span class="nav-text">3.1.4 SPECTRE协议</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-1-5-Conflux%E5%8D%8F%E8%AE%AE"><span class="nav-text">3.1.5 Conflux协议</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-1-6-%E5%AE%89%E5%85%A8%E5%88%86%E6%9E%90"><span class="nav-text">3.1.6 安全分析</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-%E7%A1%AE%E5%AE%9A%E6%80%A7%E5%85%B1%E8%AF%86"><span class="nav-text">3.2 确定性共识</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#3-2-1-%E9%9D%9E%E8%AE%B8%E5%8F%AF%E9%93%BE%E6%8B%9C%E5%8D%A0%E5%BA%AD%E5%AE%B9%E9%94%99%E5%8D%8F%E8%AE%AE"><span class="nav-text">3.2.1 非许可链拜占庭容错协议</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-2-2-%E8%AE%B8%E5%8F%AF%E9%93%BE%E6%8B%9C%E5%8D%A0%E5%BA%AD%E5%AE%B9%E9%94%99%E5%8D%8F%E8%AE%AE"><span class="nav-text">3.2.2 许可链拜占庭容错协议</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-2-3-%E5%AE%89%E5%85%A8%E5%88%86%E6%9E%90"><span class="nav-text">3.2.3 安全分析</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-2-4-%E6%80%BB%E7%BB%93"><span class="nav-text">3.2.4 总结</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-%E6%80%BB%E7%BB%93%E4%B8%8E%E5%B1%95%E6%9C%9B"><span class="nav-text">4 总结与展望</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="dounine"
+      src="https://avatars.githubusercontent.com/u/41814469?s=400&u=48bf60a3428a3cb86a84a110c8688930cf6ceb08&v=4">
+  <p class="site-author-name" itemprop="name">dounine</p>
+  <div class="site-description" itemprop="description">回首向来萧瑟处</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">75</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">18</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">48</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/99MyCql" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;99MyCql" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+
+  <div class="links-of-blogroll site-overview-item animated">
+    <div class="links-of-blogroll-title"><i class="fa fa-globe fa-fw"></i>
+      Links
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://bkfish.gitee.io/" title="https:&#x2F;&#x2F;bkfish.gitee.io&#x2F;" rel="noopener" target="_blank">Kitty萌新的卧室</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://hitworld.github.io/" title="https:&#x2F;&#x2F;hitworld.github.io&#x2F;" rel="noopener" target="_blank">hirworld</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://wyjoutstanding.github.io/" title="https:&#x2F;&#x2F;wyjoutstanding.github.io&#x2F;" rel="noopener" target="_blank">wyjoutstanding</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://iwtf.github.io/" title="https:&#x2F;&#x2F;iwtf.github.io&#x2F;" rel="noopener" target="_blank">IWTF</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://wood1314.github.io/" title="https:&#x2F;&#x2F;wood1314.github.io&#x2F;" rel="noopener" target="_blank">wood</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://desperadoccy.github.io/" title="https:&#x2F;&#x2F;desperadoccy.github.io&#x2F;" rel="noopener" target="_blank">desperadoccy</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://doudouqaq.github.io/" title="https:&#x2F;&#x2F;doudouqaq.github.io&#x2F;" rel="noopener" target="_blank">doudouqaq</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://kylinnnnn.github.io/" title="https:&#x2F;&#x2F;kylinnnnn.github.io&#x2F;" rel="noopener" target="_blank">kylinnnnn</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://miaotony.xyz/" title="https:&#x2F;&#x2F;miaotony.xyz" rel="noopener" target="_blank">miaotony</a>
+        </li>
+    </ul>
+  </div>
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://github.com/99MyCql" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.dounine.live/%E5%8C%BA%E5%9D%97%E9%93%BE%E4%B9%8B%E5%85%B1%E8%AF%86%E2%80%94%E2%80%94%E8%A7%A3%E8%AF%BB%E3%80%8A%E5%8C%BA%E5%9D%97%E9%93%BE%E5%85%B1%E8%AF%86%E5%8D%8F%E8%AE%AE%E7%BB%BC%E8%BF%B0%E3%80%8B.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://avatars.githubusercontent.com/u/41814469?s=400&u=48bf60a3428a3cb86a84a110c8688930cf6ceb08&v=4">
+      <meta itemprop="name" content="dounine">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dounine's blog">
+      <meta itemprop="description" content="回首向来萧瑟处">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="区块链之共识——解读《区块链共识协议综述》 | dounine's blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          区块链之共识——解读《区块链共识协议综述》
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-12-15 13:25:42" itemprop="dateCreated datePublished" datetime="2021-12-15T13:25:42+08:00">2021-12-15</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Pro/" itemprop="url" rel="index"><span itemprop="name">欲穷千里目，更上一层楼</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Pro/BlockChain/" itemprop="url" rel="index"><span itemprop="name">区块链</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p>论文：夏清,窦文生,郭凯文,梁赓,左春,张凤军.区块链共识协议综述.软件学报,2021,32(2):277−299. <a target="_blank" rel="noopener" href="http://www.jos.org.cn/1000-9825/6150.htm">http://www.jos.org.cn/1000-9825/6150.htm</a></p>
+<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>共识是指：群体中各个独立的参与者，就某件事情达成一致。比如：公司的董事会根据某个决策，进行讨论、投票、最终达成一致的过程，就是一种共识。根据<strong>是否存在恶意参与者</strong> ，共识可分为<strong>崩溃容错（crash fault tolerant，简称CFT）</strong> 和<strong>拜占庭容错（Byzantine fault tolerant，简称BFT）</strong> 两大类。崩溃容错是指：在不存在恶意节点的情况下，即使某个节点崩溃，系统也能正常运行并达成共识，它常用于中心化的分布式数据库中。而拜占庭容错，名字来源于著名的拜占庭将军问题，指存在恶意者的情况下，整体还能否达成正确的共识，比如：将军们的军事议会中混进了叛徒，决策是否会被影响。</p>
+<p>共识作为区块链的核心技术，一直是区块链的重中之重。毫不夸张地说，比特币成功的关键是它独到的共识机制。而正是比特币的共识机制，使得大规模、分布式、拜占庭容错共识成为了可能。因此，了解区块链相关共识协议是研究区块链不可或缺的一步（当然也为了完成读书报告任务）。</p>
+<p>本文主要以解读<a target="_blank" rel="noopener" href="http://www.jos.org.cn/1000-9825/6150.htm">《区块链共识协议综述》</a>为主，大多内容提炼自原文。论文虽是中文，但愚以为质量可观，感兴趣可阅读原文。</p>
+<span id="more"></span>
+
+<h1 id="论文解读"><a href="#论文解读" class="headerlink" title="论文解读"></a>论文解读</h1><blockquote>
+<p>区块链共识协议分为两个主要步骤:出块节点选举和主链共识.在出块节点选举阶段,某个节点(或多个节点)成为出块节点,提出新区块.由于分布式网络中可能存在的恶意节点及分叉块的影响,其他节点在收到新区块以后不能直接将其加入自己的本地区块链中.所有节点需要利用主链共识对新区块及其构成的主链达成一致.</p>
+</blockquote>
+<p>区块链共识协议分为两个主要步骤：</p>
+<ul>
+<li><strong>出块节点选举</strong> ，类似于领导人选举。</li>
+<li><strong>主链共识</strong> 。</li>
+</ul>
+<blockquote>
+<p>在出块节点选举机制部分,我们主要围绕目前已得到广泛研究与应用的工作量证明和权益证明展开讨论,总结工作量证明和权益证明机制存在的问题,从解决问题的角度讨论了随后出现的各种替代性证明机制.在主链共识部分,我们根据主链共识的性质,将主链共识分为概率性共识和确定性共识两类.在概率性共识中,我们讨论了各种主链选取规则,包括最长链规则[2]、GHOST[12]、包容性协议[26]等,并从概率性共识的持久性和活性角度对上述规则进行分析比较.在确定性共识中,我们首先讨论了经典的拜占庭协议[27]以及其应用到区块链中需要解决的问题,随后讨论了各种基于拜占庭容错协议达成一致的共识算法,包括 Algorand 的 BA*协议[14]、Byzcoin 的 PBFT 协议[15]、Stellar 的 SCP 协议[28]及 Honeybadger[16],并从确定性共识的安全性和活性角度对各种协议进行分析比较.</p>
+</blockquote>
+<p>在出块节点选举机制部分，论文主要讨论<strong>工作量证明</strong> 和<strong>权益证明</strong> ，总结存在的问题，从解决问题的角度讨论了随后出现的各种替代性证明机制。</p>
+<p>在主链共识部分，论文根据主链共识的性质，将主链共识分为<strong>概率性共识</strong> 和<strong>确定性共识</strong> 两类：</p>
+<ul>
+<li>在概率性共识中，讨论各种主链选取规则，包括最长链规则、GHOST、包容性协议等，并从持久性和活性角度进行分析比较。</li>
+<li>在确定性共识中，论文首先讨论了经典的拜占庭协议以及其应用到区块链中需要解决的问题，随后讨论了各种基于拜占庭容错协议达成一致的共识算法，包括Algorand的BA*协议、Byzcoin的PBFT协议、Stellar的SCP协议及Honeybadger，并从安全性和活性角度进行分析比较。</li>
+</ul>
+<h2 id="1-区块链共识协议"><a href="#1-区块链共识协议" class="headerlink" title="1 区块链共识协议"></a>1 区块链共识协议</h2><blockquote>
+<p>区块链共识协议属于拜占庭容错协议,保证区块链网络中诚实节点在恶意节点干扰下也能达成共识.在分布式系统中,依据系统对故障组件的容错能力,共识协议分为<strong>崩溃容错协议(crash fault tolerant,简称 CFT)</strong> 和<strong>拜占庭容错协议(Byzantine fault tolerant,简称 BFT)</strong> 两大类[20].CFT 协议保证系统在组件宕机的情况下也能达成共识,适用于中心化的分布式数据集群,例如 Google 分布式锁服务 Chubby[29]、Paxos[30]协议等.BFT 协议由 LeslieLamport 在 1982 年提出,保证分布式系统在故障组件[31,32]的干扰下依然可以达成一致性.由于区块链网络的开放性质,区块链共识协议需要抵御恶意节点干扰,因此属于 BFT 协议.</p>
+</blockquote>
+<blockquote>
+<p>按节点准入机制,区块链系统分为<strong>非许可链(permissionless blockchain)</strong> 和<strong>许可链(permissioned blockchain)</strong> 两类[34,35].非许可链系统中没有许可机构对节点进行身份审查,节点以匿名形式任意加入或退出系统,因此非许可链又被称为公开链(public blockchain).基于这种开放性质,非许可链系统规模通常较大,共识节点甚至可达上万[36,37].许可链系统中节点需经过中心机构的准入审查,获得授权后才能加入系统.因而,许可链系统规模往往较小,节点数通常为几十到几百[16,38].针对不同应用场景,许可链又分为联盟链(consortium blockchain)和私有链(private blockchain)[34,39].联盟链通常由具有相同行业背景的多家不同机构组成,共识节点来自联盟内各个机构,区块链数据在联盟机构内部共享.私有链通常部署在单个机构内部,共识节点来自机构内部,类似于传统的分布式数据集群.由于区块链共识协议的相关研究主要针对非许可链,因此我们在本文中主要分析非许可链共识协议,同时也包括一些典型的许可链共识协议.</p>
+</blockquote>
+<p>按节点准入机制，区块链系统分为：</p>
+<ul>
+<li><strong>非许可链系统(permissionless blockchain)</strong> ，没有许可机构对节点进行身份审查，节点以匿名形式任意加入或退出系统，因此非许可链又被称为<strong>公开链(public blockchain)</strong> 。</li>
+<li><strong>许可链系统(permissioned blockchain)</strong> ，节点需经过中心机构的准入审查，获得授权后才能加入系统。许可链系统规模往往较小，节点数通常为几十到几百。许可链又分为：<ul>
+<li><strong>联盟链(consortium blockchain)</strong> ，通常由具有相同行业背景的多家不同机构组成，共识节点来自联盟内各个机构，区块链数据在联盟机构内部共享。</li>
+<li><strong>私有链(private blockchain)</strong> ，通常部署在单个机构内部，共识节点来自机构内部，类似于传统的分布式数据集群（其实就是分布式数据库）。</li>
+</ul>
+</li>
+</ul>
+<p>区块链共识协议的相关研究主要针对非许可链，论文也主要分析非许可链共识协议。</p>
+<p><img src="/%E5%8C%BA%E5%9D%97%E9%93%BE%E4%B9%8B%E5%85%B1%E8%AF%86%E2%80%94%E2%80%94%E8%A7%A3%E8%AF%BB%E3%80%8A%E5%8C%BA%E5%9D%97%E9%93%BE%E5%85%B1%E8%AF%86%E5%8D%8F%E8%AE%AE%E7%BB%BC%E8%BF%B0%E3%80%8B/image.png" alt="1"></p>
+<h2 id="2-出块节点选举机制"><a href="#2-出块节点选举机制" class="headerlink" title="2 出块节点选举机制"></a>2 出块节点选举机制</h2><h3 id="2-1-工作量证明机制"><a href="#2-1-工作量证明机制" class="headerlink" title="2.1 工作量证明机制"></a>2.1 工作量证明机制</h3><blockquote>
+<p>比特币[2]首次使用工作量证明(proof of work,简称 PoW)机制进行出块节点选举,随后的大量区块链研究工作及系统都采用这一机制.<strong>工作量证明的概念最早由 Jakobsson 等人在 1999 年提出[46],用于实现可验证的计算任务</strong> .</p>
+</blockquote>
+<p>比特币<strong>基于难题形式</strong> 实现工作量证明机制。给定全网统一的难度值 D、区块元数据 blockData，寻找满足条件的Nonce值,使得根据哈希函数 SHA-256 计算得到的区块哈希 blockHash 低于目标难度值 D:</p>
+<p>$$<br>blockHash&#x3D;Hash(blockData,Nonce)≤D<br>$$</p>
+<p><img src="/%E5%8C%BA%E5%9D%97%E9%93%BE%E4%B9%8B%E5%85%B1%E8%AF%86%E2%80%94%E2%80%94%E8%A7%A3%E8%AF%BB%E3%80%8A%E5%8C%BA%E5%9D%97%E9%93%BE%E5%85%B1%E8%AF%86%E5%8D%8F%E8%AE%AE%E7%BB%BC%E8%BF%B0%E3%80%8B/image_1.png" alt="1"></p>
+<h4 id="2-1-1-算力中心化"><a href="#2-1-1-算力中心化" class="headerlink" title="2.1.1 算力中心化"></a>2.1.1 算力中心化</h4><p>背景：</p>
+<blockquote>
+<p>在中本聪的设想中,节点使用个人电脑即可进行 PoW 运算,参与出块节点选举,并获得相应报酬.然而,随着比特币价格的上涨,出块节点获得的区块奖励吸引了大量算力加入,比特币网络中的哈希算力呈指数级增长趋势[64].共识节点参与 PoW 运算的物理设备从早期的个人电脑转换为 GPU,再演变为目前广泛使用的专用集成电路(application-specific integrated circuits,简称 ASIC)矿机.</p>
+</blockquote>
+<p>问题：</p>
+<blockquote>
+<p>矿池管理员将计算子任务下发给矿工,子任务难度值 d 远低于全网统一难度值 D.矿工找到子任务难题解后,提交给矿池.由于部分子任务难题解也是定义 1 中比特币 PoW 难题解,矿池将获得区块奖励,并根据矿工根据提交的子任务解的数量分配报酬.矿池子任务难题的设计保证矿工收入的稳定性.截止 2019 年 7 月 9 日,占比第一的BTC.com矿池拥有 21.9%的算力,前两大矿池拥有 33.9%的算力.<strong>算力中心化会带来一系列的安全问题[65−67],例如发动双花攻击、自私挖矿攻击等.</strong></p>
+</blockquote>
+<p>解决措施：</p>
+<ul>
+<li>替换 SHA-256 哈希函数</li>
+</ul>
+<blockquote>
+<p>针对 SHA-256 哈希函数计算密集型的特点,一些区块链系统选择用内存密集型哈希函数替代原有函数.例如,莱特币(Litecoin)[18]和狗狗币(Dogecoin)[53]采用 Scrypt 算法[68],以太坊[17]采用 Ethash 算法[69],大零币(ZeroCash)[54]和小零币(ZeroCoin)[55]采用 Equihash 算法[70].内存密集型哈希函数由于计算时占用内存多、难以并行计算,能在一定程度上降低 ASIC 矿机的算力优势.</p>
+</blockquote>
+<ul>
+<li>设计外包困难的 PoW 难题</li>
+</ul>
+<blockquote>
+<p>针对比特币 PoW难题可外包的特点,研究人员修改难题形式使其外包困难,达到区块链系统去中心化的目标.例如,文献[56]重新设计比特币 PoW 难题,使矿池管理者将计算任务分发给矿工后,矿工可修改计算任务中获取奖励的地址,并不被矿池管理者发现.</p>
+</blockquote>
+<ul>
+<li>去中心化矿池</li>
+</ul>
+<blockquote>
+<p>文献[57]实现了基于智能合约的去中心化矿池 SmartPool,矿池可自动执行子任务难题分发与确认工作,替代矿池管理员,矿工在获得稳定收入的前提下,共同维护 SmartPool,从而保持算力的去中心化.</p>
+</blockquote>
+<h4 id="2-1-2-资源浪费"><a href="#2-1-2-资源浪费" class="headerlink" title="2.1.2 资源浪费"></a>2.1.2 资源浪费</h4><p>问题：</p>
+<blockquote>
+<p>截至 2019 年 7 月,哈希率达到 70EH&#x2F;s(百亿亿次哈希&#x2F;秒).现有文献[71]估计,比特币网络年用电量与爱尔兰或奥地利年用电量相当.</p>
+</blockquote>
+<p>解决措施：</p>
+<ul>
+<li>提供有用服务</li>
+</ul>
+<blockquote>
+<p>一些区块链系统利用 PoW 计算过程中消耗的算力提供有用服务.例如,素数币(Primecoin)[58]将PoW 难题改进为寻找符合要求的素数,供公众使用,进而促进数学领域发展</p>
+</blockquote>
+<ul>
+<li>利用其他特定能力证明</li>
+</ul>
+<blockquote>
+<p>如<strong>权益证明(proof of stake,简称PoS)</strong> [24,44,50,72,73]、空间证明(proof of space,简称 PoSp,又被称为容量证明(proof of capacity,简称 PoC)、存储证明(proof of storage,简称 PoSt)[61]、权威证明(proof of authority,简称 PoAu)[62]、信誉证明(proof of reputation,简称PoR)[63]替代工作量证明.这些特定能力证明中,节点成为出块节点的概率分别与其拥有的某种稀缺资源相关,如权益(即加密货币数量)、内存或硬盘存储空间、权威、信誉相关,与算力无关.例如,文献[61]的空间证明用内存消耗型难题替代 PoW 算力难题.PoAu 与 PoR 思想类似,只有具有较高权威或信誉度的节点才能成为出块节点,由于区块带有节点签名,节点被检测到作恶后会丧失出块资格.因此,PoAu 与 PoR 只能用于具有准入机制的许可链系统中,无法用于非许可链系统.</p>
+</blockquote>
+<h4 id="2-1-3-性能"><a href="#2-1-3-性能" class="headerlink" title="2.1.3 性能"></a>2.1.3 性能</h4><p>问题：</p>
+<blockquote>
+<p>随着比特币系统关注度上升,网络中未确认交易数增多.截至 2019 年 7 月 10 日,比特币网络存在近 5 万笔未确认交易[74].</p>
+</blockquote>
+<p>解决措施：</p>
+<ul>
+<li>修改参数</li>
+</ul>
+<blockquote>
+<p>例如,以太坊、莱特币、狗狗币系统分别将比特币 PoW 机制中的区块间隔调整为 15s、2.5min 和 1min[75],以此加速交易处理速度.缩短区块间隔看起来是改善性能的可行方案,然而一些研究工作发现,缩短区块间隔存在安全隐患.文献[11−13]指出:<strong>足够长的区块间隔保证区块数据在 P2P 网络中广泛传播,区块间隔缩短会削弱系统安全性</strong> .例如,当攻击者掌握 30%系统算力时,为了达到和比特币系统同等程度的安全性,以太坊、莱特币、狗狗币系统需要分别等待至少 37 个、28 个、47 个区块长度确认[75].</p>
+</blockquote>
+<ul>
+<li>修改比特币的出块节点选举机制</li>
+</ul>
+<blockquote>
+<p>Bitcoin-NG 将区块分为关键块(key block)和微块(micro block)两类:关键块包含比特币 PoW 难题的解,体现出块节点的工作量证明;微块包含关键块对应的出块节点签名,但不包含难题的解,不体现工作量证明.节点生成关键块后,负责在随后的区块间隔时间内将交易打包进微块并签名.通过验证节点签名,其他节点判断微块的合法性.通过在区块间隔连续产生微块,Bitcoin-NG 实现了在出块节点选举环节加速交易处理.关键块和微块的概念随后也在 Byzcoin[15]中得到应用.</p>
+</blockquote>
+<h4 id="2-1-4-总结"><a href="#2-1-4-总结" class="headerlink" title="2.1.4 总结"></a>2.1.4 总结</h4><p>可行的研究点：</p>
+<blockquote>
+<p>首先,工作量证明改进工作多以白皮书的形式提出,<strong>缺乏理论及实验数据支撑</strong> .例如,以太坊系统等白皮书大多从概念层面进行论述,没有相关实验数据支撑,也没有进行安全性证明.</p>
+</blockquote>
+<blockquote>
+<p>其次,众多的工作量证明<strong>改进机制之间缺乏相互比较</strong> ,无法判读其优劣势.例如,包括 Scrypt[68]、Ethash[69]、Equihash[70]在内的众多内存密集型哈希函数没有相互比较,尚不清楚这些算法针对算力中心化问题的改进程度.值得注意的是,目前已出现针对以上内存密集型哈希函数的专用矿机.</p>
+</blockquote>
+<blockquote>
+<p>再者,由于分布式系统的各方面复杂因素,<strong>对协议进行参数调整需要加以严格的安全证明</strong> .例如,莱特币等调整参数的改进方案看似可行,但被证明存在安全隐患[13],最终没能达到预期效果.</p>
+</blockquote>
+<h3 id="2-2-权益证明机制"><a href="#2-2-权益证明机制" class="headerlink" title="2.2 权益证明机制"></a>2.2 权益证明机制</h3><p>背景：</p>
+<blockquote>
+<p>针对工作量证明机制的资源浪费问题,比特币社区[76]在 2011 年首次提出了权益证明机制,根据节点掌握的比特币数量而不是算力作为权重选举出块节点.<strong>权益证明机制的安全性基于权益拥有者比矿工更有动力维护网络安全的假设</strong> [44,72,76],当区块链系统遭到攻击,权益拥有者自身利益更容易受损.2012年,权益证明机制首次在点点币(peercoin&#x2F;ppcoin)[44]系统中得到应用.</p>
+</blockquote>
+<p>定义：</p>
+<blockquote>
+<p>给定全网统一的难度值 D,区块元数据 blockData,寻找满足条件的时间戳timeStamp,使根据哈希函数 SHA-256 计算得到的区块哈希 blockHash 低于目标难度值.目标难度值为全网统一难度值 D 和币龄 coinDay 的乘积.币龄是节点持有权益(即节点持有的数字货币数量,coin)与持有时间(day)的乘积:</p>
+</blockquote>
+<p>$$<br>blockHash&#x3D;Hash(blockData,timeStamp)≤D×coinDay<br>$$</p>
+<p>与工作量证明的不同：</p>
+<ul>
+<li>移除随机数 Nonce，缩小计算尝试空间</li>
+</ul>
+<blockquote>
+<p>由于移除随机数 Nonce,点点币权益证明难题减轻了工作量证明难题算力竞争问题.在给定元数据 blockData 的情况下,共识节点在求解点点币权益证明难题中,可尝试的只有时间戳变量.由于点点币采用以秒计数的 UNIX 时间戳,节点求解难题时尝试空间有限.因此,点点币权益证明难题大大缩小了工作量证明难题的计算尝试空间,减缓了算力竞赛带来的资源浪费问题.</p>
+</blockquote>
+<ul>
+<li>引入币龄调整难题难度</li>
+</ul>
+<blockquote>
+<p>以币龄作为权重,实现根据权益选举出块节点的目标,币龄的概念随后在披风币(Cloakcoin)[77]和新星币(Novacoin)[78]中也得到应用.币龄是用户权益和持有时间的乘积.假设用户 A 拥有 10 个点点币并持有 90 天,累计 900 币龄.用户 B 拥有 10 个点点币并持有 45 天,累计 450 币龄.根据点点币权益证明难题,用户 A 解决难题的可能性 2 倍于用户 B.</p>
+</blockquote>
+<p>不足：</p>
+<blockquote>
+<p>不活跃节点可能通过长期持有权益累积大量币龄,提高自己成为出块节点的可能性,从而等待发动攻击的时机.针对这一问题,未来币[45]和黑币[79]在权益证明难题中以权益替代币龄,维理币[80]使用类似币龄的权益时间(stakeTime)概念,节点离线后权益时间会逐渐减少,活动证明(proof of activity,简称PoA)[50]将权益证明与工作量证明结合,使得只有在线的活跃节点才能获得挖矿收益和交易费.这几种方法都用于改进点点币系统中不活跃节点问题.</p>
+</blockquote>
+<h4 id="2-2-1-基于随机函数的权益证明"><a href="#2-2-1-基于随机函数的权益证明" class="headerlink" title="2.2.1 基于随机函数的权益证明"></a>2.2.1 基于随机函数的权益证明</h4><p>问题：</p>
+<blockquote>
+<p>权益证明机制在一定程度上缓和了工作量证明机制的算力浪费问题,但采用的仍是基于难题求解的竞争性选举机制.</p>
+</blockquote>
+<p>基于随机函数的权益证明机制：</p>
+<blockquote>
+<p>这类机制采用以权益作为权重的随机算法确定出块节点,同时,其他节点可通过随机算法验证出块节点身份的正确性.由于不再利用算力竞争成为出块节点,基于随机函数的权益证明属于非竞争性选举机制.</p>
+</blockquote>
+<p>follow-the-satoshi算法：</p>
+<blockquote>
+<p>聪(satoshi)是比特币的最小货币单位,follow-the-satoshi 算法将零和比特币发行总量(以聪为单位)间的一个随机数作为输入,通过追溯区块数据,找到目前持有该货币的节点,该节点即成为出块节点.假设用户 A持有 10 个比特币,用户 B 持有 5 个比特币,用户 A 被 follow-the-satoshi 算法选中的概率 2 倍于用户 B.因此,follow-the-satoshi 算法实现根据权益进行出块节点选举.</p>
+</blockquote>
+<p>相关例子（活动证明、活动链和Ouroboros都利用 follow-the-satoshi 算法随机选举出块节点，但采用不同方式更新 follow-the-satoshi 算法的随机种子）：</p>
+<ul>
+<li>活动证明(PoA)</li>
+</ul>
+<blockquote>
+<p>PoA[50]中,出块节点首先需要生成满足 PoW 的空区块(不包含交易,只包含区块元数据的空区块)哈希,将该哈希作为随机算法输入,选出一组背书节点.出块节点搜集一定数量背书节点签名后才能打包交易、生成合法区块.因此,PoA[50]的出块节点选举机制实质是 PoW 和 PoS 的结合,PoW区块哈希的不可预测保证了 PoS 选举结果的不可预测.</p>
+</blockquote>
+<ul>
+<li>活动链(chains of activity,简称 CoA)</li>
+</ul>
+<blockquote>
+<p>CoA[72]将当前区块的前 N 个区块哈希作为随机算法输入,选出后 N 个区块的出块节点.</p>
+</blockquote>
+<ul>
+<li>Ouroboros</li>
+</ul>
+<blockquote>
+<p>Ouroboros[24]基于安全多方计算(multi-party computation,简称 MPC)更新随机种子.Ouroboros 将多个区块间隔称为一个纪元(epoch),纪元内的出块节点共同组成组委员(committee),组委会节点参与 MPC 算法,合作更新随机种子.</p>
+</blockquote>
+<ul>
+<li>Algorand</li>
+</ul>
+<blockquote>
+<p>Algorand[14]基于<strong>可验证随机函数(verifiable random function,简称 VRF)</strong> 进行出块节点选举,各节点利用自己的私钥和全网统一的随机种子作为算法输入,判断自己是否是本轮的出块节点.若成为出块节点,节点将同时出示算法生成的选举证明,供其他节点验证.前一区块间隔的出块节点利用VRF 函数更新下一间隔的随机种子.</p>
+</blockquote>
+<p><img src="/%E5%8C%BA%E5%9D%97%E9%93%BE%E4%B9%8B%E5%85%B1%E8%AF%86%E2%80%94%E2%80%94%E8%A7%A3%E8%AF%BB%E3%80%8A%E5%8C%BA%E5%9D%97%E9%93%BE%E5%85%B1%E8%AF%86%E5%8D%8F%E8%AE%AE%E7%BB%BC%E8%BF%B0%E3%80%8B/image_2.png" alt="1"></p>
+<h4 id="2-2-2-问题及解决方案"><a href="#2-2-2-问题及解决方案" class="headerlink" title="2.2.2 问题及解决方案"></a>2.2.2 问题及解决方案</h4><p>PoS虽然解决了算力浪费问题，但也存在一些问题：</p>
+<p><img src="/%E5%8C%BA%E5%9D%97%E9%93%BE%E4%B9%8B%E5%85%B1%E8%AF%86%E2%80%94%E2%80%94%E8%A7%A3%E8%AF%BB%E3%80%8A%E5%8C%BA%E5%9D%97%E9%93%BE%E5%85%B1%E8%AF%86%E5%8D%8F%E8%AE%AE%E7%BB%BC%E8%BF%B0%E3%80%8B/image_3.png" alt="1"></p>
+<ul>
+<li><p>粉碎攻击(grinding attack)</p>
+<ul>
+<li><p>描述</p>
+<blockquote>
+<p>粉碎攻击(grinding attack)指节点通过尝试随机参数提高成为出块节点概率的一类攻击形式.例如,攻击者通过尝试点点币权益证明难题中的时间戳(timeStamp)和拥有的多个账户币龄提高成为出块节点概率[60].与点点币类似,未来币中也有时间戳尝试和公钥尝试问题.除此以外,基于随机函数的权益证明可提前尝试随机种子,提高随后被选中为出块节点的概率[24,50,60].由于随机种子基于以前的区块哈希,CoA[72]可能会遭到粉碎攻击[24].</p>
+</blockquote>
+</li>
+<li><p>解决方案</p>
+<blockquote>
+<p>主要包括参数不可尝试以及随机种子限制:前者指权益证明难题中不包括可尝试参数;后者指随机种子尽量不依赖区块本身信息,否则存在随机算法偏向某一节点的可能.例如,Ouroboros[24]和Ouroboros Praos[82]利用多方安全计算产生随机算法种子,既解决了可尝试参数问题,同时保证随机性与区块信息无关.</p>
+</blockquote>
+</li>
+</ul>
+</li>
+<li><p>无权益攻击(nothing-at-stake)</p>
+<ul>
+<li>描述<blockquote>
+<p>无权益攻击(nothing-at-stake)指被选中的出块节点在同一高度产生多个区块,导致区块分叉无法解决的问题.无权益攻击是出块节点出于利益最大化作出的选择.如图 2 所示,基于权益证明的区块链系统在高度 h 处出现分叉,节点 A 是高度 h+1 的出块节点,由于尚不确定在高度 h 上被最终确认的区块,节点 A 选择同时在多个分叉块后产生区块.因此,无论最终哪一区块是合法区块,节点 A 都可获利.</p>
+</blockquote>
+</li>
+</ul>
+<p>  <img src="/%E5%8C%BA%E5%9D%97%E9%93%BE%E4%B9%8B%E5%85%B1%E8%AF%86%E2%80%94%E2%80%94%E8%A7%A3%E8%AF%BB%E3%80%8A%E5%8C%BA%E5%9D%97%E9%93%BE%E5%85%B1%E8%AF%86%E5%8D%8F%E8%AE%AE%E7%BB%BC%E8%BF%B0%E3%80%8B/image_4.png" alt="1"></p>
+<ul>
+<li>解决方案<blockquote>
+<p>主要包括保证金制度和安全硬件.<strong>保证金制度</strong> 指共识节点需在账户中存取一定金额保证金,若节点被监测发动无权益攻击,则罚没其保证金,从经济激励角度解决无权益攻击.例如,以太坊的 PoS 提案 Slasher[83]和 Casper[84]都引入了保证金制度.类似地,Tendermint[85]也引入了保证金机制,且保证金比例和共识票数成正比.除此以外,文献[86]基于可信执行环境(trusted execution environment,简称TEE)的安全硬件,限制节点在同一高度只能生成一个区块.</p>
+</blockquote>
+</li>
+</ul>
+</li>
+<li><p>长程攻击(long range)</p>
+<ul>
+<li><p>描述</p>
+<blockquote>
+<p>长程攻击(long range)指攻击者试图从某一高度区块后重新生成后续所有区块,覆盖这一区间区块数据,也被称为历史攻击(history attack).由于长程攻击要求攻击者的区块生成速度快于其他节点,因此理论上只有掌握超过 50%权益的攻击者才能发动长程攻击,然而实际上,攻击者可通过控制或贿赂历史时刻拥有大量权益的节点[86]发动长程攻击.例如,攻击者 A 拥有 21%的权益,节点 B 在某一历史时刻拥有 30%的权益,随后将 30%权益转让他人,攻击者可通过控制或贿赂的手段,利用节点 B 在历史时刻拥有的权益,从该时刻重新生成区块.</p>
+</blockquote>
+</li>
+<li><p>解决方案：</p>
+<blockquote>
+<p>主要包括移动检查点机制和密钥演进加密技术.移动检查点机制[87]将某一历史高度的区块作为检查点,检查点前的区块不可篡改.移动检查点机制在点点币[44]、未来币[45]、黑币[79]、snowwhite[88]中得到使用.点点币和黑币依赖中心服务器定期发布检查点.未来币[45]不接受 720 个区块以前的历史区块分叉.与未来币类似,snow white[88]不接受对距离当前区块太远的历史区块分叉.除了检查点机制以外,Ouroboros Praos[82]采用密钥演进加密技术解决长程攻击[87].节点随着时间需要不断演变私钥,当攻击者盗取了节点目前的密钥时,由于不能伪造过去的签名,无法利用节点的历史权益发送长程攻击.</p>
+</blockquote>
+</li>
+</ul>
+</li>
+</ul>
+<p>委托权益证明(delegated proof of stake,简称 DPoS)：</p>
+<blockquote>
+<p>委托权益证明(delegated proof of stake,简称 DPoS)[89]通过投票机制缩小共识节点范围,使 PoS 在大规模网络中得以高效应用.DPoS 中的票数与权益成正比,权益所有者投票选出一部分节点作为候选出块节点,这些节点再利用 PoS 的随机算法成为出块节点.节点若在给定时间段内未完成出块,将被移出候选出块节点列表.因此,持有权益较少的节点可通过投票维护系统安全,而不必购买专业硬件设备成为共识节点.投票机制还可用于权益所有者修改系统参数,包括交易大小、区块间隔、交易费规则等,实现了区块链系统自治.</p>
+</blockquote>
+<h4 id="2-2-3-总结"><a href="#2-2-3-总结" class="headerlink" title="2.2.3 总结"></a>2.2.3 总结</h4><blockquote>
+<p>权益证明机制由早期基于难题的竞争性机制,逐渐演变为<strong>基于随机函数的非竞争性出块节点选举机制</strong> .后者由于安全且高效,<strong>是目前权益证明共识协议的重点研究方向</strong> .我们在调研过程中发现,尽管研究成果众多,<strong>目前尚没有权益证明机制及其安全问题的综述研究</strong> .因此,本文对权益证明及其 3 种主要攻击方法和对应解决方案进行总结.此外,相比工作量证明机制,<strong>采用权益证明机制的区块链系统仍较少</strong> .再者,一些区块链系统采用工作量证明和权益证明结合的方式,前期利用工作量证明完成权益的初始分配,再逐渐过渡到权益证明机制,例如以太坊、点点币等.但是,<strong>目前尚没有关于工作量证明如何安全过渡到权益证明的相关研究</strong> .</p>
+</blockquote>
+<h2 id="3-主链共识"><a href="#3-主链共识" class="headerlink" title="3 主链共识"></a>3 主链共识</h2><p>根据区块数据是否满足最终一致性，主链共识可分为：</p>
+<ul>
+<li>概率性共识</li>
+</ul>
+<blockquote>
+<p>区块数据以一定概率达成一致,随着时间推移概率逐渐提高,不能保证区块数据将来不可更改,这种一致性也称为弱一致性.</p>
+</blockquote>
+<ul>
+<li>确定性共识</li>
+</ul>
+<blockquote>
+<p>一旦区块数据达成一致便不可更改,又被称为强一致性.</p>
+</blockquote>
+<h3 id="3-1-概率性共识"><a href="#3-1-概率性共识" class="headerlink" title="3.1 概率性共识"></a>3.1 概率性共识</h3><p><img src="/%E5%8C%BA%E5%9D%97%E9%93%BE%E4%B9%8B%E5%85%B1%E8%AF%86%E2%80%94%E2%80%94%E8%A7%A3%E8%AF%BB%E3%80%8A%E5%8C%BA%E5%9D%97%E9%93%BE%E5%85%B1%E8%AF%86%E5%8D%8F%E8%AE%AE%E7%BB%BC%E8%BF%B0%E3%80%8B/image_5.png" alt="1"></p>
+<h4 id="3-1-1-最长链规则"><a href="#3-1-1-最长链规则" class="headerlink" title="3.1.1 最长链规则"></a>3.1.1 最长链规则</h4><blockquote>
+<p>最长链规则在比特币白皮书[2]中首次提出</p>
+</blockquote>
+<blockquote>
+<p>最长链规则是目前应用最广泛的主链选取规则</p>
+</blockquote>
+<h4 id="3-1-2-GHOST规则"><a href="#3-1-2-GHOST规则" class="headerlink" title="3.1.2 GHOST规则"></a>3.1.2 GHOST规则</h4><p>背景：</p>
+<blockquote>
+<p>文献[12]发现,在交易请求增多时,比特币不得不频繁地创建大区块以提高交易吞吐量.大区块将导致区块传输时间延长,使得分叉块增多、诚实节点算力分散,此时,恶意节点将更容易发动攻击.</p>
+</blockquote>
+<p>当分叉块增多、诚实节点算力分散时，会出现如下安全问题：</p>
+<blockquote>
+<p>攻击者秘密生成一条私有区块链(黑色链条),当私有区块链长度超过网络中公开的最长链时将其发布,根据最长链规则,攻击者的私有区块链将成为主链.攻击者可通过私有区块链发动双花攻击,从而破坏区块链系统安全性.</p>
+</blockquote>
+<p><img src="/%E5%8C%BA%E5%9D%97%E9%93%BE%E4%B9%8B%E5%85%B1%E8%AF%86%E2%80%94%E2%80%94%E8%A7%A3%E8%AF%BB%E3%80%8A%E5%8C%BA%E5%9D%97%E9%93%BE%E5%85%B1%E8%AF%86%E5%8D%8F%E8%AE%AE%E7%BB%BC%E8%BF%B0%E3%80%8B/image_6.png" alt="1"></p>
+<blockquote>
+<p>为了在交易请求增多时依然保证较高安全性,Sompolinsky 等人提出了 GHOST(greedy heaviest-observed sub-tree)[12]规则作为最长链规则的替代.</p>
+</blockquote>
+<blockquote>
+<p>与最长链不同,<strong>GHOST 规则将分叉块纳入主链选取规则,区块树中最重子树的区块将构成主链,又被称为最重链</strong> .由于最重链代表网络中的大部分算力,文献[12]认为:只要诚实节点掌握大多数算力,GHOST 规则在网络交易吞吐量高的情况下也能保证安全性.</p>
+</blockquote>
+<p><strong>GHOST(greedy heaviest-observed sub-tree)规则，每当遇到分叉时就选择最重子树（区块最多的分叉子树），直到选出最长链</strong> 。如上图中，最终选择中间虚线链条为最长链。</p>
+<p>应用：</p>
+<blockquote>
+<p>GHOST 规则随后在包容性协议[26]和 Conflux 中用来选择主链,但据我们所知,该规则目前并未直接应用于非许可链系统中(我们注意到:以太坊声称使用 GHOST规则来选取主链,并实现了一个GHOST的简化版本[12],但项目代码[92]显示,目前采用的仍是最长链规则).</p>
+</blockquote>
+<p>性能对比：</p>
+<blockquote>
+<p>文献[12]在相同实验条件下对比了 GHOST 与最长链规则的性能,实验结果显示:在不同参数设置中,GHOST 的吞吐量都略低于最长链规则,但其在处理高吞吐量交易时拥有更高安全性能.</p>
+</blockquote>
+<h4 id="3-1-3-包容性协议"><a href="#3-1-3-包容性协议" class="headerlink" title="3.1.3 包容性协议"></a>3.1.3 包容性协议</h4><blockquote>
+<p>包容性协议[26]<strong>将 GHOST 规则与有向无环图(directed acyclic graph,简称 DAG)结合</strong> ,进一步提高交易吞吐量.包容性协议修改了以比特币为代表的传统区块链数据结构,<strong>区块可以指向多个父区块而不是唯一一个,新区块将所有没有被指向的区块(即叶子区块)作为父区块</strong> ,因此,包容性协议中区块构成了有向无环图而不是区块树.基于该有向无环图,<strong>包容性协议首先利用 GHOST 规则选出主链,遍历主链区块的多个分叉父区块,如果分叉块中的交易和主链交易没有冲突,则将分叉块也纳入主链中.</strong> 通过利用分叉块交易内容,包容性协议进一步提升交易通量,并且对于网络连接差、不能及时广播区块的节点更加友好.</p>
+</blockquote>
+<h4 id="3-1-4-SPECTRE协议"><a href="#3-1-4-SPECTRE协议" class="headerlink" title="3.1.4 SPECTRE协议"></a>3.1.4 SPECTRE协议</h4><blockquote>
+<p>SPECTRE[51]协议<strong>利用成对投票(pair voting)解决冲突区块问题</strong> ,提高系统吞吐量并保证安全性.与包容性协议类似,SPECTRE 中新区块指向多个父区块,形成有向无环图,在此基础上运行投票规则.</p>
+</blockquote>
+<p>假设区块x和y是一对包容冲突交易的区块，z区块将对冲突区块进行投票，投票规则如下：</p>
+<ol>
+<li>z 是 x 的后代区块,不是 y 的后代区块,z 投票给 x,表示为 x≤y.</li>
+<li>z 同时是 x 和 y 的后代区块,则根据本区块之前有向无环图的区块投票结果确定.如果投票数量相等,则根据预定义规则决定(区块哈希的字典顺序等).</li>
+<li>z 既不是 x 的后代区块,也不是 y 的后代区块,则根据本区块之后有向无环图的区块投票结果确定.如果投票数量相等,则根据预定义规则决定.</li>
+</ol>
+<p>示例如下，交易x是攻击者支付的正确交易，交易y是恶意交易。攻击者先广播交易x，交易x被确认之后，再公布隐藏链，企图代替主链。但根据SPECTRE协议，区块6<del>10肯定投票给x；区块11</del>12由于前置区块投给x的票数大于投给y的，也投给x；区块2~5由于后接区块投给x的票数更多，也投给x；最终交易x胜出。</p>
+<p><img src="/%E5%8C%BA%E5%9D%97%E9%93%BE%E4%B9%8B%E5%85%B1%E8%AF%86%E2%80%94%E2%80%94%E8%A7%A3%E8%AF%BB%E3%80%8A%E5%8C%BA%E5%9D%97%E9%93%BE%E5%85%B1%E8%AF%86%E5%8D%8F%E8%AE%AE%E7%BB%BC%E8%BF%B0%E3%80%8B/image_7.png" alt="1"></p>
+<h4 id="3-1-5-Conflux协议"><a href="#3-1-5-Conflux协议" class="headerlink" title="3.1.5 Conflux协议"></a>3.1.5 Conflux协议</h4><blockquote>
+<p>Conflux[25]协议<strong>基于有向无环图计算出区块内交易的全局顺序,通过剔除冲突交易,使所有分叉块内的交易得到利用</strong> ,从而提升系统吞吐量.Conflux 的区块间有两类指向关系:父边(parent edge)和引用边(reference edge).父边指向父区块,每个区块只有一条父边.除父边外,区块可以有多条引用边,引用边指向所有目前没有被父边引用的叶子区块,引用边代表时间上的发生在先(happen-before)关系.<strong>Conflux利用 GHOST规则选出有向无环图中的主链,利用主链和两类指向关系对所有区块进行全局排序.基于区块的全局排序,区块内的交易也达成全局排序.随后,Conflux 从交易全局排序中剔除掉重复和冲突的交易,对余下交易达成共识.</strong></p>
+</blockquote>
+<h4 id="3-1-6-安全分析"><a href="#3-1-6-安全分析" class="headerlink" title="3.1.6 安全分析"></a>3.1.6 安全分析</h4><p>主要围绕以下两方面进行安全性分析：</p>
+<ul>
+<li>持久性(persistence)</li>
+</ul>
+<blockquote>
+<p>持久性衡量概率性共识中区块链数据的一致性.持久性指如果某区块在节点的本地区块链中拥有 k 个区块的深度,该区块在其他节点的本地区块链中(极大概率)也拥有 k 个区块的深度.由于网络传播等限制,各个节点的本地区块链可能暂时不一致,但 k 个区块之前的数据(极大概率)是一致的.</p>
+</blockquote>
+<ul>
+<li>活性(liveness)</li>
+</ul>
+<blockquote>
+<p>活性衡量概率性共识中区块链系统的可用性.活性指诚实节点发起的交易最终被打包进节点区块链中,并满足持久性.由于网络吞吐量等限制,诚实节点发起的交易可能不会立即被处理,但最终会被处理.</p>
+</blockquote>
+<p>各概率性共识协议的分析（都需要在诚实节点掌握大多数算力情况下）：</p>
+<ul>
+<li>最长链规则</li>
+</ul>
+<blockquote>
+<p>在同步和异步网络中都满足持久性和活性要求.比特币白皮书[2]对基于工作量证明的最长链规则首先进行了非正式分析,在网络同步且诚实节点掌握大多数算力时,协议满足持久性要求.随后,文献[13]对最长链规则进行了理论证明,在网络同步且诚实节点拥有大多数算力的情况下,最长链规则满足持久性和活性要求.在此基础上,文献[96]证明了最长链规则在延迟时间有上界的异步网络中,且诚实节点拥有大多数算力的情况下,满足持久性和活性要求,并可以适应算力动态变化.</p>
+</blockquote>
+<ul>
+<li>GHOST与Conflux</li>
+</ul>
+<blockquote>
+<p>GHOST 规则满足持久性和活性要求,但活性弱于最长链规则.GHOST规则[12]作为最长链规则的替代,只要诚实节点掌握大部分算力,在网络交易吞吐量高的情况下,依然可以保证安全性.文献[97]理论证明了 GHOST 协议满足持久性和活性,然而文献[97]认为:<strong>在网络交易吞吐量高的情况下,GHOST 规则相对最长链规则并没有性能优势</strong> .除此以外,<strong>文献[97]提出了一种针对区块链活性的攻击方法,通过干扰交易和区块的传播,拖延交易的确认时间,从而破坏活性</strong> .在这种攻击方式下,GHOST 的活性弱于最长链规则.由于 Conflux 利用 GHOST 协议选择主链,因此安全性质和 GHOST 相同[25].</p>
+</blockquote>
+<ul>
+<li>包容性协议</li>
+</ul>
+<blockquote>
+<p>包容性协议满足持久性和活性.文献[26]未对包容性协议进行理论证明,但通过实验方式显示,协议可满足持久性和活性.</p>
+</blockquote>
+<ul>
+<li>SPECTRE协议</li>
+</ul>
+<blockquote>
+<p>SPECTRE 协议可保证区块链系统的持久性和弱活性(SPECTRE 协议中未对持久性(persistence)进行证明,但其中的一致性、安全性与持久性同一定义,因此我们将其看做对持久性的证明) [51].SPECTRE 协议在交易内容互不冲突时,能保证交易在有限时间内被打包到区块中,即满足活性要求.然而,<strong>当攻击者同时发起两笔冲突交易时,合法交易只能满足弱活性,即交易最终会被打包到区块中,但时间有明显延迟.</strong></p>
+</blockquote>
+<p><img src="/%E5%8C%BA%E5%9D%97%E9%93%BE%E4%B9%8B%E5%85%B1%E8%AF%86%E2%80%94%E2%80%94%E8%A7%A3%E8%AF%BB%E3%80%8A%E5%8C%BA%E5%9D%97%E9%93%BE%E5%85%B1%E8%AF%86%E5%8D%8F%E8%AE%AE%E7%BB%BC%E8%BF%B0%E3%80%8B/image_8.png" alt="1"></p>
+<p>激励相容(incentive compatibility)问题：</p>
+<blockquote>
+<p>激励相容问题指节点的个人目标与系统目标不一致,其中最典型的是<strong>自私挖矿问题</strong> .在工作量证明机制的基础上,为鼓励节点加入网络维护安全,系统通常以数字货币形式给出块节点一定报酬.然而大量研究工作[65,66,98,99]发现,<strong>当节点掌握算力达到一定程度时,理性节点选择不遵守协议将获得更高的收益.这些节点被称为自私挖矿节点,他们将生成的新区块隐藏起来,并选择在将来的适当时机公开,从而获得更高收益.</strong> 这些隐藏区块可能会颠覆网络的公开区块,引发安全问题.</p>
+</blockquote>
+<blockquote>
+<p>在自私挖矿影响下,最长链规则的安全边界从 50%降低到 33%,即只能抵御算力不超过 33%的恶意节点.随后,一系列研究工作[66,98]在最长链规则上拓展不同的自私挖矿策略,进一步降低系统安全边界.与最长链规则类似,GHOST 规则和包容性协议也受到自私挖矿的影响[26,66].SPECTRE 协议没有说明是否存在自私挖矿问题.此外,由于 Conflux 协议基于 GHOST 规则选择主链,也有同样的自私挖矿问题.</p>
+</blockquote>
+<h3 id="3-2-确定性共识"><a href="#3-2-确定性共识" class="headerlink" title="3.2 确定性共识"></a>3.2 确定性共识</h3><p>概率性共识存在的问题：</p>
+<blockquote>
+<p>概率性共识在交易延迟与安全性存在天然的权衡问题[100],限制了区块链技术的应用场景.<strong>概率性共识的权衡问题源于区块数据的一致性概率随着时间推移逐渐提高,为保证交易安全性,用户不得不等待多个区块确认,带来明显的交易延时.</strong> 延时问题限制了基于概率性共识的区块链系统的商业应用.</p>
+</blockquote>
+<p>引出确实性共识：</p>
+<blockquote>
+<p>在确定性共识中,区块一旦写入节点本地区块链,就不存在随后被改变的可能性.确定性共识有两个明显优势[15]:首先,用户不用等待较长时间确保交易安全性;其次,由于同一高度仅有一个合法区块,节点不用在分叉区块上浪费计算资源.</p>
+</blockquote>
+<p>拜占庭将军问题：</p>
+<blockquote>
+<p>拜占庭容错协议用于解决分布式系统中的拜占庭将军问题,在存在恶意节点的情况下达成一致性.<strong>拜占庭将军问题由 Leslie Lamport 在 1982 年[31]提出</strong> ,诚实将军在叛徒将军的干扰下对进攻命令达成一致.</p>
+</blockquote>
+<p>经典拜占庭共识存在的问题：</p>
+<blockquote>
+<p>经典的拜占庭容错协议通常面向中心化的分布式集群达成确定一致性,如 <strong>PBFT[27]、Byzantine Paoxs[101]</strong> 等,但无法直接应用在区块链系统中.<strong>在这些协议中,共识节点数量固定或者变化缓慢[27],节点之间需要多轮广播通信[102],通信复杂度较高.</strong> 然而区块链系统中的节点数量不断动态变化,区块链系统(特别是非许可链)的网络规模也不支持节点间的多轮广播通信,因此,区块链拜占庭容许协议需要适应系统特点进行改进.</p>
+</blockquote>
+<h4 id="3-2-1-非许可链拜占庭容错协议"><a href="#3-2-1-非许可链拜占庭容错协议" class="headerlink" title="3.2.1 非许可链拜占庭容错协议"></a>3.2.1 非许可链拜占庭容错协议</h4><p>混合协议（结合拜占庭容错协议和区块链的出块节点选举机制）：</p>
+<blockquote>
+<p>在出块节点选举阶段,混合协议采用区块链的选举机制,抵御开放网络中的女巫攻击等问题;</p>
+</blockquote>
+<blockquote>
+<p>在主链共识阶段,混合协议通常让多个出块节点构成组委会,运行拜占庭容错协议,对新区块达成一致.组委会成员通常随着时间变化[103].</p>
+</blockquote>
+<p>相关协议：</p>
+<ul>
+<li><p>Algorand，权益证明和拜占庭容错协议结合的混合协议：</p>
+<blockquote>
+<p>在出块节点选举阶段,Algorand 利用<strong>基于随机函数的权益证明</strong> 选出一组出块节点,<strong>每个节点发起区块提案(block proposal)并广播,各提案附有随机优先级,每个节点只保留优先级最高的区块</strong> ;随后,节点再运行一轮<em><em>拜占庭一致性协议(BA</em>)</em>* ,将自己接收到的最高优先级区块作为输入,对区块达成共识.</p>
+</blockquote>
+<p>  Algorand中的拜占庭一致性协议分为两个阶段：</p>
+<ul>
+<li><p>规约(reduction)，保证各节点持有相同的最高优先级区块：</p>
+<blockquote>
+<p>在规约阶段,所有节点广播自己本地最高优先级的区块哈希,接收到其他节点的区块哈希后,节点统计每个区块的票数,认定票数最高的区块为最高优先级区块;没有票数最高区块时,将空区块作为最高优先级区块.归约阶段达成一致的区块将作为二进制一致性阶段的输入.</p>
+</blockquote>
+</li>
+<li><p>二进制一致性(binary agreement)：</p>
+<blockquote>
+<p>在二进制一致性阶段,出块节点选举环节发起区块提案的节点形成组委会,<strong>对规约阶段的区块投票.区块收到一定数量票数后,就被确认为最终区块.</strong> 所有节点将该区块更新到本地区块链中,达成确认性共识.由于网络原因,二进制一致性阶段的投票可能会重复多次.</p>
+</blockquote>
+</li>
+</ul>
+</li>
+<li><p>Byzcoin，工作量证明和实用拜占庭容错协议结合的混合协议：</p>
+<blockquote>
+<p>在出块节点选举阶段,节点利用工作量证明生成新区块并广播.<strong>一个时间间隔(1 天或 1 周,可调整)内的出块节点构成组委会.组委会成员的票数为在该时间间隔内的出块数量</strong> ,成员利用<strong>实用拜占庭容错协议(PBFT)</strong> 对新区块投票达成共识.出块节点广播新区块,组委会成员验证区块无误后返回签名作为投票,出块节点搜集至少 2&#x2F;3 票数后,广播组委会成员签名,证明新区块已经被组委会接收并验证.组委会成员接收到广播信息后,再次返回签名,表示同意将该区块写入区块链中,出块节点搜集至少 2&#x2F;3 票数后,再次广播区块,并写入区块链中.</p>
+</blockquote>
+<p>  <img src="/%E5%8C%BA%E5%9D%97%E9%93%BE%E4%B9%8B%E5%85%B1%E8%AF%86%E2%80%94%E2%80%94%E8%A7%A3%E8%AF%BB%E3%80%8A%E5%8C%BA%E5%9D%97%E9%93%BE%E5%85%B1%E8%AF%86%E5%8D%8F%E8%AE%AE%E7%BB%BC%E8%BF%B0%E3%80%8B/image_9.png" alt="1"></p>
+</li>
+<li><p>Stellar，采用联邦拜占庭协议(federated Byzantine agreement,简称 FBA)达成共识：</p>
+<blockquote>
+<p>Stellar 是一个开放的实时跨境支付系统[104],为了使拜占庭协议支持非许可链中开放成员的需求,引入仲裁系统分片(quorum slice)达成共识.在拜占庭协议中,仲裁系统指可达成共识的一组节点.仲裁系统分片是仲裁系统子集.Stellar 的仲裁系统基于某种标准划分,例如声誉或权益,节点可同时加入多个仲裁系统分片.仲裁系统分片保持交集,保证共识达成.</p>
+</blockquote>
+<p>  主要分为投票、接收和确认 3 个阶段：</p>
+<blockquote>
+<p>在投票阶段,节点对接收到的交易进行投票并广播投票信息.</p>
+</blockquote>
+<blockquote>
+<p>在接收阶段,若节点 v-blocking 集合中的所有节点都投票给该交易,则接收该交易.v-blocking 是和该节点所在的全部仲裁分片有交集的节点集合.</p>
+</blockquote>
+<blockquote>
+<p>在确认阶段,节点间通过消息交互对接收阶段的交易达成最终共识.仲裁分片互相影响,最终保证所有诚实节点对交易达成确定性共识.</p>
+</blockquote>
+</li>
+</ul>
+<h4 id="3-2-2-许可链拜占庭容错协议"><a href="#3-2-2-许可链拜占庭容错协议" class="headerlink" title="3.2.2 许可链拜占庭容错协议"></a>3.2.2 许可链拜占庭容错协议</h4><ul>
+<li>HoneyBadger</li>
+</ul>
+<blockquote>
+<p>HoneyBadger[16]首次将实践拜占庭容错协议应用到纯异步许可链中.HoneyBadger 系统中,<strong>共识节点身份已知且数量固定,节点两两建立经过认证的可信通道.</strong> 为了消除出块节点广播区块这一环节的带宽瓶颈,HoneyBadger 没有采用出块节点选举机制,取而代之的是:各节点在每轮出块开始时,从本地交易缓冲池中选择部分交易进行广播.为了避免拜占庭节点故意忽略某些交易从而影响系统活性,节点不广播交易内容本身而是经门限加密后的交易密文.所有节点收到密文集合后,HoneyBadger 通过拜占庭协议对一组位向量(bit vector)达成共识,假设位向量第 N 位为真,则将密文集合对应的第 N 位密文还原,并将其中包含的交易写入区块.</p>
+</blockquote>
+<ul>
+<li>Tendermint</li>
+</ul>
+<blockquote>
+<p>联盟链系统 Tendermint[81]采用基于轮询机制的实用拜占庭容错协议对新区块达成共识.在出块节点选举环节,Tendermint 采用确定性轮询机制决定出块节点.由于未采用类似工作量证明的身份定价机制,为防止拜占庭节点发动女巫攻击,系统规定节点必须在账户存入保证金才能参与拜占庭容错协议的投票过程,保证金数额与票数成正比.在网络弱同步且诚实节点掌握至少 2&#x2F;3 票数的情况下,Tendermint 满足安全性和活性.</p>
+</blockquote>
+<p>一些许可链采用CFT而非BFT（CFT不就是分布式数据库了）：</p>
+<blockquote>
+<p>除使用拜占庭容错协议外,一些企业级区块链系统采用 CFT 协议而非 BFT 协议达成确定性共识.2016 年初,Linux 基金会发起了 Hyperledger 项目,旨在建立企业级区块链框架[106],目前已有超过 270 个机构加入[107].Hyperledger Fabric(以下简称 Fabric)是 Hyperledger 项目中备受关注的一个子项目,打造面向许可链的分布式数据平台.Fabric v0.5 采用了 PBFT 协议在共识节点之间对交易内容实现共识[106],目前<strong>最新的 Fabric v1.4 用 Raft和 Apache Kafka 两种 CFT 协议实现共识</strong> [108].</p>
+</blockquote>
+<h4 id="3-2-3-安全分析"><a href="#3-2-3-安全分析" class="headerlink" title="3.2.3 安全分析"></a>3.2.3 安全分析</h4><p>由于不存在分叉情况，确定性共识不存在概率性共识中的自私挖矿问题。</p>
+<ul>
+<li>Algorand</li>
+</ul>
+<blockquote>
+<p>在强同步网络及诚实节点掌握至少 2&#x2F;3 权益的情况下,Algorand 满足安全性和活性.Algorand 拜占庭一致性协议(BA*)基于强同步网络,大多数(如 95%)诚实节点发送的消息在已知时间间隔内可发送给其他大多数诚实节点.<strong>BA*在弱同步网络情况下不能达成一致性,需要等待网络变为强同步.</strong> Algorand 采用权益证明的出块节点选举机制,要求诚实节点掌握系统中至少 2&#x2F;3 的权益.<strong>最好情况下,即每个节点收到的最高优先级区块一致时,Algorand 需要节点间的四轮交互达成共识;最坏情况下则需要 13 轮.</strong></p>
+</blockquote>
+<ul>
+<li>Byzcoin</li>
+</ul>
+<blockquote>
+<p>在弱同步网络及节点总数至少 3f+2 的情况下,Byzcoin 满足安全性和活性.Byzcoin 是实用拜占庭容错协议和工作量证明的混合协议,网络环境要求和实用拜占庭容错协议一致,即消息延迟有上限但上限不可知的弱同步环境.当网络存在 f 个恶意节点时,Byzcoin 需要至少 3f+2 节点数才能达成共识.</p>
+</blockquote>
+<ul>
+<li>Stellar</li>
+</ul>
+<blockquote>
+<p>在同步网络及节点选择足够多的仲裁分片的情况下,Stellar 满足安全性,但恶意节点故意过滤交易时, Stellar 活性受到影响.Stellar 分为投票、接收和确认这 3 个阶段,投票和接收阶段要求同步网络,确认阶段可以是异步网络,总体上,Stellar 需运行在同步网络中.在节点选择足够多的仲裁分片,且仲裁分片中声誉或权益高的节点是诚实节点时,文献[28]证明:Stellar 满足安全性,但恶意节点在 Stellar 的交易投票阶段故意过滤交易,会影响交易活性.</p>
+</blockquote>
+<ul>
+<li>HoneyBadger</li>
+</ul>
+<blockquote>
+<p>由于采用拜占庭容错协议,为抵御 f 个恶意节点,HoneyBadger 需要至少 3f+1 个节点保证安全性.HoneyBadger 可用于广域网中的联盟链系统,系统可扩展至上百节点数.</p>
+</blockquote>
+<h4 id="3-2-4-总结"><a href="#3-2-4-总结" class="headerlink" title="3.2.4 总结"></a>3.2.4 总结</h4><p><img src="/%E5%8C%BA%E5%9D%97%E9%93%BE%E4%B9%8B%E5%85%B1%E8%AF%86%E2%80%94%E2%80%94%E8%A7%A3%E8%AF%BB%E3%80%8A%E5%8C%BA%E5%9D%97%E9%93%BE%E5%85%B1%E8%AF%86%E5%8D%8F%E8%AE%AE%E7%BB%BC%E8%BF%B0%E3%80%8B/image_10.png" alt="1"></p>
+<p><img src="/%E5%8C%BA%E5%9D%97%E9%93%BE%E4%B9%8B%E5%85%B1%E8%AF%86%E2%80%94%E2%80%94%E8%A7%A3%E8%AF%BB%E3%80%8A%E5%8C%BA%E5%9D%97%E9%93%BE%E5%85%B1%E8%AF%86%E5%8D%8F%E8%AE%AE%E7%BB%BC%E8%BF%B0%E3%80%8B/image_11.png" alt="1"></p>
+<h2 id="4-总结与展望"><a href="#4-总结与展望" class="headerlink" title="4 总结与展望"></a>4 总结与展望</h2><ul>
+<li><p>对于出块节点选举机制：</p>
+<blockquote>
+<p>工作量证明通过物理资源的投入抵御恶意节点,存在算力中心化、资源浪费、选举性能低等若干问题.为了解决这些问题,一些研究工作用内存密集型函数替代计算密集型函数、利用算力提供有用服务、调整工作量证明难题参数等.部分方案改变了系统性质,从而引出了新的研究问题,包括改变区块大小、出块间隔、难度调整算法等,<strong>研究人员可针对已有攻击方式在改进系统中的新型攻击手段、安全边界展开研究.</strong></p>
+</blockquote>
+<blockquote>
+<p>权益证明被用于解决工作量证明的资源浪费问题,由早期的竞争性难题机制逐渐演变为基于随机函数的非竞争性机制.<strong>非竞争性机制由于安全和高效,是目前权益证明的重点研究方向.权益证明也存在粉碎攻击、无权益攻击和长程攻击等问题,但目前尚没有对权益证明及其安全问题的综述研究.</strong></p>
+</blockquote>
+</li>
+<li><p>对于主链共识：</p>
+<blockquote>
+<p>概率性共识从早期基于区块树的选取规则逐渐演变为基于有向无环图的选取规则,且共识粒度从区块细化为交易,部分有向无环图协议对交易全局顺序达成概率性共识.当前,大部分概率性共识通过理论证明满足安全性和活性.<strong>然而,概率性共识之间缺乏对比工作,目前仅有最长链和GHOST 规则的安全性对比分析.在调研过程中我们发现,最长链规则仍是区块链系统的主导规则,GHOST 规则在研究工作中备受关注但目前缺乏实际应用.此外,几乎所有基于工作量证明的概率性共识都存在自私挖矿问题,但尚未有研究工作对除最长链规则以外的其他概率性共识度量自私挖矿攻击的影响.</strong></p>
+</blockquote>
+<blockquote>
+<p>为满足非许可链开放成员及网络规模要求,大多数确定性共识将出块节点选举机制与拜占庭容错协议相结合,实现区块链系统的确定一致性.这些协议通常运行于异步网络中,并要求恶意节点不超过节点总数的 1&#x2F;3.<strong>据我们所知,目前尚没有可运行于大规模纯异步网络中的确定性共识协议.HoneyBadger 作为纯异步共识协议,只适用于节点身份和数量都已知的非许可链系统.</strong></p>
+</blockquote>
+</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/BlockChain/" rel="tag"><i class="fa fa-tag"></i> 区块链</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BMapReduce%E2%80%94%E2%80%94%E8%A7%A3%E8%AF%BB%E3%80%8AMapReduce%E3%80%8B.html" rel="prev" title="分布式之MapReduce——解读《MapReduce》">
+                  <i class="fa fa-chevron-left"></i> 分布式之MapReduce——解读《MapReduce》
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/%E8%87%AA%E7%84%B6%E8%AF%AD%E8%A8%80%E5%A4%84%E7%90%86%E7%BB%BC%E8%BF%B0.html" rel="next" title="自然语言处理综述">
+                  自然语言处理综述 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments gitalk-container"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">dounine</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/mist/" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+<script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.0/search.js" integrity="sha256-vXZMYLEqsROAXkEw93GGIvaB2ab+QW6w3+1ahD9nXXA=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.0/es5/tex-mml-chtml.js","integrity":"sha256-r+3itOMtGGjap0x+10hu6jW/gZCzxHsoKrOd7gyRSGY="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/gitalk/1.7.2/gitalk.css" integrity="sha256-AJnUHL7dBv6PGaeyPQJcgQPDjt/Hn/PvYZde1iqfp8U=" crossorigin="anonymous">
+
+<script class="next-config" data-name="gitalk" type="application/json">{"enable":true,"github_id":"99MyCql","repo":"99MyCql.github.io","client_id":"7c69ea063e9c78a72075","client_secret":"f222b18af36b2dffda7884ce5fd77bbb9172de54","admin_user":"99MyCql","distraction_free_mode":false,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token","language":"zh-CN","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/gitalk/1.7.2/gitalk.min.js","integrity":"sha256-Pmj85ojLaPOWwRtlMJwmezB/Qg8BzvJp5eTzvXaYAfA="},"path_md5":"651793f693172709e118787796f996ed"}</script>
+<script src="/js/third-party/comments/gitalk.js"></script>
+
+</body>
+</html>

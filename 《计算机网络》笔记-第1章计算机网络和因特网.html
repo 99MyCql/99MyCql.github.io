@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.2.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/golang32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/golang16.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="baidu-site-verification" content="code-RpvRDWfflk">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" integrity="sha256-DfWjNxDkM94fVBWx1H5BMMp0Zq7luBlV8QRcSES7s+0=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"blog.dounine.live","root":"/","images":"/images","scheme":"Mist","darkmode":false,"version":"8.11.1","exturl":false,"sidebar":{"position":"right","display":"always","padding":18,"offset":12},"copycode":{"enable":true,"style":"flat"},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":"gitalk","storage":true,"lazyload":false,"nav":null,"activeClass":"gitalk"},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="[TOC] 0. 前言鉴于计算机网络的重要性，以及即将开设的计算机网络课程，我决定利用寒假的时间认真研读 《计算机网络——自顶向下方法》第7版，并撰写阅读笔记。 愚以为，计算机网络是计算机领域中基础且重要的部分，必须牢固掌握。相对于各种新兴框架，计算机网络才是提高计算机素养的关键之一。值得我们花时间去阅读、研究和实践。 我接触计算机网络，是从一本叫做《网络是如何连接》的小书开始的。这本书十分不错，">
+<meta property="og:type" content="article">
+<meta property="og:title" content="《计算机网络》笔记-第1章计算机网络和因特网">
+<meta property="og:url" content="https://blog.dounine.live/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC1%E7%AB%A0%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E5%92%8C%E5%9B%A0%E7%89%B9%E7%BD%91.html">
+<meta property="og:site_name" content="dounine&#39;s blog">
+<meta property="og:description" content="[TOC] 0. 前言鉴于计算机网络的重要性，以及即将开设的计算机网络课程，我决定利用寒假的时间认真研读 《计算机网络——自顶向下方法》第7版，并撰写阅读笔记。 愚以为，计算机网络是计算机领域中基础且重要的部分，必须牢固掌握。相对于各种新兴框架，计算机网络才是提高计算机素养的关键之一。值得我们花时间去阅读、研究和实践。 我接触计算机网络，是从一本叫做《网络是如何连接》的小书开始的。这本书十分不错，">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://blog.dounine.live/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC1%E7%AB%A0%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E5%92%8C%E5%9B%A0%E7%89%B9%E7%BD%91/1.png">
+<meta property="og:image" content="https://blog.dounine.live/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC1%E7%AB%A0%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E5%92%8C%E5%9B%A0%E7%89%B9%E7%BD%91/2.png">
+<meta property="og:image" content="https://blog.dounine.live/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC1%E7%AB%A0%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E5%92%8C%E5%9B%A0%E7%89%B9%E7%BD%91/3.png">
+<meta property="og:image" content="https://blog.dounine.live/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC1%E7%AB%A0%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E5%92%8C%E5%9B%A0%E7%89%B9%E7%BD%91/4.png">
+<meta property="og:image" content="https://blog.dounine.live/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC1%E7%AB%A0%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E5%92%8C%E5%9B%A0%E7%89%B9%E7%BD%91/5.png">
+<meta property="og:image" content="https://blog.dounine.live/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC1%E7%AB%A0%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E5%92%8C%E5%9B%A0%E7%89%B9%E7%BD%91/6.png">
+<meta property="og:image" content="https://blog.dounine.live/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC1%E7%AB%A0%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E5%92%8C%E5%9B%A0%E7%89%B9%E7%BD%91/7.png">
+<meta property="og:image" content="https://blog.dounine.live/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC1%E7%AB%A0%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E5%92%8C%E5%9B%A0%E7%89%B9%E7%BD%91/8.png">
+<meta property="og:image" content="https://blog.dounine.live/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC1%E7%AB%A0%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E5%92%8C%E5%9B%A0%E7%89%B9%E7%BD%91/9.png">
+<meta property="og:image" content="https://blog.dounine.live/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC1%E7%AB%A0%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E5%92%8C%E5%9B%A0%E7%89%B9%E7%BD%91/10.png">
+<meta property="og:image" content="https://blog.dounine.live/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC1%E7%AB%A0%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E5%92%8C%E5%9B%A0%E7%89%B9%E7%BD%91/11.png">
+<meta property="og:image" content="https://blog.dounine.live/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC1%E7%AB%A0%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E5%92%8C%E5%9B%A0%E7%89%B9%E7%BD%91/12.png">
+<meta property="article:published_time" content="2020-01-19T02:21:14.000Z">
+<meta property="article:modified_time" content="2020-01-19T02:21:14.000Z">
+<meta property="article:author" content="dounine">
+<meta property="article:tag" content="计算机网络">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://blog.dounine.live/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC1%E7%AB%A0%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E5%92%8C%E5%9B%A0%E7%89%B9%E7%BD%91/1.png">
+
+
+<link rel="canonical" href="https://blog.dounine.live/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC1%E7%AB%A0%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E5%92%8C%E5%9B%A0%E7%89%B9%E7%BD%91.html">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://blog.dounine.live/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC1%E7%AB%A0%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E5%92%8C%E5%9B%A0%E7%89%B9%E7%BD%91.html","path":"《计算机网络》笔记-第1章计算机网络和因特网.html","title":"《计算机网络》笔记-第1章计算机网络和因特网"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>《计算机网络》笔记-第1章计算机网络和因特网 | dounine's blog</title>
+  
+
+  <script src="/js/third-party/analytics/baidu-analytics.js"></script>
+  <script async src="https://hm.baidu.com/hm.js?66c7065aa71681df47eb23eff557978b"></script>
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">dounine's blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">18</span></a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">48</span></a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">75</span></a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#0-%E5%89%8D%E8%A8%80"><span class="nav-text">0. 前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-What-Is-the-Internet"><span class="nav-text">1. What Is the Internet</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-A-Nuts-and-Bolts-Description-%E7%94%A8%E5%85%B7%E4%BD%93%E6%9E%84%E6%88%90%E6%8F%8F%E8%BF%B0%E5%9B%A0%E7%89%B9%E7%BD%91"><span class="nav-text">1.1. A Nuts-and-Bolts Description(用具体构成描述因特网)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-A-Services-Description-%E7%94%A8%E6%9C%8D%E5%8A%A1%E6%8F%8F%E8%BF%B0%E5%9B%A0%E7%89%B9%E7%BD%91"><span class="nav-text">1.2. A Services Description(用服务描述因特网)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-3-What-Is-a-Protocol"><span class="nav-text">1.3. What Is a Protocol</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-The-Network-Edge-%E7%BD%91%E7%BB%9C%E8%BE%B9%E7%BC%98"><span class="nav-text">2. The Network Edge(网络边缘)</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-Access-Networks-%E6%8E%A5%E5%85%A5%E7%BD%91"><span class="nav-text">2.1. Access Networks(接入网)</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-1-DSL-Digital-Subscriber-Line-%E6%95%B0%E5%AD%97%E7%94%A8%E6%88%B7%E7%BA%BF"><span class="nav-text">2.1.1. DSL(Digital Subscriber Line, 数字用户线)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-2-Cable-Internet-Access-%E7%94%B5%E7%BC%86%E5%9B%A0%E7%89%B9%E7%BD%91%E6%8E%A5%E5%85%A5"><span class="nav-text">2.1.2. Cable Internet Access(电缆因特网接入)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-3-FTTH-Fiber-To-The-Home-%E5%85%89%E7%BA%A4%E5%88%B0%E6%88%B7"><span class="nav-text">2.1.3. FTTH(Fiber To The Home, 光纤到户)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-4-%E5%8D%AB%E6%98%9F%E4%B8%8E%E6%8B%A8%E5%8F%B7"><span class="nav-text">2.1.4. 卫星与拨号</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-5-%E4%BB%A5%E5%A4%AA%E7%BD%91%E4%B8%8EWiFi"><span class="nav-text">2.1.5. 以太网与WiFi</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-6-3G%E3%80%814G%E4%B8%8E5G"><span class="nav-text">2.1.6. 3G、4G与5G</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-Physical-Media-%E7%89%A9%E7%90%86%E5%AA%92%E4%BD%93"><span class="nav-text">2.2. Physical Media(物理媒体)</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-The-Network-Core-%E7%BD%91%E7%BB%9C%E6%A0%B8%E5%BF%83"><span class="nav-text">3. The Network Core(网络核心)</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-Packet-Switching-%E5%88%86%E7%BB%84%E4%BA%A4%E6%8D%A2"><span class="nav-text">3.1. Packet Switching(分组交换)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-Circuit-Switching-%E7%94%B5%E8%B7%AF%E4%BA%A4%E6%8D%A2"><span class="nav-text">3.2. Circuit Switching(电路交换)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-3-Packet-Switching-vs-Circuit-Switching"><span class="nav-text">3.3. Packet Switching vs Circuit Switching</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-4-A-Network-of-Networks-%E7%BD%91%E7%BB%9C%E7%9A%84%E7%BD%91%E7%BB%9C"><span class="nav-text">3.4. A Network of Networks(网络的网络)</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-Delay-Loss-and-Throughput-in-Packet-Switched-Networks-%E5%88%86%E7%BB%84%E4%BA%A4%E6%8D%A2%E4%B8%AD%E7%9A%84%E5%BB%B6%E8%BF%9F%E3%80%81%E4%B8%A2%E5%8C%85%E5%92%8C%E5%90%9E%E5%90%90%E9%87%8F"><span class="nav-text">4. Delay, Loss, and Throughput in Packet-Switched Networks(分组交换中的延迟、丢包和吞吐量)</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-1-Overview-of-Delay-in-Packet-Switched-Networks-%E5%88%86%E7%BB%84%E4%BA%A4%E6%8D%A2%E7%BD%91%E4%B8%AD%E7%9A%84%E6%97%B6%E5%BB%B6%E6%A6%82%E8%BF%B0"><span class="nav-text">4.1. Overview of Delay in Packet-Switched Networks(分组交换网中的时延概述)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-Queuing-Delay-and-Packet-Loss-%E6%8E%92%E9%98%9F%E6%97%B6%E5%BB%B6%E5%92%8C%E4%B8%A2%E5%8C%85"><span class="nav-text">4.2. Queuing Delay and Packet Loss(排队时延和丢包)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-3-End-to-End-Delay-%E7%AB%AF%E5%88%B0%E7%AB%AF%E6%97%B6%E5%BB%B6"><span class="nav-text">4.3. End-to-End Delay(端到端时延)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-4-Throughput-in-Computer-Networks-%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%AD%E7%9A%84%E5%90%9E%E5%90%90%E9%87%8F"><span class="nav-text">4.4. Throughput in Computer Networks(计算机网络中的吞吐量)</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-Protocol-Layers-and-Their-Service-Models-%E5%8D%8F%E8%AE%AE%E5%B1%82%E6%AC%A1%E5%8F%8A%E5%85%B6%E6%9C%8D%E5%8A%A1%E6%A8%A1%E5%9E%8B"><span class="nav-text">5. Protocol Layers and Their Service Models(协议层次及其服务模型)</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#5-1-Layered-Architecture-%E5%88%86%E5%B1%82%E7%9A%84%E4%BD%93%E7%B3%BB%E7%BB%93%E6%9E%84"><span class="nav-text">5.1. Layered Architecture(分层的体系结构)</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#5-1-1-Protocol-Layering-%E5%8D%8F%E8%AE%AE%E5%88%86%E5%B1%82"><span class="nav-text">5.1.1. Protocol Layering(协议分层)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5-1-2-The-OSI-Model-OSI%E6%A8%A1%E5%9E%8B"><span class="nav-text">5.1.2. The OSI Model(OSI模型)</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-2-Encapsulation-%E5%B0%81%E8%A3%85"><span class="nav-text">5.2. Encapsulation(封装)</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-Networks-Under-Attack-%E9%9D%A2%E5%AF%B9%E6%94%BB%E5%87%BB%E7%BD%91%E7%BB%9C"><span class="nav-text">6. Networks Under Attack(面对攻击网络)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-History-of-Computer-Networking-and-the-Internet"><span class="nav-text">7. History of Computer Networking and the Internet</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="dounine"
+      src="https://avatars.githubusercontent.com/u/41814469?s=400&u=48bf60a3428a3cb86a84a110c8688930cf6ceb08&v=4">
+  <p class="site-author-name" itemprop="name">dounine</p>
+  <div class="site-description" itemprop="description">回首向来萧瑟处</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">75</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">18</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">48</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/99MyCql" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;99MyCql" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+
+  <div class="links-of-blogroll site-overview-item animated">
+    <div class="links-of-blogroll-title"><i class="fa fa-globe fa-fw"></i>
+      Links
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://bkfish.gitee.io/" title="https:&#x2F;&#x2F;bkfish.gitee.io&#x2F;" rel="noopener" target="_blank">Kitty萌新的卧室</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://hitworld.github.io/" title="https:&#x2F;&#x2F;hitworld.github.io&#x2F;" rel="noopener" target="_blank">hirworld</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://wyjoutstanding.github.io/" title="https:&#x2F;&#x2F;wyjoutstanding.github.io&#x2F;" rel="noopener" target="_blank">wyjoutstanding</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://iwtf.github.io/" title="https:&#x2F;&#x2F;iwtf.github.io&#x2F;" rel="noopener" target="_blank">IWTF</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://wood1314.github.io/" title="https:&#x2F;&#x2F;wood1314.github.io&#x2F;" rel="noopener" target="_blank">wood</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://desperadoccy.github.io/" title="https:&#x2F;&#x2F;desperadoccy.github.io&#x2F;" rel="noopener" target="_blank">desperadoccy</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://doudouqaq.github.io/" title="https:&#x2F;&#x2F;doudouqaq.github.io&#x2F;" rel="noopener" target="_blank">doudouqaq</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://kylinnnnn.github.io/" title="https:&#x2F;&#x2F;kylinnnnn.github.io&#x2F;" rel="noopener" target="_blank">kylinnnnn</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://miaotony.xyz/" title="https:&#x2F;&#x2F;miaotony.xyz" rel="noopener" target="_blank">miaotony</a>
+        </li>
+    </ul>
+  </div>
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://github.com/99MyCql" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.dounine.live/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC1%E7%AB%A0%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E5%92%8C%E5%9B%A0%E7%89%B9%E7%BD%91.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://avatars.githubusercontent.com/u/41814469?s=400&u=48bf60a3428a3cb86a84a110c8688930cf6ceb08&v=4">
+      <meta itemprop="name" content="dounine">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dounine's blog">
+      <meta itemprop="description" content="回首向来萧瑟处">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="《计算机网络》笔记-第1章计算机网络和因特网 | dounine's blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          《计算机网络》笔记-第1章计算机网络和因特网
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-01-19 10:21:14" itemprop="dateCreated datePublished" datetime="2020-01-19T10:21:14+08:00">2020-01-19</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Base/" itemprop="url" rel="index"><span itemprop="name">九层之台，起于累土</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Base/Network/" itemprop="url" rel="index"><span itemprop="name">计算机网络</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p>[TOC]</p>
+<h2 id="0-前言"><a href="#0-前言" class="headerlink" title="0. 前言"></a>0. 前言</h2><p>鉴于计算机网络的重要性，以及即将开设的计算机网络课程，我决定利用寒假的时间认真研读 <strong>《计算机网络——自顶向下方法》第7版</strong>，并撰写阅读笔记。</p>
+<p>愚以为，计算机网络是计算机领域中基础且重要的部分，必须牢固掌握。相对于各种新兴框架，计算机网络才是提高计算机素养的关键之一。值得我们花时间去阅读、研究和实践。</p>
+<p>我接触计算机网络，是从一本叫做《网络是如何连接》的小书开始的。这本书十分不错，帮我打开了计算机网络的大门。但这本书中的知识并不深入，也没帮我形成完整的知识体系。所以，此次选择更加权威而全面的《计算机网络——自顶向下方法》进行阅读，希望我能从中收获更多。</p>
+<p>这篇是《计算机网络——自顶向下方法》第1章的学习笔记。由于我结合了英文版的内容，所以笔记中用到了一些英文，请大家见谅。不过，个人认为英语对计算机学生还是很重要的（后悔自己英语不好）。同时，笔记中既有原文内容，也有我自己的理解部分。如果存在某些名词跟原文不符，我希望大家不要纠结。（愚以为，重要的在于理解思想，而不在于名词解释、或者概念背诵）</p>
+<p>那话不多说，冲冲冲。</p>
+<span id="more"></span>
+
+<h2 id="1-What-Is-the-Internet"><a href="#1-What-Is-the-Internet" class="headerlink" title="1. What Is the Internet"></a>1. What Is the Internet</h2><blockquote>
+<p>But what is the Internet? There are a couple of ways to answer this question. First, we can describe the nuts and bolts of the Internet, that is, the basic hardware and software components that make up the Internet. Second, we can describe the Internet in terms of a networking infrastructure that provides services to distributed applications.</p>
+</blockquote>
+<p>什么是因特网？回答这个问题有两种方式：其一，我们能够描述因特网的具体构成，即构成因特网的基本硬件和软件组件；其二，我们能够根据为分布式应用提供服务的联网基础设施来描述因特网。</p>
+<h3 id="1-1-A-Nuts-and-Bolts-Description-用具体构成描述因特网"><a href="#1-1-A-Nuts-and-Bolts-Description-用具体构成描述因特网" class="headerlink" title="1.1. A Nuts-and-Bolts Description(用具体构成描述因特网)"></a>1.1. A Nuts-and-Bolts Description(用具体构成描述因特网)</h3><p><img src="/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC1%E7%AB%A0%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E5%92%8C%E5%9B%A0%E7%89%B9%E7%BD%91/1.png" alt="1"></p>
+<p>客观存在：</p>
+<ul>
+<li><p><strong>主机(host)</strong> &#x3D;&#x3D; **端系统(end system)**，接入因特网的设备，如图中的电脑、手机、联网汽车等</p>
+</li>
+<li><p>**通信链路(communication link)**，连接各端系统的物理媒介，图中的线</p>
+</li>
+<li><p>**分组交换机(packet switch)**，通信链路中的交叉口。其中最著名的两种是：</p>
+<ul>
+<li>**路由器(router)**，图中的圆形带“X”体</li>
+<li>**链路层交换机(link-layer switch)**，图中的方形带“X”体</li>
+</ul>
+</li>
+<li><p>**分组(packet)**，由一台端系统发送给另一台端系统的数据&#x2F;信息包</p>
+</li>
+</ul>
+<p>主观存在：</p>
+<ul>
+<li><p>**ISP(Internet Service Provider, 因特网服务提供商)**，为端系统提供接入因特网的服务。较低层的ISP管理某个区域，类似于校园网、公司网等；较高层的ISP管理整个国家，类似于联通、移动等。</p>
+</li>
+<li><p>**协议(protocol)**，因特网中最重要的两个协议是：</p>
+<ul>
+<li><strong>TCP(Transmission Control Protocol, 传输控制协议)</strong></li>
+<li><strong>IP(Internet Protocol, 网际协议)</strong></li>
+</ul>
+</li>
+</ul>
+<p>将因特网与现代物流系统类比：</p>
+<table>
+<thead>
+<tr>
+<th>因特网</th>
+<th>物流</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>端系统</td>
+<td>货物寄送或到达的地方</td>
+</tr>
+<tr>
+<td>通信链路</td>
+<td>高速公路、铁路、普通公路等</td>
+</tr>
+<tr>
+<td>分组交换机</td>
+<td>岔路口</td>
+</tr>
+<tr>
+<td>分组</td>
+<td>货物</td>
+</tr>
+<tr>
+<td>ISP</td>
+<td>公路局、铁路局等</td>
+</tr>
+</tbody></table>
+<h3 id="1-2-A-Services-Description-用服务描述因特网"><a href="#1-2-A-Services-Description-用服务描述因特网" class="headerlink" title="1.2. A Services Description(用服务描述因特网)"></a>1.2. A Services Description(用服务描述因特网)</h3><ul>
+<li>**分布式应用程序(distributed application)**，各大网站</li>
+</ul>
+<h3 id="1-3-What-Is-a-Protocol"><a href="#1-3-What-Is-a-Protocol" class="headerlink" title="1.3. What Is a Protocol"></a>1.3. What Is a Protocol</h3><p>人们规定好的一套交流、行事的标准，就是协议</p>
+<p>古代儒学、书信格式、普通话标准等等，都是协议。</p>
+<p>学习计算机网络，最重要的就在于理解网络协议。</p>
+<h2 id="2-The-Network-Edge-网络边缘"><a href="#2-The-Network-Edge-网络边缘" class="headerlink" title="2. The Network Edge(网络边缘)"></a>2. The Network Edge(网络边缘)</h2><p>网络边缘主要包括：端系统和接入网</p>
+<h3 id="2-1-Access-Networks-接入网"><a href="#2-1-Access-Networks-接入网" class="headerlink" title="2.1. Access Networks(接入网)"></a>2.1. Access Networks(接入网)</h3><ul>
+<li><p>接入网(access networks)，将端系统物理连接到其边缘路由器的网络</p>
+</li>
+<li><p>边缘路由器(edge router)，端系统发送的数据，到达任何其它远程端系统所经过的第一台路由器</p>
+</li>
+</ul>
+<p>以上定义有待考察。</p>
+<p>总而言之，<strong>接入网</strong>就是指连接互联网与家庭、公司网络的通信线路。其长度一般为几百米到几公里，因而被形象地称为”最后一公里”。它包括 DSL、电缆、FTTH 等</p>
+<h4 id="2-1-1-DSL-Digital-Subscriber-Line-数字用户线"><a href="#2-1-1-DSL-Digital-Subscriber-Line-数字用户线" class="headerlink" title="2.1.1. DSL(Digital Subscriber Line, 数字用户线)"></a>2.1.1. DSL(Digital Subscriber Line, 数字用户线)</h4><p>DSL，即<strong>用电话线作为网线</strong>。它包括**ADSL(Asymmetric Digital Subscriber Line，非对称数字用户线)**、RADSL、HDSL和VDSL等等</p>
+<p>用户从提供本地电话接入的本地电话公司处，获取DSL因特网接入，用户的本地电话公司即是它的ISP。</p>
+<p><img src="/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC1%E7%AB%A0%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E5%92%8C%E5%9B%A0%E7%89%B9%E7%BD%91/2.png" alt="1"></p>
+<p>如上图所示，每个用户的 <strong>DSL调制解调器(DSL modem)</strong> 使用现有电话线(双绞铜线)，与位于电话公司的本地中心局中的 <strong>数字用户线接入复用器(DSLAM)</strong> 交换数据，<strong>分配器(splitter)</strong> 则将网络信号与电话信号分开。</p>
+<p>在电话线中，包含三个通道：</p>
+<ul>
+<li>电话信号通道位于0到4kHz频段；</li>
+<li>网络上行信号通道位于4kHz到50kHz频段；</li>
+<li>网络下行信号通道位于50kHz到1MHz频段。</li>
+</ul>
+<p><strong>缺点</strong>：短距离。</p>
+<h4 id="2-1-2-Cable-Internet-Access-电缆因特网接入"><a href="#2-1-2-Cable-Internet-Access-电缆因特网接入" class="headerlink" title="2.1.2. Cable Internet Access(电缆因特网接入)"></a>2.1.2. Cable Internet Access(电缆因特网接入)</h4><p><strong>用电视线作为网线</strong>。由于在这个系统中应用了光纤和同轴电缆，又被称为**混合光纤同轴(Hybrid Fiber Coax, HFC)**系统。</p>
+<p><img src="/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC1%E7%AB%A0%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E5%92%8C%E5%9B%A0%E7%89%B9%E7%BD%91/3.png" alt="1"></p>
+<p>使用电缆接入因特网，需要<strong>电缆调制解调器(cable modem)<strong>，家庭PC会连接到它的以太网接口。在</strong>电缆头端(cable head end)<strong>，有一个</strong>电缆调制解调器端接系统(cable modem termination system, CMTS)<strong>，负责接收并处理各家庭传来的网络信号。在电缆中，也分为</strong>上行</strong>和<strong>下行</strong>两个信号通道。</p>
+<p><strong>缺点</strong>：多个家庭共享电缆，用的人越多，网速越慢。</p>
+<h4 id="2-1-3-FTTH-Fiber-To-The-Home-光纤到户"><a href="#2-1-3-FTTH-Fiber-To-The-Home-光纤到户" class="headerlink" title="2.1.3. FTTH(Fiber To The Home, 光纤到户)"></a>2.1.3. FTTH(Fiber To The Home, 光纤到户)</h4><p>根据光纤分布体系结构，可分为：</p>
+<ul>
+<li>**AON(active optical networks, 主动光纤网络)**，从本地中心局到每户设置一根光纤</li>
+<li>**PON(passive optical networks, 被动光纤网络)**，从中心局出来的每根光纤由许多家庭共享，直到接近用户的位置，才为每个用户分配一根光纤，类似于树杈状</li>
+</ul>
+<p>以较为常见的PON为例，如图：</p>
+<p><img src="/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC1%E7%AB%A0%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E5%92%8C%E5%9B%A0%E7%89%B9%E7%BD%91/4.png" alt="1"></p>
+<p>每个家庭都有一个<strong>光纤网络端接器(optical network terminator, ONT)<strong>，用户将一台</strong>家庭路由器</strong>与ONT相连，并经过这台家庭路由器接入因特网。ONT通过专门的光纤连接到邻近的**光纤分配器(optical splitter)<strong>，该分配器把一些家庭(少于100个)集结到一根共享光纤，该光纤再连接到中心局(central office)的</strong>光纤线路端接器(optical line terminator, OLT)**。该OLT再经过中心局路由器与因特网相连。</p>
+<h4 id="2-1-4-卫星与拨号"><a href="#2-1-4-卫星与拨号" class="headerlink" title="2.1.4. 卫星与拨号"></a>2.1.4. 卫星与拨号</h4><p>在一些乡村环境，常使用<strong>卫星链路</strong>或<strong>拨号接入</strong>的方式，但是网速很慢。</p>
+<h4 id="2-1-5-以太网与WiFi"><a href="#2-1-5-以太网与WiFi" class="headerlink" title="2.1.5. 以太网与WiFi"></a>2.1.5. 以太网与WiFi</h4><p>在公司、大学校园以及越来越多的家庭中，也常使用**局域网(LAN)**，将端系统连接到边缘路由器。</p>
+<p>有线局域网常使用<strong>以太网</strong>技术；</p>
+<p>无线局域网常使用<strong>WiFi</strong>技术。</p>
+<h4 id="2-1-6-3G、4G与5G"><a href="#2-1-6-3G、4G与5G" class="headerlink" title="2.1.6. 3G、4G与5G"></a>2.1.6. 3G、4G与5G</h4><p>手机等移动设备，则使用广域无线接入的方式。通过蜂窝网提供商运营的基站来发送和接收分组，用户需要位于基站的数万米范围内。</p>
+<h3 id="2-2-Physical-Media-物理媒体"><a href="#2-2-Physical-Media-物理媒体" class="headerlink" title="2.2. Physical Media(物理媒体)"></a>2.2. Physical Media(物理媒体)</h3><p>分组数据所跨越的物理媒介，分为两种类型：</p>
+<ul>
+<li>导引型媒体：电波沿着固体媒体前行，如光纤、双绞铜线或同轴电缆</li>
+<li>非导引型媒体：电波在空气或外层空间中传播，如无线局域网或卫星</li>
+</ul>
+<p>下面讨论几种导引型媒体：</p>
+<ul>
+<li><p>双绞铜线：两根绝缘铜线螺旋绞合形成双绞线(减少干扰)，许多双绞线构成一根电缆</p>
+<ul>
+<li>优点：便宜</li>
+<li>缺点：传输速率取决于粗细和距离</li>
+<li>用途：局域网、DSL、拨号</li>
+</ul>
+</li>
+<li><p>同轴电缆：两个同心的铜导体</p>
+<ul>
+<li>优点：</li>
+<li>缺点：共享</li>
+<li>用途：电缆接入因特网</li>
+</ul>
+</li>
+<li><p>光纤：细而柔软的、能够导引光脉冲的媒体，每个脉冲表示一个比特(bit)</p>
+<ul>
+<li>优点：网速高、抗干扰强</li>
+<li>缺点：发送接收的光设备(接收器、交换机等)成本高</li>
+<li>用途：光纤入户</li>
+</ul>
+</li>
+</ul>
+<h2 id="3-The-Network-Core-网络核心"><a href="#3-The-Network-Core-网络核心" class="headerlink" title="3. The Network Core(网络核心)"></a>3. The Network Core(网络核心)</h2><p>下图中，蓝色加粗部分即为网络核心：</p>
+<p><img src="/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC1%E7%AB%A0%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E5%92%8C%E5%9B%A0%E7%89%B9%E7%BD%91/5.png" alt="1"></p>
+<p>通过网络链路和交换机移动数据有两种基本方法：<strong>分组交换</strong>和<strong>电路交换</strong>。</p>
+<h3 id="3-1-Packet-Switching-分组交换"><a href="#3-1-Packet-Switching-分组交换" class="headerlink" title="3.1. Packet Switching(分组交换)"></a>3.1. Packet Switching(分组交换)</h3><ul>
+<li><p>**报文(message)<strong>，源端系统向目的端系统发送的完整的数据信息，如图像数据、音频数据等。在传递过程中，报文会被分解为较小的数据块，被称为</strong>分组(packet)**。</p>
+</li>
+<li><p><strong>存储转发传输(store-and-forward transmission)</strong> 机制，分组交换机必须接收到整个<strong>分组</strong>，才能向输出链路传输该分组的第一个比特。</p>
+</li>
+<li><p>**输出缓存(output buffer)**，用于存储路由器准备发往对应链路的分组，当该链路正忙于传输其它分组时，刚到达的分组必须在输出缓存中等待。</p>
+</li>
+<li><p>**排队时延(queuing delay)**，由于分组会遇到在输出缓存中等待的情况，所以分组传输中会存在排队时延。</p>
+</li>
+<li><p>**分组丢失(packet loss)**，由于缓存空间有限，当缓存已满时，将出现分组丢失的情况。</p>
+</li>
+<li><p>**转发表(forwarding table)**，存在于每台路由器中，用于将目的地址映射成对应的输出链路。路由器通过转发表，判断将当前分组转发到哪一条输出链路。</p>
+</li>
+<li><p>**路由选择协议(routing protocol)**，用于自动地设置这些转发表。例如，一个路由选择协议可以决定从每台路由器到每个目的地地最短路径，并使用这些最短路径结果来配置路由器中的转发表。</p>
+</li>
+</ul>
+<h3 id="3-2-Circuit-Switching-电路交换"><a href="#3-2-Circuit-Switching-电路交换" class="headerlink" title="3.2. Circuit Switching(电路交换)"></a>3.2. Circuit Switching(电路交换)</h3><p>在电路交换网络中，端系统通信期间，会在沿路<strong>预留</strong>通信所需要的资源(缓存，链路传输速率)。而在分组交换网络中，这些资源是不预留的。</p>
+<p>传统的<strong>电话网络</strong>就是电路交换网络的例子。在两方通话期间，第三方不能插足，因为没有多余的资源了。</p>
+<p>电路交换主要通过 <strong>频分复用(frequency-division multiplexing, FDM)</strong> 或 <strong>时分复用(time-division multiplexing, TDM)</strong> 来实现。</p>
+<p><img src="/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC1%E7%AB%A0%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E5%92%8C%E5%9B%A0%E7%89%B9%E7%BD%91/6.png" alt="1"></p>
+<p>如上图所示，频分复用是划分频谱，不同用户不同频段；时分复用是划分时间，不同用户不同时隙。</p>
+<h3 id="3-3-Packet-Switching-vs-Circuit-Switching"><a href="#3-3-Packet-Switching-vs-Circuit-Switching" class="headerlink" title="3.3. Packet Switching vs Circuit Switching"></a>3.3. Packet Switching vs Circuit Switching</h3><ul>
+<li>分组交换：<ul>
+<li>优点：更好的带宽共享；更简单、有效、成本低</li>
+<li>缺点：端到端的时延是可变和不可预测的</li>
+</ul>
+</li>
+<li>电路交换：<ul>
+<li>优点：稳定</li>
+<li>缺点：预留端到端带宽是复杂的</li>
+</ul>
+</li>
+</ul>
+<p>分组交换胜出！</p>
+<h3 id="3-4-A-Network-of-Networks-网络的网络"><a href="#3-4-A-Network-of-Networks-网络的网络" class="headerlink" title="3.4. A Network of Networks(网络的网络)"></a>3.4. A Network of Networks(网络的网络)</h3><p>年复一年，因特网用户越来越多，导致网络越来越大，从而形成了网络的网络。</p>
+<p>端系统通过<strong>接入ISP</strong>进入因特网，只要所有的接入ISP互联，所有的端系统就能够彼此发送分组。那么，如何使所有的接入ISP互联呢？</p>
+<p>网络的网络结构演变如下：</p>
+<ul>
+<li><p>一种幼稚的方法是，使每个接入ISP直接与其它每个接入ISP连接。</p>
+</li>
+<li><p>网络结构1，用单一的全球传输ISP互联所有接入ISP，全球ISP相当于每个接入ISP的提供商(ISP)。</p>
+</li>
+<li><p>网络结构2，由无数的接入ISP和多个 <strong>第一层ISP&#x2F;全球ISP(tier-1 ISP)</strong> 组成。</p>
+</li>
+<li><p>网络结构3，拥有多层等级ISP。例如，在中国，每个城市有接入ISP，它们与省级ISP连接，省级ISP又与国家级ISP连接，国家级ISP最终与 <strong>第一层ISP(tier-1 ISP)</strong> 连接。</p>
+</li>
+<li><p><strong>网络结构4</strong>，在网络结构3的基础上添加了如下内容：</p>
+<ul>
+<li><p>**PoP(points of presence, 存在点)**，一个PoP是提供商ISP中的一台或多台路由器(在同一位置)群组，客户ISP借此与提供商ISP连接。</p>
+</li>
+<li><p>**多宿(multi-home)**，任何ISP(除第一层ISP外)都可以与一个或更多个提供商ISP连接。打比方说，就是你可以同时购买电信、联通的宽带，这样一个挂了，你还可以选择另一个。</p>
+</li>
+<li><p>**对等(peer)**，同等级相邻的ISP能直接互联，而不通过上级ISP，这样两者之间不需要付费，也可以不用向上级ISP交钱了。比如，南京市ISP与苏州市ISP对等，就可以不用向国家ISP缴纳这部分的钱，但南京市ISP要访问深圳市ISP，依旧要向国家ISP交钱。</p>
+</li>
+<li><p>**IXP(Internet Exchange Point, 因特网交换点)**，是由第三方公司提供的汇合点，多个ISP可以在这里一起对等。2016的因特网中，由400多个IXP。</p>
+</li>
+</ul>
+</li>
+<li><p>网络结构5，在网络结构4的基础上添加了**内容提供商网络(content-provider networks)**，例如谷歌，它的专用网络与较低层ISP对等，并“绕过”较高层ISP。如下图：</p>
+<p><img src="/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC1%E7%AB%A0%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E5%92%8C%E5%9B%A0%E7%89%B9%E7%BD%91/7.png" alt="1"></p>
+</li>
+</ul>
+<h2 id="4-Delay-Loss-and-Throughput-in-Packet-Switched-Networks-分组交换中的延迟、丢包和吞吐量"><a href="#4-Delay-Loss-and-Throughput-in-Packet-Switched-Networks-分组交换中的延迟、丢包和吞吐量" class="headerlink" title="4. Delay, Loss, and Throughput in Packet-Switched Networks(分组交换中的延迟、丢包和吞吐量)"></a>4. Delay, Loss, and Throughput in Packet-Switched Networks(分组交换中的延迟、丢包和吞吐量)</h2><h3 id="4-1-Overview-of-Delay-in-Packet-Switched-Networks-分组交换网中的时延概述"><a href="#4-1-Overview-of-Delay-in-Packet-Switched-Networks-分组交换网中的时延概述" class="headerlink" title="4.1. Overview of Delay in Packet-Switched Networks(分组交换网中的时延概述)"></a>4.1. Overview of Delay in Packet-Switched Networks(分组交换网中的时延概述)</h3><p><img src="/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC1%E7%AB%A0%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E5%92%8C%E5%9B%A0%E7%89%B9%E7%BD%91/8.png" alt="1"></p>
+<p>上图所示的时延分为以下四种类型：</p>
+<ul>
+<li><p>处理时延(Processing Delay)，路由器(分组交换机)检查分组首部和决定将该分组导向何处。在节点处理之后，路由器将该分组引向通往B链路之前的队列中。处理时延通常是微秒或更低的数量级。</p>
+</li>
+<li><p>排队时延(Queuing Delay)，分组在路由器中等待传输时经受的时延，取决于当前队列中分组的数量，即网络流量。排队时延可以是毫秒到微秒量级。</p>
+</li>
+<li><p>传输时延(Transmission Delay)，是将分组的所有比特推向链路(发射)所需要的时间。通常在毫秒到微秒量级。</p>
+</li>
+<li><p>传播时延(Propagation Delay)，从该链路起点到达路由器B所需要的时间。在广域网中，传播时延为毫秒量级。</p>
+</li>
+</ul>
+<p>节点时延($d_{nodal}$) &#x3D; 处理时延($d_{proc}$) + 排队时延($d_{queue}$) + 传输时延($d_{trans}$) + 传播时延($d_{prop}$)</p>
+<h3 id="4-2-Queuing-Delay-and-Packet-Loss-排队时延和丢包"><a href="#4-2-Queuing-Delay-and-Packet-Loss-排队时延和丢包" class="headerlink" title="4.2. Queuing Delay and Packet Loss(排队时延和丢包)"></a>4.2. Queuing Delay and Packet Loss(排队时延和丢包)</h3><p>节点时延中最为复杂和有趣的成分是排队时延(其实，就是<strong>堵车</strong>消耗的时间)。</p>
+<ul>
+<li><code>a</code>表示分组到达队列的平均速率(单位是分组&#x2F;秒，即pkt&#x2F;s)，即路由器处理该分组的速率；</li>
+<li><code>R</code>表示传输速率，即从队列中推出比特的速率；</li>
+<li><code>L</code>表示所有分组的平均比特长度；</li>
+<li><code>La/R</code>被称为**流量强度(traffic intensity)**。</li>
+</ul>
+<p>如果<code>La/R&gt;1</code>，则比特到达队列的平均速率超过从该队列传输出去的速率，即接收比送出去的快。同一时刻到达的分组越多，排队时延将越大，因为$\lim_{N\to \infty}N\tfrac{La}{R} &#x3D; N$。</p>
+<p>因此：</p>
+<blockquote>
+<p>Design your system so that the traffic intensity is no greater than 1</p>
+</blockquote>
+<p>当分组到达时，队列已满，那该分组奖会**丢失(loss)**。</p>
+<h3 id="4-3-End-to-End-Delay-端到端时延"><a href="#4-3-End-to-End-Delay-端到端时延" class="headerlink" title="4.3. End-to-End Delay(端到端时延)"></a>4.3. End-to-End Delay(端到端时延)</h3><p>假设网络是无拥塞的（因此排队时延是微不足道的）。</p>
+<p>端到端时延：$d_{end-end} &#x3D; N(d_{proc} + d_{trans} + d_{prop})$</p>
+<h3 id="4-4-Throughput-in-Computer-Networks-计算机网络中的吞吐量"><a href="#4-4-Throughput-in-Computer-Networks-计算机网络中的吞吐量" class="headerlink" title="4.4. Throughput in Computer Networks(计算机网络中的吞吐量)"></a>4.4. Throughput in Computer Networks(计算机网络中的吞吐量)</h3><p>除了时延和丢包，端到端吞吐量是计算机网络中另一个至关重要的性能测度。包含如下两个度量：</p>
+<ul>
+<li><p>**瞬时吞吐量(instantaneous throughput)**：某一时刻的下载速率，以每秒传送的比特数bps计。比如文件下载时，不断变化的xxxkb&#x2F;s</p>
+</li>
+<li><p>**平均吞吐量(average throughput)**：下载完整个文件的平均速率</p>
+</li>
+</ul>
+<p>另外，端到端的吞吐量，取决于端到端路径中速率(bps)最小的链路，即**瓶颈链路(bottleneck link)**。论证如下：</p>
+<p>假设有一台服务器和一台客户机，他们通过两条通信链路和一台路由器相连，不考虑处理时延和传输时延，令$R_s$表示服务器到路由器之间的链路速率(bps)，$R_c$表示路由器到客户之间的链路速率(bps)，<strong>特别注意：链路速率(bps)表示每秒传送的比特数，而不是每秒前进的路程</strong>。如下图：</p>
+<p><img src="/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC1%E7%AB%A0%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E5%92%8C%E5%9B%A0%E7%89%B9%E7%BD%91/9.png" alt="1"></p>
+<p>根据$R_s$与$R_c$的比较关系，可分为以下两种情况：</p>
+<ol>
+<li><p>假设$R_s &lt; R_c 且 R_s&#x3D;1bit&#x2F;s, R_c&#x3D;2bit&#x2F;s$：在时刻1，有1bit从服务器到达路由器；在1s~2s间，虽然路由器到客户端的链路1s能够传播2bit，但路由器此时只有1bit，所以该链路1s只能转播1bit；在时刻2，1bit到达客户端，新的1bit又到达了路由器；重复上述步骤。虽然$R_c&#x3D;2bit&#x2F;s$，但由于服务器到路由器的链路1s只能提供1bit，所以路由器到客户端的链路速率也降至$1bit&#x2F;s$。</p>
+</li>
+<li><p>假设$R_s &gt; R_c 且 R_s&#x3D;2bit&#x2F;s, R_c&#x3D;1bit&#x2F;s$：在时刻1，有2bit从服务器到达路由器；在1s~2s间，由于路由器到客户端的链路1s只能够传播1bit，所以路由器还停留了1bit；在时刻2，1bit到达客户端，新的1bit又到达了路由器，此时路由器保留了2bit。随着时间推移，路由器积累的bit越来越多，这是一种最不希望的情况。</p>
+</li>
+</ol>
+<p>因此，**对于这种简单的两链路网络，其吞吐量为$\tfrac{1}{2}min{R_c, R_s}$**（此处略不同于《计算机网络——自顶向下方法》1.4.4节中的内容，愚以为书中存在纰漏）。</p>
+<p>综上所述，我们可以知道，端到端路径中的瓶颈链路，决定了端到端的吞吐量。所以，在今天因特网中，<strong>对吞吐量的限制因素通常是接入网</strong>。</p>
+<p>另外，当有许多数据流通过一条链路时，一条高传输速率的链路也可能成为瓶颈链路。</p>
+<h2 id="5-Protocol-Layers-and-Their-Service-Models-协议层次及其服务模型"><a href="#5-Protocol-Layers-and-Their-Service-Models-协议层次及其服务模型" class="headerlink" title="5. Protocol Layers and Their Service Models(协议层次及其服务模型)"></a>5. Protocol Layers and Their Service Models(协议层次及其服务模型)</h2><h3 id="5-1-Layered-Architecture-分层的体系结构"><a href="#5-1-Layered-Architecture-分层的体系结构" class="headerlink" title="5.1. Layered Architecture(分层的体系结构)"></a>5.1. Layered Architecture(分层的体系结构)</h3><p><strong>分层</strong>是分析和设计大型系统的良好方法。</p>
+<h4 id="5-1-1-Protocol-Layering-协议分层"><a href="#5-1-1-Protocol-Layering-协议分层" class="headerlink" title="5.1.1. Protocol Layering(协议分层)"></a>5.1.1. Protocol Layering(协议分层)</h4><p>5层因特网<strong>协议栈(protocol stack, 各层的所有协议)</strong> 如下图：</p>
+<p><img src="/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC1%E7%AB%A0%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E5%92%8C%E5%9B%A0%E7%89%B9%E7%BD%91/10.png" alt="1"></p>
+<p>上层服务依赖于下层服务，下层服务为上层服务提供接口。</p>
+<p>就像本书所说，我们采用 <strong>自顶向下方法(top-down approach)</strong> 进行解释分析：</p>
+<ul>
+<li>**应用层(Application)<strong>，软件实现。包含HTTP、SMTP、FTP、DNS等协议，应用层中的基本信息称为</strong>报文(message)**。</li>
+<li>**运输层(Transport)<strong>，软件实现。包含TCP、UDP等协议，运输层中的基本信息称为</strong>报文段(segment)**。</li>
+<li>**网络层(Network)<strong>，软硬件实现。包含IP、路由选择等协议，基本信息称为</strong>数据报(datagram)**。</li>
+<li>**链路层(Link)<strong>，硬件实现。包含以太网、WiFi等协议，基本信息称为</strong>帧(frame)**。</li>
+<li>**物理层(Physical)<strong>，硬件实现。包含关于双绞铜线、光纤等链路的协议，基本信息为</strong>比特(bit)**。</li>
+</ul>
+<h4 id="5-1-2-The-OSI-Model-OSI模型"><a href="#5-1-2-The-OSI-Model-OSI模型" class="headerlink" title="5.1.2. The OSI Model(OSI模型)"></a>5.1.2. The OSI Model(OSI模型)</h4><p>1970s后期，国际标准化组织(ISO)提出计算机网络围绕7层来组织，称为开发系统互连模型(OSI模型)，如下：</p>
+<p><img src="/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC1%E7%AB%A0%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E5%92%8C%E5%9B%A0%E7%89%B9%E7%BD%91/11.png" alt="1"></p>
+<p>相比于因特网5层模型，7层模型多了 <strong>表示层(Presentation)</strong> 和 <strong>会话层(Session)</strong> 两层。</p>
+<p>为什么会少了两层呢？因特网回答如下：</p>
+<blockquote>
+<p>it’s up to the application developer.</p>
+</blockquote>
+<p>这交给开发者处理。</p>
+<h3 id="5-2-Encapsulation-封装"><a href="#5-2-Encapsulation-封装" class="headerlink" title="5.2. Encapsulation(封装)"></a>5.2. Encapsulation(封装)</h3><p>封装的意义：对于上一层传来的数据信息，附加上当前层的附加信息。</p>
+<p>对于每一层的数据信息，具有两种类型的字段：<strong>首部字段(当前层信息)</strong> 和 **有效载荷字段(payload field, 来自上一层)**。</p>
+<h2 id="6-Networks-Under-Attack-面对攻击网络"><a href="#6-Networks-Under-Attack-面对攻击网络" class="headerlink" title="6. Networks Under Attack(面对攻击网络)"></a>6. Networks Under Attack(面对攻击网络)</h2><ul>
+<li>**僵尸网络(botnet)**，被黑客入侵设备组成的网络。</li>
+<li>**病毒(virus)**，一种需要某种形式的用户交互来感染用户设备的恶意软件。</li>
+<li>**蠕虫(worm)**，一种无须任何明显用户交互就能进入设备的恶意软件。</li>
+<li>**DoS(denial-of-service attacks, 拒绝服务攻击)**：<ul>
+<li>弱点攻击。攻击目标主机上运行的应用程序，从而使主机崩溃或者控制主机。这不是<a target="_blank" rel="noopener" href="https://ctf-wiki.github.io/ctf-wiki/pwn/readme-zh/">pwn</a>吗！</li>
+<li>带宽洪泛。攻击者向目标主机发送大量分组，使其接入链路拥塞。</li>
+<li>连接洪泛。攻击者在目标主机中创建大量的半开或全开的TCP连接。</li>
+</ul>
+</li>
+<li>**DDoS(distributed DoS, 分布式DoS)**，黑客利用受害主机组成的僵尸网络对服务器进行攻击：<br><img src="/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC1%E7%AB%A0%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E5%92%8C%E5%9B%A0%E7%89%B9%E7%BD%91/12.png" alt="1"></li>
+<li>**分组嗅探器(packet sniffer)**，记录每个流经的分组副本的被动接收机。在无线传输设备的附近放置一台被动的接收机，它就能得到传输的每个分组的副本。分组嗅探软件——Wireshark。</li>
+</ul>
+<p>等等等等。</p>
+<h2 id="7-History-of-Computer-Networking-and-the-Internet"><a href="#7-History-of-Computer-Networking-and-the-Internet" class="headerlink" title="7. History of Computer Networking and the Internet"></a>7. History of Computer Networking and the Internet</h2><ul>
+<li>1960s，电话网络统治着通信网络，它主要采用电路交换的方式发送信息。</li>
+<li>1960s，MIT(麻省理工)的研究生Leonard Kleinrock、兰德公司和NPL(英国国家物理实验室)分别研究并发明了分组交换技术。</li>
+<li>1967年左右，Lawrence Roberts(Leonard Kleinrock的同事)公布了一个<strong>ARPAnet</strong>(ARPA，美国高级研究计划署)的总体计划，它是第一个分组交换计算机网络，是因特网的祖先。</li>
+<li>1969年，第一个分组交换网络<strong>ARPAnet</strong>落地，但只有4个节点。</li>
+<li>1972年，ARPAnet发展到15个节点，并完成了第一个端到端协议——<strong>NCP</strong>。</li>
+<li>1970s早中期，其它分组交换网络问世，包括：ALOHAnet(无线电网络)、Telenet(BBN的商用分组交换网路)等，还有分时网络：Tymnet和GE信息服务网。</li>
+<li>1970s，将各网络互联的工作得到了DARPA(美国国防部高级研究计划署)的支持。</li>
+<li>1976年， Metcalfe 和 Boggs 基于ALOHAnet中的多路访问协议，研制了<strong>以太网协议</strong>。</li>
+<li>1970s末，TCP、UDP、IP协议在概念上已经完成。</li>
+<li>1979年，ARPAnet拥有200个节点。</li>
+<li>1982年，<strong>SMTP</strong>邮件协议被发明。</li>
+<li>1983年1月1日，<strong>TCP&#x2F;IP协议</strong>替代了NCP协议，成为ARPAnet新的标准主机协议。</li>
+<li>1983年，发明了<strong>DNS</strong>协议。</li>
+<li>1985年，发明了<strong>FTP</strong>协议。</li>
+<li>1980s初期，在ARPAnet发展的同时，法国启动了<strong>Minitel</strong>项目，他的计划是让数据网络进入每个家庭。在1990s中期，Minitel提供了20000多种服务，涵盖了广泛的范围。Minitel在大量法国家庭中存在了10年后，大多数美国人才听说因特网。</li>
+<li>1980s，BITNET为美国东北部的几个大学之间提供电子邮件和文件传输。然后，建立了CSNET将没有接入ARPAnet的大学研究人员连接到一起。1986年，又建立了NSFNET。</li>
+<li>1980s末期，连到公共因特网的主机数量达到1000000台。</li>
+<li>1990s，ARPAnet已不复存在，NSFNET也于1995年退役，因特网步入商业化。</li>
+<li>1989~1991年间，Tim Berners-Lee发明了<strong>Web</strong>，并和他的同事研制了HTML、HTTP、Web服务器和浏览器，这是Web的4个关键部分。</li>
+<li>1995~2000，因特网飞速发展。</li>
+<li>2000~2001，因特网股票崩盘，许多因特网初创公司倒闭。</li>
+<li>2000至今，因特网家庭接入、速度越来越快、大公司部署专用网络、“云”。</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Network/" rel="tag"><i class="fa fa-tag"></i> 计算机网络</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC2%E7%AB%A0%E5%BA%94%E7%94%A8%E5%B1%82.html" rel="prev" title="《计算机网络》笔记-第2章应用层">
+                  <i class="fa fa-chevron-left"></i> 《计算机网络》笔记-第2章应用层
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/ocaml%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%E6%94%BE%E5%BC%83.html" rel="next" title="OCaml从入门到放弃">
+                  OCaml从入门到放弃 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments gitalk-container"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">dounine</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/mist/" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+<script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.0/search.js" integrity="sha256-vXZMYLEqsROAXkEw93GGIvaB2ab+QW6w3+1ahD9nXXA=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.0/es5/tex-mml-chtml.js","integrity":"sha256-r+3itOMtGGjap0x+10hu6jW/gZCzxHsoKrOd7gyRSGY="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/gitalk/1.7.2/gitalk.css" integrity="sha256-AJnUHL7dBv6PGaeyPQJcgQPDjt/Hn/PvYZde1iqfp8U=" crossorigin="anonymous">
+
+<script class="next-config" data-name="gitalk" type="application/json">{"enable":true,"github_id":"99MyCql","repo":"99MyCql.github.io","client_id":"7c69ea063e9c78a72075","client_secret":"f222b18af36b2dffda7884ce5fd77bbb9172de54","admin_user":"99MyCql","distraction_free_mode":false,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token","language":"zh-CN","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/gitalk/1.7.2/gitalk.min.js","integrity":"sha256-Pmj85ojLaPOWwRtlMJwmezB/Qg8BzvJp5eTzvXaYAfA="},"path_md5":"10b2d161a9744becc20436f7113a6ec2"}</script>
+<script src="/js/third-party/comments/gitalk.js"></script>
+
+</body>
+</html>

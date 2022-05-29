@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.2.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/golang32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/golang16.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="baidu-site-verification" content="code-RpvRDWfflk">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" integrity="sha256-DfWjNxDkM94fVBWx1H5BMMp0Zq7luBlV8QRcSES7s+0=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"blog.dounine.live","root":"/","images":"/images","scheme":"Mist","darkmode":false,"version":"8.11.1","exturl":false,"sidebar":{"position":"right","display":"always","padding":18,"offset":12},"copycode":{"enable":true,"style":"flat"},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":"gitalk","storage":true,"lazyload":false,"nav":null,"activeClass":"gitalk"},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="[TOC] 0. 前言通过网络层，我们知道网络如何选择最优路径，将分组从一个主机发送到另一个主机。 而通过链路层，我们将知道：分组是如何在构成端到端最优路径的各段物理链路上进行传输的。 同样类比物流寄件，如果说网络层解决的是：将邮件从一个地址邮寄到另一个地址；那么链路层解决的就是：将邮件从一个节点交付给下一个节点，是采用卡车、还是飞机、还是轮船呢。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="《计算机网络》笔记-第6章链路层和局域网">
+<meta property="og:url" content="https://blog.dounine.live/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC6%E7%AB%A0%E9%93%BE%E8%B7%AF%E5%B1%82%E5%92%8C%E5%B1%80%E5%9F%9F%E7%BD%91.html">
+<meta property="og:site_name" content="dounine&#39;s blog">
+<meta property="og:description" content="[TOC] 0. 前言通过网络层，我们知道网络如何选择最优路径，将分组从一个主机发送到另一个主机。 而通过链路层，我们将知道：分组是如何在构成端到端最优路径的各段物理链路上进行传输的。 同样类比物流寄件，如果说网络层解决的是：将邮件从一个地址邮寄到另一个地址；那么链路层解决的就是：将邮件从一个节点交付给下一个节点，是采用卡车、还是飞机、还是轮船呢。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://blog.dounine.live/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC6%E7%AB%A0%E9%93%BE%E8%B7%AF%E5%B1%82%E5%92%8C%E5%B1%80%E5%9F%9F%E7%BD%91/2.png">
+<meta property="og:image" content="https://blog.dounine.live/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC6%E7%AB%A0%E9%93%BE%E8%B7%AF%E5%B1%82%E5%92%8C%E5%B1%80%E5%9F%9F%E7%BD%91/3.png">
+<meta property="og:image" content="https://blog.dounine.live/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC6%E7%AB%A0%E9%93%BE%E8%B7%AF%E5%B1%82%E5%92%8C%E5%B1%80%E5%9F%9F%E7%BD%91/4.png">
+<meta property="og:image" content="https://blog.dounine.live/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC6%E7%AB%A0%E9%93%BE%E8%B7%AF%E5%B1%82%E5%92%8C%E5%B1%80%E5%9F%9F%E7%BD%91/5.png">
+<meta property="og:image" content="https://blog.dounine.live/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC6%E7%AB%A0%E9%93%BE%E8%B7%AF%E5%B1%82%E5%92%8C%E5%B1%80%E5%9F%9F%E7%BD%91/6.png">
+<meta property="og:image" content="https://blog.dounine.live/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC6%E7%AB%A0%E9%93%BE%E8%B7%AF%E5%B1%82%E5%92%8C%E5%B1%80%E5%9F%9F%E7%BD%91/7.png">
+<meta property="og:image" content="https://blog.dounine.live/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC6%E7%AB%A0%E9%93%BE%E8%B7%AF%E5%B1%82%E5%92%8C%E5%B1%80%E5%9F%9F%E7%BD%91/8.png">
+<meta property="og:image" content="https://blog.dounine.live/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC6%E7%AB%A0%E9%93%BE%E8%B7%AF%E5%B1%82%E5%92%8C%E5%B1%80%E5%9F%9F%E7%BD%91/9.png">
+<meta property="og:image" content="https://blog.dounine.live/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC6%E7%AB%A0%E9%93%BE%E8%B7%AF%E5%B1%82%E5%92%8C%E5%B1%80%E5%9F%9F%E7%BD%91/10.png">
+<meta property="og:image" content="https://blog.dounine.live/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC6%E7%AB%A0%E9%93%BE%E8%B7%AF%E5%B1%82%E5%92%8C%E5%B1%80%E5%9F%9F%E7%BD%91/11.png">
+<meta property="og:image" content="https://blog.dounine.live/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC6%E7%AB%A0%E9%93%BE%E8%B7%AF%E5%B1%82%E5%92%8C%E5%B1%80%E5%9F%9F%E7%BD%91/12.png">
+<meta property="og:image" content="https://blog.dounine.live/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC6%E7%AB%A0%E9%93%BE%E8%B7%AF%E5%B1%82%E5%92%8C%E5%B1%80%E5%9F%9F%E7%BD%91/13.png">
+<meta property="og:image" content="https://blog.dounine.live/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC6%E7%AB%A0%E9%93%BE%E8%B7%AF%E5%B1%82%E5%92%8C%E5%B1%80%E5%9F%9F%E7%BD%91/15.png">
+<meta property="og:image" content="https://blog.dounine.live/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC6%E7%AB%A0%E9%93%BE%E8%B7%AF%E5%B1%82%E5%92%8C%E5%B1%80%E5%9F%9F%E7%BD%91/16.png">
+<meta property="og:image" content="https://blog.dounine.live/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC6%E7%AB%A0%E9%93%BE%E8%B7%AF%E5%B1%82%E5%92%8C%E5%B1%80%E5%9F%9F%E7%BD%91/23.png">
+<meta property="og:image" content="https://blog.dounine.live/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC6%E7%AB%A0%E9%93%BE%E8%B7%AF%E5%B1%82%E5%92%8C%E5%B1%80%E5%9F%9F%E7%BD%91/17.png">
+<meta property="og:image" content="https://blog.dounine.live/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC6%E7%AB%A0%E9%93%BE%E8%B7%AF%E5%B1%82%E5%92%8C%E5%B1%80%E5%9F%9F%E7%BD%91/19.png">
+<meta property="og:image" content="https://blog.dounine.live/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC6%E7%AB%A0%E9%93%BE%E8%B7%AF%E5%B1%82%E5%92%8C%E5%B1%80%E5%9F%9F%E7%BD%91/18.png">
+<meta property="og:image" content="https://blog.dounine.live/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC6%E7%AB%A0%E9%93%BE%E8%B7%AF%E5%B1%82%E5%92%8C%E5%B1%80%E5%9F%9F%E7%BD%91/20.png">
+<meta property="og:image" content="https://blog.dounine.live/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC6%E7%AB%A0%E9%93%BE%E8%B7%AF%E5%B1%82%E5%92%8C%E5%B1%80%E5%9F%9F%E7%BD%91/21.png">
+<meta property="og:image" content="https://blog.dounine.live/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC6%E7%AB%A0%E9%93%BE%E8%B7%AF%E5%B1%82%E5%92%8C%E5%B1%80%E5%9F%9F%E7%BD%91/22.png">
+<meta property="article:published_time" content="2020-11-02T03:00:05.000Z">
+<meta property="article:modified_time" content="2020-11-02T03:00:05.000Z">
+<meta property="article:author" content="dounine">
+<meta property="article:tag" content="计算机网络">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://blog.dounine.live/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC6%E7%AB%A0%E9%93%BE%E8%B7%AF%E5%B1%82%E5%92%8C%E5%B1%80%E5%9F%9F%E7%BD%91/2.png">
+
+
+<link rel="canonical" href="https://blog.dounine.live/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC6%E7%AB%A0%E9%93%BE%E8%B7%AF%E5%B1%82%E5%92%8C%E5%B1%80%E5%9F%9F%E7%BD%91.html">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://blog.dounine.live/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC6%E7%AB%A0%E9%93%BE%E8%B7%AF%E5%B1%82%E5%92%8C%E5%B1%80%E5%9F%9F%E7%BD%91.html","path":"《计算机网络》笔记-第6章链路层和局域网.html","title":"《计算机网络》笔记-第6章链路层和局域网"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>《计算机网络》笔记-第6章链路层和局域网 | dounine's blog</title>
+  
+
+  <script src="/js/third-party/analytics/baidu-analytics.js"></script>
+  <script async src="https://hm.baidu.com/hm.js?66c7065aa71681df47eb23eff557978b"></script>
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">dounine's blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">18</span></a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">48</span></a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">75</span></a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#0-%E5%89%8D%E8%A8%80"><span class="nav-text">0. 前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E6%A6%82%E8%BF%B0"><span class="nav-text">1. 概述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E5%B7%AE%E9%94%99%E6%A3%80%E6%B5%8B%E5%92%8C%E7%BA%A0%E6%AD%A3%E6%8A%80%E6%9C%AF"><span class="nav-text">2. 差错检测和纠正技术</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-%E5%A5%87%E5%81%B6%E6%A0%A1%E9%AA%8C"><span class="nav-text">2.1. 奇偶校验</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-%E6%A0%A1%E9%AA%8C%E5%92%8C%E6%96%B9%E6%B3%95"><span class="nav-text">2.2. 校验和方法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-%E5%BE%AA%E7%8E%AF%E5%86%97%E4%BD%99%E6%A3%80%E6%B5%8B"><span class="nav-text">2.3. 循环冗余检测</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E5%A4%9A%E8%B7%AF%E8%AE%BF%E9%97%AE%E9%93%BE%E8%B7%AF%E5%92%8C%E5%8D%8F%E8%AE%AE"><span class="nav-text">3. 多路访问链路和协议</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-%E4%BF%A1%E9%81%93%E5%88%92%E5%88%86%E5%8D%8F%E8%AE%AE"><span class="nav-text">3.1. 信道划分协议</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-%E9%9A%8F%E6%9C%BA%E6%8E%A5%E5%85%A5%E5%8D%8F%E8%AE%AE"><span class="nav-text">3.2. 随机接入协议</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#3-2-1-%E6%97%B6%E9%9A%99-ALOHA"><span class="nav-text">3.2.1. 时隙 ALOHA</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-2-2-%E8%BD%BD%E6%B3%A2%E4%BE%A6%E5%90%AC%E5%A4%9A%E8%B7%AF%E8%AE%BF%E9%97%AE%EF%BC%88CSMA%EF%BC%89"><span class="nav-text">3.2.2. 载波侦听多路访问（CSMA）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-2-3-%E5%85%B7%E6%9C%89%E7%A2%B0%E6%92%9E%E6%A3%80%E6%B5%8B%E7%9A%84%E8%BD%BD%E6%B3%A2%E4%BE%A6%E5%90%AC%E5%A4%9A%E8%B7%AF%E8%AE%BF%E9%97%AE%EF%BC%88CSMA-x2F-CD%EF%BC%89"><span class="nav-text">3.2.3. 具有碰撞检测的载波侦听多路访问（CSMA&#x2F;CD）</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-3-%E8%BD%AE%E6%B5%81%E5%8D%8F%E8%AE%AE"><span class="nav-text">3.3. 轮流协议</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-%E4%BA%A4%E6%8D%A2%E5%B1%80%E5%9F%9F%E7%BD%91"><span class="nav-text">4. 交换局域网</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-1-%E9%93%BE%E8%B7%AF%E5%B1%82%E5%AF%BB%E5%9D%80%E2%80%94%E2%80%94MAC%E5%9C%B0%E5%9D%80"><span class="nav-text">4.1. 链路层寻址——MAC地址</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-%E5%9C%B0%E5%9D%80%E8%A7%A3%E6%9E%90%E5%8D%8F%E8%AE%AE-ARP"><span class="nav-text">4.2. 地址解析协议 ARP</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#4-2-1-%E5%9C%A8%E5%AD%90%E7%BD%91%E5%86%85%E5%8F%91%E9%80%81%E6%95%B0%E6%8D%AE%E6%8A%A5"><span class="nav-text">4.2.1. 在子网内发送数据报</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-2-2-%E5%8F%91%E9%80%81%E6%95%B0%E6%8D%AE%E6%8A%A5%E5%88%B0%E5%AD%90%E7%BD%91%E5%A4%96"><span class="nav-text">4.2.2. 发送数据报到子网外</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-3-%E4%BB%A5%E5%A4%AA%E7%BD%91%EF%BC%88Ethernet%EF%BC%89"><span class="nav-text">4.3. 以太网（Ethernet）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-4-%E9%93%BE%E8%B7%AF%E5%B1%82%E4%BA%A4%E6%8D%A2%E6%9C%BA"><span class="nav-text">4.4. 链路层交换机</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#4-4-1-%E4%BA%A4%E6%8D%A2%E6%9C%BA%E7%9A%84%E8%BD%AC%E5%8F%91%E5%92%8C%E8%BF%87%E6%BB%A4"><span class="nav-text">4.4.1. 交换机的转发和过滤</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-4-2-%E8%87%AA%E5%AD%A6%E4%B9%A0"><span class="nav-text">4.4.2. 自学习</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-5-%E8%99%9A%E6%8B%9F%E5%B1%80%E5%9F%9F%E7%BD%91"><span class="nav-text">4.5. 虚拟局域网</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-Web-%E9%A1%B5%E9%9D%A2%E8%AF%B7%E6%B1%82%E5%8E%86%E7%A8%8B"><span class="nav-text">5. Web 页面请求历程</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="dounine"
+      src="https://avatars.githubusercontent.com/u/41814469?s=400&u=48bf60a3428a3cb86a84a110c8688930cf6ceb08&v=4">
+  <p class="site-author-name" itemprop="name">dounine</p>
+  <div class="site-description" itemprop="description">回首向来萧瑟处</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">75</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">18</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">48</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/99MyCql" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;99MyCql" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+
+  <div class="links-of-blogroll site-overview-item animated">
+    <div class="links-of-blogroll-title"><i class="fa fa-globe fa-fw"></i>
+      Links
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://bkfish.gitee.io/" title="https:&#x2F;&#x2F;bkfish.gitee.io&#x2F;" rel="noopener" target="_blank">Kitty萌新的卧室</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://hitworld.github.io/" title="https:&#x2F;&#x2F;hitworld.github.io&#x2F;" rel="noopener" target="_blank">hirworld</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://wyjoutstanding.github.io/" title="https:&#x2F;&#x2F;wyjoutstanding.github.io&#x2F;" rel="noopener" target="_blank">wyjoutstanding</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://iwtf.github.io/" title="https:&#x2F;&#x2F;iwtf.github.io&#x2F;" rel="noopener" target="_blank">IWTF</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://wood1314.github.io/" title="https:&#x2F;&#x2F;wood1314.github.io&#x2F;" rel="noopener" target="_blank">wood</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://desperadoccy.github.io/" title="https:&#x2F;&#x2F;desperadoccy.github.io&#x2F;" rel="noopener" target="_blank">desperadoccy</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://doudouqaq.github.io/" title="https:&#x2F;&#x2F;doudouqaq.github.io&#x2F;" rel="noopener" target="_blank">doudouqaq</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://kylinnnnn.github.io/" title="https:&#x2F;&#x2F;kylinnnnn.github.io&#x2F;" rel="noopener" target="_blank">kylinnnnn</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://miaotony.xyz/" title="https:&#x2F;&#x2F;miaotony.xyz" rel="noopener" target="_blank">miaotony</a>
+        </li>
+    </ul>
+  </div>
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://github.com/99MyCql" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.dounine.live/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC6%E7%AB%A0%E9%93%BE%E8%B7%AF%E5%B1%82%E5%92%8C%E5%B1%80%E5%9F%9F%E7%BD%91.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://avatars.githubusercontent.com/u/41814469?s=400&u=48bf60a3428a3cb86a84a110c8688930cf6ceb08&v=4">
+      <meta itemprop="name" content="dounine">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dounine's blog">
+      <meta itemprop="description" content="回首向来萧瑟处">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="《计算机网络》笔记-第6章链路层和局域网 | dounine's blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          《计算机网络》笔记-第6章链路层和局域网
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-11-02 11:00:05" itemprop="dateCreated datePublished" datetime="2020-11-02T11:00:05+08:00">2020-11-02</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Base/" itemprop="url" rel="index"><span itemprop="name">九层之台，起于累土</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Base/Network/" itemprop="url" rel="index"><span itemprop="name">计算机网络</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p>[TOC]</p>
+<h2 id="0-前言"><a href="#0-前言" class="headerlink" title="0. 前言"></a>0. 前言</h2><p>通过网络层，我们知道网络如何选择最优路径，将分组从一个主机发送到另一个主机。</p>
+<p>而通过链路层，我们将知道：<strong>分组是如何在构成端到端最优路径的各段物理链路上进行传输的</strong>。</p>
+<p>同样类比物流寄件，如果说网络层解决的是：将邮件从一个地址邮寄到另一个地址；那么链路层解决的就是：将邮件从一个节点交付给下一个节点，是采用卡车、还是飞机、还是轮船呢。</p>
+<span id="more"></span>
+
+<h2 id="1-概述"><a href="#1-概述" class="headerlink" title="1. 概述"></a>1. 概述</h2><p>在链路层中，任何设备将称作<strong>节点（node）</strong>，包括主机、路由器、交换机等。</p>
+<p>连接相邻节点的通信信道则称为<strong>链路（link）</strong>。</p>
+<p>链路层传输的分组称为<strong>帧（frame）</strong>。</p>
+<p>在链路层的讨论中，将介绍两种不同类型的链路层通信：</p>
+<ul>
+<li><strong>广播信道</strong>。它用于连接有线局域网、卫星网中的多台主机等。</li>
+<li><strong>点对点信道</strong>。它用于长距离链路连接的两台路由器之间等。</li>
+</ul>
+<p>链路层协议所提供的服务包括：</p>
+<ul>
+<li><strong>成帧</strong>。将网络层数据封装进链路层分组——帧中。</li>
+<li>链路接入。<strong>媒体访问控制（Medium Access Control，MAC）协议</strong>规定了帧在链路上传输的规则。<strong>根据信道的不同，MAC 协议可分为点对点协议和多路访问协议两大类</strong>。在点对点信道上，MAC 协议比较简单；而在广播信道上，MAC 协议比较复杂。</li>
+<li>可靠交付。有些高差错率的链路会提供可靠交付服务，但大部分都不提供。</li>
+<li>差错检测和纠正。</li>
+</ul>
+<p>链路层主体部分在<strong>网络适配器&#x2F;网络接口卡&#x2F;网卡（Network adapter）</strong>中实现，网卡的核心是一个实现了大部分链路层服务的芯片——链路层控制器（Controller）。剩余小部分链路层功能在 CPU 中实现。</p>
+<p><img src="/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC6%E7%AB%A0%E9%93%BE%E8%B7%AF%E5%B1%82%E5%92%8C%E5%B1%80%E5%9F%9F%E7%BD%91/2.png" alt="pic"></p>
+<h2 id="2-差错检测和纠正技术"><a href="#2-差错检测和纠正技术" class="headerlink" title="2. 差错检测和纠正技术"></a>2. 差错检测和纠正技术</h2><p>上文提到，对链路层帧中的比特差错进行检测和纠正，是链路层提供的服务之一。接下来，将介绍3种差错检测技术：</p>
+<ul>
+<li>奇偶校验</li>
+<li>校验和方法</li>
+<li>循环冗余检测</li>
+</ul>
+<h3 id="2-1-奇偶校验"><a href="#2-1-奇偶校验" class="headerlink" title="2.1. 奇偶校验"></a>2.1. 奇偶校验</h3><p>最简单的奇偶校验即使用单个<strong>奇偶校验位（parity bit）</strong>。假设发送 <code>d</code> 比特的信息，在<strong>偶校验</strong>方案中，发送方只需附加一个比特，使得这 <code>d+1</code> 比特中 <code>1</code> 的总数是偶数。奇校验则使 <code>1</code> 的个数是奇数。</p>
+<p><img src="/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC6%E7%AB%A0%E9%93%BE%E8%B7%AF%E5%B1%82%E5%92%8C%E5%B1%80%E5%9F%9F%E7%BD%91/3.png" alt="pic"></p>
+<p>实践证明，单个奇偶校验位方案，检测出差错的概率为 50% 。</p>
+<p><strong>二维奇偶校验</strong>是一种更强大的方案。发送数据的 <code>d</code> 个比特被划分为 <code>i</code> 行 <code>j</code> 列，对每行每列计算奇偶值，产生 <code>i+j+1</code> 个差错检测比特。它还能用来纠正出现差错的比特。</p>
+<p><img src="/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC6%E7%AB%A0%E9%93%BE%E8%B7%AF%E5%B1%82%E5%92%8C%E5%B1%80%E5%9F%9F%E7%BD%91/4.png" alt="pic"></p>
+<h3 id="2-2-校验和方法"><a href="#2-2-校验和方法" class="headerlink" title="2.2. 校验和方法"></a>2.2. 校验和方法</h3><p>与运输层校验和方法相同。</p>
+<h3 id="2-3-循环冗余检测"><a href="#2-3-循环冗余检测" class="headerlink" title="2.3. 循环冗余检测"></a>2.3. 循环冗余检测</h3><p>当下使用最广泛的差错检测技术为<strong>循环冗余检测（cyclic redundancy check，CRC）编码</strong>，也被称为<strong>多项式编码</strong>。</p>
+<p>其操作过程为：</p>
+<ol>
+<li>发送方和接收方事先协商一个 <code>r+1</code> 的比特串（最高位必须是1），称为<strong>生成多项式</strong>，我们将其表示为 <code>G</code>。</li>
+<li>对于要发送的 <code>d</code> 字节数据 <code>D</code>，发送方要得出 <code>r</code> 个比特的附加比特串 <code>R</code> ，并附加到 <code>D</code> 右边，使得这个 <code>d+r</code> 个比特能被 <code>G</code> “整除”（除的过程中，加不进位、减不借位，等价于异或）。那如何得出 <code>R</code> 呢？示例：<code>D=101110, d=6, G=1001, r=3</code>，其计算过程如下，最后得到 <code>R</code> 为 <code>011</code>，<code>d+r</code> 个比特为 <code>101110 011</code>。<br>  <img src="/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC6%E7%AB%A0%E9%93%BE%E8%B7%AF%E5%B1%82%E5%92%8C%E5%B1%80%E5%9F%9F%E7%BD%91/5.png" alt="pic"></li>
+<li>接收方接收到 <code>d+r</code> 个比特的数据后，会用 <code>G</code> 去除。如果余数非零，则表示出现差错；余数为零，则表示正确。</li>
+</ol>
+<h2 id="3-多路访问链路和协议"><a href="#3-多路访问链路和协议" class="headerlink" title="3. 多路访问链路和协议"></a>3. 多路访问链路和协议</h2><p>此前提到，有两种类型的链路：</p>
+<ul>
+<li><strong>点对点链路</strong>。由单个发送方和单个接收方组成，相关协议有：<strong>点对点协议（point-to-point protocol，PPP）</strong>、高级数据链路控制（high-level data link control，HDLC）。</li>
+<li><strong>广播链路</strong>。当某节点发送数据时，它会以广播的方式发送，同一广播链路上的节点都能接收到。而当多个发送发同时发送数据时，数据会在链路中发生<strong>碰撞</strong>，以致数据被损坏。如以太网、无线局域网等都是广播链路。</li>
+</ul>
+<p>我们将主要讨论广播链路，而广播链路中最重要的问题即<strong>多路访问问题（multiple access problem）</strong>。什么是多路访问问题呢？举个例子：有许多人聚集在一个房间中讨论问题，每个人都能发言。但讨论时，有可能每个人都争抢着发言、互不礼让，导致场面混乱不堪。</p>
+<p>而为了让讨论井然有序地进行，我们需要指定一些规则：</p>
+<ul>
+<li>每个人都有讲话的权力</li>
+<li>不要一个人讲太久，导致其它人没有发言机会</li>
+<li>想发言可以举手示意</li>
+<li>不要贸然打断他人的讲话</li>
+<li>当有人讲话时，不能睡觉</li>
+</ul>
+<p>这些规则同样适用于解决多路访问问题，这也就是<strong>多路访问协议（multiple access protocols）</strong>。</p>
+<p>当下，有十几种多路访问协议，我们将其划分为 3 种类型：</p>
+<ul>
+<li><strong>信道划分协议（channel partitioning protocols）</strong></li>
+<li><strong>随机接入协议（random access protocols）</strong></li>
+<li><strong>轮流协议（taking-turns protocols）</strong></li>
+</ul>
+<h3 id="3-1-信道划分协议"><a href="#3-1-信道划分协议" class="headerlink" title="3.1. 信道划分协议"></a>3.1. 信道划分协议</h3><p>为了避免碰撞，我们可以将广播信道以不同的方式平均地分配给每个节点，这就是信道划分协议。</p>
+<p>主要有三种信道划分方法：</p>
+<ul>
+<li><p><strong>时分多路复用（time-division multiplexing，TDM）</strong>。TDM 将时间划分为<strong>时间帧（time frame）</strong>，并进一步将每个时间帧划分成 N 个<strong>时隙（slot）</strong>，然后把 N 个时隙分配给 N 个节点。节点发送数据时，必须在指定时隙中传输比特。<br><img src="/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC6%E7%AB%A0%E9%93%BE%E8%B7%AF%E5%B1%82%E5%92%8C%E5%B1%80%E5%9F%9F%E7%BD%91/6.png" alt="pic"><br>其主要缺点为：节点速率被限制为 $R&#x2F;N bps$ （$R$ 为整个信道的速率），且必须等待它所属的时隙，即使它是唯一要发送的时隙。</p>
+</li>
+<li><p><strong>频分多路复用（frequency-division multiplexing，FDM）</strong>。将信道划分为不同的频段（每个频段具有 $R&#x2F;N$ 带宽），并把 N 个频段分配给 N 个节点。它也有着与 TDM 相同的缺点。<br><img src="/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC6%E7%AB%A0%E9%93%BE%E8%B7%AF%E5%B1%82%E5%92%8C%E5%B1%80%E5%9F%9F%E7%BD%91/7.png" alt="pic"></p>
+</li>
+<li><p><strong>码分多址（code division multiple access，CDMA）</strong>。一种神奇的方法，目前已广泛地用于蜂窝电话中，我们将在之后详细讲解。</p>
+</li>
+</ul>
+<h3 id="3-2-随机接入协议"><a href="#3-2-随机接入协议" class="headerlink" title="3.2. 随机接入协议"></a>3.2. 随机接入协议</h3><p>在随机接入协议中，节点总是以 $R$ 速率发送数据。当发生碰撞时，节点会在等待随机时间后重新发送，如此循环。</p>
+<p>我们将主要介绍两种常用的随机接入协议：</p>
+<ul>
+<li><strong>ALOHA 协议</strong></li>
+<li><strong>载波侦听多路访问协议（CSMA）</strong></li>
+</ul>
+<h4 id="3-2-1-时隙-ALOHA"><a href="#3-2-1-时隙-ALOHA" class="headerlink" title="3.2.1. 时隙 ALOHA"></a>3.2.1. 时隙 ALOHA</h4><p>时隙 ALOHA 结合了时分多路复用的方法，但进行了改进。</p>
+<p>时隙 ALOHA 先进行了如下规定：</p>
+<p><img src="/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC6%E7%AB%A0%E9%93%BE%E8%B7%AF%E5%B1%82%E5%92%8C%E5%B1%80%E5%9F%9F%E7%BD%91/8.png" alt="pic"></p>
+<p>然后，其操作过程为：</p>
+<p><img src="/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC6%E7%AB%A0%E9%93%BE%E8%B7%AF%E5%B1%82%E5%92%8C%E5%B1%80%E5%9F%9F%E7%BD%91/9.png" alt="pic"></p>
+<p>与信道划分不同，当只有一个节点发送数据时，它可以独占整个信道，也就是能以 $R$ 速率发送数据。</p>
+<p>但它的效率并不高。</p>
+<p>分享一个历史小故事：</p>
+<p><img src="/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC6%E7%AB%A0%E9%93%BE%E8%B7%AF%E5%B1%82%E5%92%8C%E5%B1%80%E5%9F%9F%E7%BD%91/10.png" alt="pic"></p>
+<h4 id="3-2-2-载波侦听多路访问（CSMA）"><a href="#3-2-2-载波侦听多路访问（CSMA）" class="headerlink" title="3.2.2. 载波侦听多路访问（CSMA）"></a>3.2.2. 载波侦听多路访问（CSMA）</h4><p>CSMA 的关键在于 <strong>载波侦听（carrier sensing）</strong>，它的本质很简单：一个节点在传输前先听信道，如果没有数据在传输，则发送数据；反之，则等待直到检测到信道一段时间都没有数据传输，再开始传输。</p>
+<p>但 CSMA 存在一个问题：当两个节点都监听到信道空闲时，它们会同时发送数据，最终导致数据碰撞。</p>
+<h4 id="3-2-3-具有碰撞检测的载波侦听多路访问（CSMA-x2F-CD）"><a href="#3-2-3-具有碰撞检测的载波侦听多路访问（CSMA-x2F-CD）" class="headerlink" title="3.2.3. 具有碰撞检测的载波侦听多路访问（CSMA&#x2F;CD）"></a>3.2.3. 具有碰撞检测的载波侦听多路访问（CSMA&#x2F;CD）</h4><p>CSMA&#x2F;CD 在 CSMA 的基础上，加入了<strong>碰撞检测（collision detection）</strong>。传输节点在传输时会一直监听此信道，如果它检测到另一个节点正在发送干扰帧并产生碰撞，就停止传输，并等待一段随机时间后，重复“侦听——当空闲时传输——碰撞则等待”。</p>
+<p>CSMA&#x2F;CD 具体过程如下：</p>
+<p><img src="/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC6%E7%AB%A0%E9%93%BE%E8%B7%AF%E5%B1%82%E5%92%8C%E5%B1%80%E5%9F%9F%E7%BD%91/11.png" alt="pic"></p>
+<p>算法中有一个很重要的随机时间，如果随机范围太大，则会降低节点效率；如果随即范围太小，则可能会再次碰撞。</p>
+<p>为了解决这个问题，人们提出了 <strong>二进制指数后退（binary exponential backoff）</strong> 算法。算法十分简单，即：当该帧经历了 $n$ 次碰撞后，节点将随机从 ${0,1,2…2^n-1}$ 中选择一个 $K$ 值，等待 $K$ 倍数的时间。因此，一个帧经历的碰撞越多，$K$ 选择的范围也会越大。</p>
+<h3 id="3-3-轮流协议"><a href="#3-3-轮流协议" class="headerlink" title="3.3. 轮流协议"></a>3.3. 轮流协议</h3><p><strong>多路访问协议的两个理想特性</strong>是：</p>
+<ol>
+<li>当只有一个节点活跃时，该节点具有 $R bps$ 的吞吐量。</li>
+<li>当有 $M$ 个节点活跃时，每个节点都有接近 $R&#x2F;M bps$ 的吞吐量。</li>
+</ol>
+<p>信道划分协议具备第2个特性，却不具备第1个；随机接入协议具备第1个特性，却不具备第2个。</p>
+<p>为了同时实现这两种特性，人们又发明了<strong>轮流协议（taking-turns protocol）</strong>。轮流协议有很多，我们只讨论两种比较重要的协议：</p>
+<ul>
+<li><p><strong>轮询协议（polling protocol）</strong>。协议会从所有节点中指定一个主节点，主节点 <strong>轮询（poll）</strong> 每个节点。例如，主节点会先询问节点1，如果它要发送数据，那么主节点会告诉它能传输的帧的最多数量，传输完毕后主节点会接着询问节点，周而复始。虽然轮询协议避免了碰撞和空时隙的问题，提高了效率，但也有一些<strong>缺点</strong>：</p>
+<ul>
+<li>引入了轮询时延。节点需要等待主节点轮询到它，才能发送数据。</li>
+<li><strong>若主节点发生故障，整个信道就不能使用了</strong>。</li>
+</ul>
+</li>
+<li><p><strong>令牌传递协议（token-passing protocol）</strong>。一个称为 <strong>令牌（token）</strong> 的小特殊帧会在节点之间循环传递。当一个节点要发送数据时，它会持有这个令牌，并传输所有数据，然后再释放令牌；当不需要发送数据时，则传给下一个节点。令牌传递协议同样也存在着一些问题，例如：一个节点故障可能导致整个信道崩溃，或者一个节点忘记释放令牌等。</p>
+</li>
+</ul>
+<h2 id="4-交换局域网"><a href="#4-交换局域网" class="headerlink" title="4. 交换局域网"></a>4. 交换局域网</h2><h3 id="4-1-链路层寻址——MAC地址"><a href="#4-1-链路层寻址——MAC地址" class="headerlink" title="4.1. 链路层寻址——MAC地址"></a>4.1. 链路层寻址——MAC地址</h3><p>主机与路由器都拥有链路层地址。但严格来讲，并不是主机和路由器拥有链路层地址，而是<strong>网络适配器（网络接口&#x2F;网卡）拥有链路层地址</strong>。具有多个网卡的主机或路由器将具有多个链路层地址，也具有多个IP地址。</p>
+<p>链路层地址有许多不同的称呼：<strong>LAN 地址</strong>、<strong>物理地址</strong> 或 <strong>MAC 地址</strong>，其中 MAC 地址最为常用。</p>
+<p>对大多数局域网而言，MAC 地址长度为 6 字节，通常用十六进制表示，如 <code>1A-23-F9-CD-06-9B</code> 。网卡上的 MAC 地址是与生俱来的，也是固定的（现在可以改变，但我们不考虑），而且<strong>没有两块网卡的 MAC 地址是相同的</strong>。不论网卡到何处，MAC 地址都不会改变。</p>
+<p>到此，你或许会疑惑：<strong>为什么网络层与链路层都需要地址呢</strong>？且听我慢慢道来。</p>
+<ul>
+<li>MAC 地址是扁平结构，且每个地址全球唯一，不论身在何处，它相当于<strong>身份证</strong>；IP 地址则是层次结构，主机移动时 IP 地址需要改变，它用来定位，相当于<strong>邮政地址</strong>。</li>
+<li>链路层是为任意网络层协议而设计的，而不只是用于 IP 协议。如果网卡被指派 IP 地址，而不是“中性”的 MAC 地址，那将不能用于其它网络层协议。</li>
+<li>若网卡使用网络层地址，那网络层地址就不能“刻”在网卡上，每次移动主机都得重新配置；或者网卡不使用任何地址，而直接交付给网络层，但这样的话，主机将被局域网发送的每个帧而<strong>中断</strong>，即使帧的目的地不是自己。</li>
+</ul>
+<p>在局域网中，网卡会接收每一个发送的帧，并检查帧中目的 MAC 地址是否与自己 MAC 地址匹配。如果匹配，则取出帧中数据，向上层传递；如果不匹配，则丢弃该帧。</p>
+<p>与 IP 协议一样，MAC 也有<strong>广播地址</strong>，即比特全为 1 的 MAC 地址，用于向局域网所有其它主机广播信息。</p>
+<h3 id="4-2-地址解析协议-ARP"><a href="#4-2-地址解析协议-ARP" class="headerlink" title="4.2. 地址解析协议 ARP"></a>4.2. 地址解析协议 ARP</h3><p>当网络层将数据报传给链路层时，链路层只知道目的 IP 地址，那它如何才能知道帧的目的 MAC 地址呢？这就是 <strong>地址解析协议（Address Resolution Protocol，ARP）</strong> 的任务了。</p>
+<p>接下来，将通过两种情况了解 ARP 协议。</p>
+<h4 id="4-2-1-在子网内发送数据报"><a href="#4-2-1-在子网内发送数据报" class="headerlink" title="4.2.1. 在子网内发送数据报"></a>4.2.1. 在子网内发送数据报</h4><p>每台主机或路由器在<strong>内存</strong>中都有一个 <strong>ARP 表</strong>，它包含 IP 地址到 MAC 地址的映射关系，以及每个映射的寿命（TTL）。</p>
+<p><img src="/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC6%E7%AB%A0%E9%93%BE%E8%B7%AF%E5%B1%82%E5%92%8C%E5%B1%80%E5%9F%9F%E7%BD%91/12.png" alt="pic"></p>
+<p>现假设主机 <code>222.222.222.220</code> 要向主机 <code>222.222.222.222</code> 发送数据报，但它的 ARP 表并未存在映射关系。当数据报传至链路层时，主机 <code>222.222.222.220</code> 需要用 ARP 解析协议来获取目的主机的 MAC 地址：</p>
+<ul>
+<li><p>首先，<code>222.222.222.220</code> 主机会发送一个 <strong>ARP 查询分组</strong>，并使用 MAC 广播地址（FF-FF-FF-FF-FF-FF）为目的 MAC 地址。</p>
+</li>
+<li><p>该分组将被子网中所有主机或路由器接收到，这些主机或路由器将检查分组中的目的 IP 地址是否与自己的 IP 地址相同。若相同，则发送一个 <strong>ARP 响应分组</strong>。</p>
+</li>
+<li><p>源主机收到响应分组后，便会更新它的 ARP 表，然后正式发送数据报到 <code>222.222.222.222</code> 主机。</p>
+</li>
+</ul>
+<h4 id="4-2-2-发送数据报到子网外"><a href="#4-2-2-发送数据报到子网外" class="headerlink" title="4.2.2. 发送数据报到子网外"></a>4.2.2. 发送数据报到子网外</h4><p><img src="/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC6%E7%AB%A0%E9%93%BE%E8%B7%AF%E5%B1%82%E5%92%8C%E5%B1%80%E5%9F%9F%E7%BD%91/13.png" alt="pic"></p>
+<p>如上图所示，现有两个子网 <code>111.111.111/24</code> 和 <code>222.222.222/24</code>，假设主机 <code>111.111.111.111</code> 要向主机 <code>222.222.222.222</code> 发送数据报。由于子网 <code>111.111.111/24</code> 中并不存在主机 <code>222.222.222.222</code> ，所以 ARP 协议并不能获取目的 MAC 地址，那怎么办呢？</p>
+<ul>
+<li><p>首先，主机通过自己的子网信息，得知目的 IP 地址并不在自己的子网中，所以它会<strong>把目的 MAC 地址设为网关（路由器）接口的 MAC 地址</strong>。由于主机联网时便知道网关路由器的 IP 地址，所以它可以通过 ARP 协议获取网关路由器的 MAC 地址。</p>
+</li>
+<li><p>将数据报发送到网关路由器后，路由器会根据<strong>路由表</strong>选择输出链路接口，将数据报传递到对应接口的适配器中，准备发送。</p>
+</li>
+<li><p>帧的源 MAC 地址是路由器输出接口的 MAC 地址，而目的 MAC 地址是如何知道的呢？当然是 ARP ！路由器会向对应子网中发送 ARP 查询分组，从而获取目的 IP 地址对应的 MAC 地址。</p>
+</li>
+</ul>
+<h3 id="4-3-以太网（Ethernet）"><a href="#4-3-以太网（Ethernet）" class="headerlink" title="4.3. 以太网（Ethernet）"></a>4.3. 以太网（Ethernet）</h3><p><strong>以太网（Ethernet）是当今最流行的有线局域网技术</strong>，甚至将一直保持这一位置。最初它使用了总线型拓扑和CSMA&#x2F;CD技术，后来由于交换机的出现，它成为了星型拓扑和无碰撞局域网。</p>
+<p>它的成功有很多原因：首先，它是第一个广泛部署的高速局域网；其次，它比令牌环等技术更加简单、便宜；第三，它奋发上进，不断产生更高速率的版本，以抵抗其他技术的竞争。</p>
+<p>20世纪80年代到90年代，初始的以太网，使用基于<strong>同轴电缆</strong>的<strong>总线拓扑</strong>结构，是广播局域网。</p>
+<p>20世纪90年代后其，人们使用基于<strong>集线器</strong>的<strong>星形拓扑</strong>结构，依旧是广播局域网。</p>
+<p>21世纪初，以太网经历了革命性变化，<strong>交换机</strong>代替了<strong>集线器</strong>，以太网成为了“无碰撞”局域网。</p>
+<p>以太网帧结构如下：</p>
+<p><img src="/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC6%E7%AB%A0%E9%93%BE%E8%B7%AF%E5%B1%82%E5%92%8C%E5%B1%80%E5%9F%9F%E7%BD%91/15.png" alt="pic"></p>
+<p>各字段详情如下：</p>
+<p><img src="/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC6%E7%AB%A0%E9%93%BE%E8%B7%AF%E5%B1%82%E5%92%8C%E5%B1%80%E5%9F%9F%E7%BD%91/16.png" alt="pic"></p>
+<p>特此说明，以太网提供的是无连接、不可靠服务。即适配器在发送帧之前，不会与目标适配器握手；发送帧之后，也不知道目标适配器是否收到，而且如果某帧出现差错没有通过 CRC 效验，目标适配器则会丢弃该帧。</p>
+<p>如今，以太网已发展了多种类型，各有各的特色。这些以太网技术，在多年中已经被 <strong>IEEE 802.3</strong> 工作组标准化了。</p>
+<p><img src="/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC6%E7%AB%A0%E9%93%BE%E8%B7%AF%E5%B1%82%E5%92%8C%E5%B1%80%E5%9F%9F%E7%BD%91/23.png" alt="pic"></p>
+<h3 id="4-4-链路层交换机"><a href="#4-4-链路层交换机" class="headerlink" title="4.4. 链路层交换机"></a>4.4. 链路层交换机</h3><p>此前提到，基于交换机的以太网已成为主流。由于交换机是<strong>全双工</strong>的（同时向对方发送消息不会受到干扰），而且具有<strong>存储转发</strong>的功能，只转发帧到对应的端口。<strong>所以交换以太网不再是广播信道，也不会出现碰撞</strong>，甚至都不再需要使用多路访问协议了。</p>
+<p>为什么交换机如此神奇呢？它的原理是什么呢？</p>
+<h4 id="4-4-1-交换机的转发和过滤"><a href="#4-4-1-交换机的转发和过滤" class="headerlink" title="4.4.1. 交换机的转发和过滤"></a>4.4.1. 交换机的转发和过滤</h4><p>过滤是决定一个帧应该转发还是丢弃，转发是决定一个帧该被导向到哪个接口。</p>
+<p>这两个功能都借助于<strong>交换机表（switch table）</strong>，表中每个表项都包含：一个 MAC 地址；通向该地址的交换机接口；表项放置在表中的时间。示例如下：</p>
+<p><img src="/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC6%E7%AB%A0%E9%93%BE%E8%B7%AF%E5%B1%82%E5%92%8C%E5%B1%80%E5%9F%9F%E7%BD%91/17.png" alt="pic"></p>
+<p>现假设目的 MAC 地址为 <code>DD-DD-DD-DD-DD-DD</code> 的帧从接口 <code>x</code> 到达交换机：</p>
+<ul>
+<li>表中没有 <code>DD-DD-DD-DD-DD-DD</code> 的表项，则向所有接口广播该帧。</li>
+<li>表中存在 <code>DD-DD-DD-DD-DD-DD</code> 但对应的接口是 <code>x</code> ，则丢弃该帧。</li>
+<li>表中存在 <code>DD-DD-DD-DD-DD-DD</code> 且接口为 <code>y</code>，则将帧转发到该接口。</li>
+</ul>
+<h4 id="4-4-2-自学习"><a href="#4-4-2-自学习" class="headerlink" title="4.4.2. 自学习"></a>4.4.2. 自学习</h4><p>交换机另一个神奇的特性是：<strong>自学习</strong>。交换机表是自动、动态地建立的，不需要人为配置，所以交换机是一个<strong>即插即用设备</strong>。</p>
+<p>那交换机是如何实现自学习的呢？</p>
+<ol>
+<li>交换机表初始为空。</li>
+<li>对于每一个到达交换机的入帧，交换机都会在表中存储一个表项：<strong>该帧的源 MAC 地址；该帧进入的接口；当前时间</strong>。只要局域网中的主机发送了一个帧，那它就会在交换机中留下记录。</li>
+<li>如果一段时间后，交换机没有收到以该地址为源地址的帧，就会从表中删除这个地址。</li>
+</ol>
+<h3 id="4-5-虚拟局域网"><a href="#4-5-虚拟局域网" class="headerlink" title="4.5. 虚拟局域网"></a>4.5. 虚拟局域网</h3><p>虽然交换机简单又好用，但也存在着一些问题（以下图为例）：</p>
+<p><img src="/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC6%E7%AB%A0%E9%93%BE%E8%B7%AF%E5%B1%82%E5%92%8C%E5%B1%80%E5%9F%9F%E7%BD%91/19.png" alt="pic"></p>
+<p><img src="/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC6%E7%AB%A0%E9%93%BE%E8%B7%AF%E5%B1%82%E5%92%8C%E5%B1%80%E5%9F%9F%E7%BD%91/18.png" alt="pic"></p>
+<p>为了解决这些问题，<strong>虚拟局域网（VLAN）</strong> 出现了，它可以将一个物理局域网划分成多个虚拟局域网，虚拟局域网之间互不干扰。如下图：</p>
+<p><img src="/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC6%E7%AB%A0%E9%93%BE%E8%B7%AF%E5%B1%82%E5%92%8C%E5%B1%80%E5%9F%9F%E7%BD%91/20.png" alt="pic"></p>
+<p>但新的问题是：不同 VLAN 之间如何通信呢？</p>
+<p>最简单的方法是，用一个路由器将两个 VLAN 连接起来。幸运的是，综合 VLAN 交换机和路由器的单一设备的出现，使这个方法更为容易。</p>
+<p>另一种方法则被称为 <strong>VLAN 干线连接（VLAN trunking）</strong>：</p>
+<p><img src="/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC6%E7%AB%A0%E9%93%BE%E8%B7%AF%E5%B1%82%E5%92%8C%E5%B1%80%E5%9F%9F%E7%BD%91/21.png" alt="pic"></p>
+<h2 id="5-Web-页面请求历程"><a href="#5-Web-页面请求历程" class="headerlink" title="5. Web 页面请求历程"></a>5. Web 页面请求历程</h2><p><img src="/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC6%E7%AB%A0%E9%93%BE%E8%B7%AF%E5%B1%82%E5%92%8C%E5%B1%80%E5%9F%9F%E7%BD%91/22.png" alt="pic"></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Network/" rel="tag"><i class="fa fa-tag"></i> 计算机网络</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/ArangoDB%E5%85%A5%E9%97%A8.html" rel="prev" title="ArangoDB入门">
+                  <i class="fa fa-chevron-left"></i> ArangoDB入门
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/go%E8%AF%AD%E8%A8%80%E8%BF%9B%E9%98%B6-%E5%B9%B6%E5%8F%91.html" rel="next" title="go语言进阶-并发">
+                  go语言进阶-并发 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments gitalk-container"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">dounine</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/mist/" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+<script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.0/search.js" integrity="sha256-vXZMYLEqsROAXkEw93GGIvaB2ab+QW6w3+1ahD9nXXA=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.0/es5/tex-mml-chtml.js","integrity":"sha256-r+3itOMtGGjap0x+10hu6jW/gZCzxHsoKrOd7gyRSGY="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/gitalk/1.7.2/gitalk.css" integrity="sha256-AJnUHL7dBv6PGaeyPQJcgQPDjt/Hn/PvYZde1iqfp8U=" crossorigin="anonymous">
+
+<script class="next-config" data-name="gitalk" type="application/json">{"enable":true,"github_id":"99MyCql","repo":"99MyCql.github.io","client_id":"7c69ea063e9c78a72075","client_secret":"f222b18af36b2dffda7884ce5fd77bbb9172de54","admin_user":"99MyCql","distraction_free_mode":false,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token","language":"zh-CN","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/gitalk/1.7.2/gitalk.min.js","integrity":"sha256-Pmj85ojLaPOWwRtlMJwmezB/Qg8BzvJp5eTzvXaYAfA="},"path_md5":"9d7481b421b942d085b57070e13d78a3"}</script>
+<script src="/js/third-party/comments/gitalk.js"></script>
+
+</body>
+</html>

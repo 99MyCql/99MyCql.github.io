@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.2.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/golang32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/golang16.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="baidu-site-verification" content="code-RpvRDWfflk">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" integrity="sha256-DfWjNxDkM94fVBWx1H5BMMp0Zq7luBlV8QRcSES7s+0=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"blog.dounine.live","root":"/","images":"/images","scheme":"Mist","darkmode":false,"version":"8.11.1","exturl":false,"sidebar":{"position":"right","display":"always","padding":18,"offset":12},"copycode":{"enable":true,"style":"flat"},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":"gitalk","storage":true,"lazyload":false,"nav":null,"activeClass":"gitalk"},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="0. 前言有幸，在软件可靠性课程的实验中，被要求实现BP神经网络模型。虽然，我觉得这门课程搭配这样的实验很无厘头，但正好趁这个机会，重新学习一下神经网络知识。学校的课程设计总归是不太令人满意的，但只要能学到有益的知识，就是赚到了。至于学分、绩点多少，就无关紧要了。 BP神经网络模型简介： BP神经网络模型是1986年由Rumelhart和McClelland为首的科学家提出的概念，是一种按照误差逆">
+<meta property="og:type" content="article">
+<meta property="og:title" content="python实现BP神经网络">
+<meta property="og:url" content="https://blog.dounine.live/python%E5%AE%9E%E7%8E%B0BP%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C.html">
+<meta property="og:site_name" content="dounine&#39;s blog">
+<meta property="og:description" content="0. 前言有幸，在软件可靠性课程的实验中，被要求实现BP神经网络模型。虽然，我觉得这门课程搭配这样的实验很无厘头，但正好趁这个机会，重新学习一下神经网络知识。学校的课程设计总归是不太令人满意的，但只要能学到有益的知识，就是赚到了。至于学分、绩点多少，就无关紧要了。 BP神经网络模型简介： BP神经网络模型是1986年由Rumelhart和McClelland为首的科学家提出的概念，是一种按照误差逆">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://blog.dounine.live/python%E5%AE%9E%E7%8E%B0BP%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/13.png">
+<meta property="og:image" content="https://blog.dounine.live/python%E5%AE%9E%E7%8E%B0BP%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/9.png">
+<meta property="og:image" content="https://blog.dounine.live/python%E5%AE%9E%E7%8E%B0BP%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/14.png">
+<meta property="og:image" content="https://blog.dounine.live/python%E5%AE%9E%E7%8E%B0BP%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/16.png">
+<meta property="og:image" content="https://blog.dounine.live/python%E5%AE%9E%E7%8E%B0BP%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/17.png">
+<meta property="og:image" content="https://blog.dounine.live/python%E5%AE%9E%E7%8E%B0BP%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/18.png">
+<meta property="og:image" content="https://blog.dounine.live/python%E5%AE%9E%E7%8E%B0BP%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/1.png">
+<meta property="og:image" content="https://blog.dounine.live/python%E5%AE%9E%E7%8E%B0BP%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/2.png">
+<meta property="og:image" content="https://blog.dounine.live/python%E5%AE%9E%E7%8E%B0BP%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/3.png">
+<meta property="og:image" content="https://blog.dounine.live/python%E5%AE%9E%E7%8E%B0BP%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/4.png">
+<meta property="article:published_time" content="2019-10-29T13:54:21.000Z">
+<meta property="article:modified_time" content="2019-10-29T13:54:21.000Z">
+<meta property="article:author" content="dounine">
+<meta property="article:tag" content="Python">
+<meta property="article:tag" content="深度学习">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://blog.dounine.live/python%E5%AE%9E%E7%8E%B0BP%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/13.png">
+
+
+<link rel="canonical" href="https://blog.dounine.live/python%E5%AE%9E%E7%8E%B0BP%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C.html">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://blog.dounine.live/python%E5%AE%9E%E7%8E%B0BP%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C.html","path":"python实现BP神经网络.html","title":"python实现BP神经网络"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>python实现BP神经网络 | dounine's blog</title>
+  
+
+  <script src="/js/third-party/analytics/baidu-analytics.js"></script>
+  <script async src="https://hm.baidu.com/hm.js?66c7065aa71681df47eb23eff557978b"></script>
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">dounine's blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">18</span></a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">48</span></a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">75</span></a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#0-%E5%89%8D%E8%A8%80"><span class="nav-text">0. 前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E5%9F%BA%E6%9C%AC%E6%A8%A1%E5%9E%8B"><span class="nav-text">1. 神经网络基本模型</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-%E5%8D%95%E7%A5%9E%E7%BB%8F%E5%85%83%E6%A8%A1%E5%9E%8B"><span class="nav-text">1.1. 单神经元模型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-%E5%A4%9A%E5%B1%82%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C"><span class="nav-text">1.2. 多层神经网络</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-3-%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E5%AD%A6%E4%B9%A0%E8%BF%87%E7%A8%8B"><span class="nav-text">1.3. 神经网络学习过程</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-BP%E8%AF%AF%E5%B7%AE%E5%8F%8D%E5%90%91%E4%BC%A0%E6%92%AD%E7%AE%97%E6%B3%95"><span class="nav-text">2. BP误差反向传播算法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-%E7%AE%97%E6%B3%95%E6%8E%A8%E5%AF%BC"><span class="nav-text">2.1. 算法推导</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-%E6%A2%AF%E5%BA%A6%E4%B8%8B%E9%99%8D%E7%9A%84%E7%90%86%E8%A7%A3"><span class="nav-text">2.2. 梯度下降的理解</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-%E7%AE%97%E6%B3%95%E6%AD%A5%E9%AA%A4"><span class="nav-text">2.3. 算法步骤</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-4-%E7%AE%97%E6%B3%95%E6%B5%81%E7%A8%8B"><span class="nav-text">2.4. 算法流程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-5-%E7%AE%97%E6%B3%95%E5%AE%9E%E7%8E%B0"><span class="nav-text">2.5. 算法实现</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-6-%E7%AE%97%E6%B3%95%E6%A3%80%E9%AA%8C"><span class="nav-text">2.6. 算法检验</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-6-1-%E9%A2%84%E6%B5%8B-y-x3D-x-2-%E6%A8%A1%E5%9E%8B"><span class="nav-text">2.6.1. 预测$y&#x3D;x^2$模型</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-6-2-%E9%A2%84%E6%B5%8Bmnist%E6%89%8B%E5%86%99%E6%95%B0%E5%AD%97%E5%9B%BE%E7%89%87%E6%95%B0%E6%8D%AE%E9%9B%86"><span class="nav-text">2.6.2. 预测mnist手写数字图片数据集</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E5%8F%82%E8%80%83"><span class="nav-text">3. 参考</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="dounine"
+      src="https://avatars.githubusercontent.com/u/41814469?s=400&u=48bf60a3428a3cb86a84a110c8688930cf6ceb08&v=4">
+  <p class="site-author-name" itemprop="name">dounine</p>
+  <div class="site-description" itemprop="description">回首向来萧瑟处</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">75</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">18</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">48</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/99MyCql" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;99MyCql" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+
+  <div class="links-of-blogroll site-overview-item animated">
+    <div class="links-of-blogroll-title"><i class="fa fa-globe fa-fw"></i>
+      Links
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://bkfish.gitee.io/" title="https:&#x2F;&#x2F;bkfish.gitee.io&#x2F;" rel="noopener" target="_blank">Kitty萌新的卧室</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://hitworld.github.io/" title="https:&#x2F;&#x2F;hitworld.github.io&#x2F;" rel="noopener" target="_blank">hirworld</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://wyjoutstanding.github.io/" title="https:&#x2F;&#x2F;wyjoutstanding.github.io&#x2F;" rel="noopener" target="_blank">wyjoutstanding</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://iwtf.github.io/" title="https:&#x2F;&#x2F;iwtf.github.io&#x2F;" rel="noopener" target="_blank">IWTF</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://wood1314.github.io/" title="https:&#x2F;&#x2F;wood1314.github.io&#x2F;" rel="noopener" target="_blank">wood</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://desperadoccy.github.io/" title="https:&#x2F;&#x2F;desperadoccy.github.io&#x2F;" rel="noopener" target="_blank">desperadoccy</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://doudouqaq.github.io/" title="https:&#x2F;&#x2F;doudouqaq.github.io&#x2F;" rel="noopener" target="_blank">doudouqaq</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://kylinnnnn.github.io/" title="https:&#x2F;&#x2F;kylinnnnn.github.io&#x2F;" rel="noopener" target="_blank">kylinnnnn</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://miaotony.xyz/" title="https:&#x2F;&#x2F;miaotony.xyz" rel="noopener" target="_blank">miaotony</a>
+        </li>
+    </ul>
+  </div>
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://github.com/99MyCql" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.dounine.live/python%E5%AE%9E%E7%8E%B0BP%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://avatars.githubusercontent.com/u/41814469?s=400&u=48bf60a3428a3cb86a84a110c8688930cf6ceb08&v=4">
+      <meta itemprop="name" content="dounine">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dounine's blog">
+      <meta itemprop="description" content="回首向来萧瑟处">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="python实现BP神经网络 | dounine's blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          python实现BP神经网络
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2019-10-29 21:54:21" itemprop="dateCreated datePublished" datetime="2019-10-29T21:54:21+08:00">2019-10-29</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Pro/" itemprop="url" rel="index"><span itemprop="name">欲穷千里目，更上一层楼</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Pro/AI/" itemprop="url" rel="index"><span itemprop="name">人工智能</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h2 id="0-前言"><a href="#0-前言" class="headerlink" title="0. 前言"></a>0. 前言</h2><p>有幸，在软件可靠性课程的实验中，被要求实现BP神经网络模型。虽然，我觉得这门课程搭配这样的实验很无厘头，但正好趁这个机会，重新学习一下神经网络知识。学校的课程设计总归是不太令人满意的，但只要能学到有益的知识，就是赚到了。至于学分、绩点多少，就无关紧要了。</p>
+<p>BP神经网络模型简介：</p>
+<p>BP神经网络模型是1986年由Rumelhart和McClelland为首的科学家提出的概念，是一种按照误差逆向传播算法训练的多层前馈神经网络，是目前应用最广泛的神经网络。</p>
+<span id="more"></span>
+
+<h2 id="1-神经网络基本模型"><a href="#1-神经网络基本模型" class="headerlink" title="1. 神经网络基本模型"></a>1. 神经网络基本模型</h2><h3 id="1-1-单神经元模型"><a href="#1-1-单神经元模型" class="headerlink" title="1.1. 单神经元模型"></a>1.1. 单神经元模型</h3><p><img src="/python%E5%AE%9E%E7%8E%B0BP%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/13.png" alt="1"></p>
+<p>其中，<code>f(x)</code>函数为神经元输出经过的<strong>激活函数</strong>。</p>
+<p>常见的激活函数有：</p>
+<ul>
+<li>sigmoid函数</li>
+</ul>
+<p>$$sigmoid(x) &#x3D; \frac{ 1 }{ 1+exp(-x) }$$</p>
+<ul>
+<li>sgn函数(阶跃函数)</li>
+</ul>
+<p>$$<br>sgn(x)&#x3D;\begin{cases}<br>1, &amp; x\geq0 \<br>0, &amp; x&lt;0 \<br>\end{cases}<br>$$</p>
+<ul>
+<li>ReLU(Rectified Linear Unit)函数</li>
+</ul>
+<p>$$<br>relu(x)&#x3D;\begin{cases}<br>x, &amp; x&gt;0 \<br>0, &amp; x\leq0 \<br>\end{cases}<br>$$</p>
+<ul>
+<li>……</li>
+</ul>
+<p>值得注意的是，激活函数大多为<strong>非线性函数</strong>。原因在于：</p>
+<blockquote>
+<p>线性函数的问题在于，不管如何加深层数，总是存在与之等效的“无隐藏层的神经网络”。为了具体地（稍微直观地）理解这一点，我们来思考下面这个简单的例子。这里我们考虑把线性函数 h(x) &#x3D; cx 作为激活函数，把y(x) &#x3D; h(h(h(x)))的运算对应3层神经网络A。这个运算会进行y(x) &#x3D; c × c × c × x的乘法运算，但是同样的处理可以由y(x) &#x3D; ax（注意，a &#x3D; c^3）这一次乘法运算（即没有隐藏层的神经网络）来表示。</p>
+</blockquote>
+<h3 id="1-2-多层神经网络"><a href="#1-2-多层神经网络" class="headerlink" title="1.2. 多层神经网络"></a>1.2. 多层神经网络</h3><p><img src="/python%E5%AE%9E%E7%8E%B0BP%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/9.png" alt="9"></p>
+<p>当神经网络有多层时，中间的层称为中间层或隐藏层。隐藏层的输入为上一层的输出，隐藏层的输出为下一层的输入，对隐藏层的输出同样需使用<strong>激活函数</strong>。输入层则一般不需要经过激活函数。</p>
+<p>值得注意的是，一个神经元的输出会传递到下一层的<strong>每个</strong>神经元上。</p>
+<h3 id="1-3-神经网络学习过程"><a href="#1-3-神经网络学习过程" class="headerlink" title="1.3. 神经网络学习过程"></a>1.3. 神经网络学习过程</h3><p>以感知机(由两层神经元组成)为例:</p>
+<p><img src="/python%E5%AE%9E%E7%8E%B0BP%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/14.png" alt="1"></p>
+<p>对于训练样例$(X, y)$，其中$X&#x3D;{x_1, x_2}$，当前神经网络的输出为$\hat{y}$。假定输出层的激活函数为阶跃函数，其数学推导为：</p>
+<p>$$\hat{y} &#x3D; f(w_1x_1 + w_2x_2 - \theta)$$</p>
+<p>将实际值$y$与预测值$\hat{y}$进行数学比较，从而得出各权值$w_i$和阈值$\theta$的误差，从而更新相应的权值和阈值：</p>
+<p>$$\Delta w_i &#x3D; \eta(y - \hat{y})x_i$$</p>
+<p>$$w_i \leftarrow w_i + \Delta w_i$$</p>
+<p>其中，$\eta \in (0,1)$，称为学习率。当$\hat{y}$与$y$相等，或者之差足够小时，则可认定为训练成功。</p>
+<h2 id="2-BP误差反向传播算法"><a href="#2-BP误差反向传播算法" class="headerlink" title="2. BP误差反向传播算法"></a>2. BP误差反向传播算法</h2><h3 id="2-1-算法推导"><a href="#2-1-算法推导" class="headerlink" title="2.1. 算法推导"></a>2.1. 算法推导</h3><p>BP神经网络的数学推导过程相对简单，读者切不可望而却步。</p>
+<p>更详细内容请参考西瓜书第5章——神经网络。</p>
+<p>以三层神经网络为例：</p>
+<p><img src="/python%E5%AE%9E%E7%8E%B0BP%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/16.png" alt="1"></p>
+<p><strong>注</strong>：输入层到隐藏层的阈值为$\gamma_h$，隐藏层到输出层的阈值为$\theta_j$，激活函数$f(x)$都为$Sigmoid$函数。</p>
+<p>假定，对于一组样例$(X_k, Y_k)$，神经网络输入为$X_k &#x3D; (x_1^k, x_2^k,…, x_d^k)$，输出为$\hat{Y}_k &#x3D; (\hat{y}_1^k, \hat{y}_2^k,…, \hat{y}_l^k)$。</p>
+<p>隐藏层输出为：</p>
+<p>$$b_h &#x3D; f(\alpha_h - \gamma_h)$$</p>
+<p>输出层输出为：</p>
+<p>$$\hat{y}_j^k &#x3D; f(\beta_j - \theta_j)$$</p>
+<p>那么，神经网络在<strong>当前样例$(X_k, Y_k)$上</strong>的<strong>均方误差</strong>为：</p>
+<p>$$E_k &#x3D; \frac{1}{2}\sum_{j&#x3D;1}^l(\hat{y}_j^k-y_j^k)^2$$</p>
+<p>根据均方误差结果，基于<strong>梯度下降</strong>策略，以目标的负梯度方向对隐层到输出层的权值参数$\Delta w_{hj}$进行调整。给定学习率，有：</p>
+<p>$$\begin{aligned}<br>\Delta w_{hj} &amp;&#x3D; -\eta\frac{\partial E_k}{\partial w_{hj}} \<br>\end{aligned}$$</p>
+<p>$$\begin{aligned}<br>\Delta w_{hj} &amp;&#x3D; -\eta\frac{\partial E_k}{\partial \hat{y}_j^k}\cdot\frac{\partial \hat{y}<em>j^k}{\partial \beta_j}\cdot\frac{\partial \beta_j}{\partial w</em>{hj}}<br>\end{aligned}$$</p>
+<p>显然：</p>
+<p>$$\frac{\partial E_k}{\partial \hat{y}_j^k} &#x3D; \hat{y}_j^k-y_j^k$$</p>
+<p>根据图例中$\beta_j$的函数，又显然：</p>
+<p>$$\frac{\partial \beta_j}{\partial w_{hj}} &#x3D; b_h$$</p>
+<p>再根据$Sigmoid$函数的定义：</p>
+<p>$$f^\prime(x) &#x3D; f(x)(1-f(x))$$</p>
+<p>则：</p>
+<p>$$\frac{\partial \hat{y}_j^k}{\partial \beta_j} &#x3D; \hat{y}_j^k(1-\hat{y}_j^k)$$</p>
+<p>综上可得：</p>
+<p>$$\Delta w_{hj} &#x3D; -\eta(\hat{y}_j^k-y_j^k)\hat{y}_j^k(1-\hat{y}_j^k)b_h$$</p>
+<p>令：</p>
+<p>$$g_j &#x3D; \hat{y}_j^k(y_j^k-\hat{y}_j^k)(1-\hat{y}_j^k)$$</p>
+<p>最终：</p>
+<p>$$\Delta w_{hj} &#x3D; \eta g_j b_h$$</p>
+<p>进而，我们可以对隐藏层到输出层的阈值$\theta_j$进行调整：</p>
+<p>$$\begin{aligned}<br>\Delta \theta_j &amp;&#x3D; -\eta\frac{\partial E_k}{\partial \theta_j} \<br>\Delta \theta_j &amp;&#x3D; -\eta\frac{\partial E_k}{\partial \hat{y}_j^k}\cdot\frac{\partial \hat{y}_j^k}{\partial \theta_j} \<br>\Delta \theta_j &amp;&#x3D; -\eta g_j<br>\end{aligned}$$</p>
+<p>同理，我们可以得到输入层到隐藏层的权值和阈值误差为：</p>
+<p>$$\begin{aligned}<br>\Delta v_{ih} &amp;&#x3D; \eta e_h x_i \<br>\Delta \gamma_j &amp;&#x3D; -\eta e_h<br>\end{aligned}$$</p>
+<p>其中：</p>
+<p>$$e_h &#x3D; b_h(1-b_h)\sum_{j&#x3D;1}^l w_{hj}g_j$$</p>
+<h3 id="2-2-梯度下降的理解"><a href="#2-2-梯度下降的理解" class="headerlink" title="2.2. 梯度下降的理解"></a>2.2. 梯度下降的理解</h3><p>何为<a target="_blank" rel="noopener" href="https://baike.baidu.com/item/%E6%A2%AF%E5%BA%A6/13014729?fr=aladdin">梯度？</a></p>
+<p>首先，它是一个向量。</p>
+<p>其次，它的定义为：设可微函数$f(x,y,z)$，对于函数上的某一个点$P(x,y,z)$，${\frac{\partial f}{\partial x}, \frac{\partial f}{\partial y}, \frac{\partial f}{\partial z}}$则是该函数在$P$点的梯度。</p>
+<p>通俗来讲，函数某一点的梯度，就是该点的斜率，该点变化率最大的方向。而负梯度，则是该点能最快接近函数极小值的方向。</p>
+<p>那么，何为<a target="_blank" rel="noopener" href="https://baike.baidu.com/item/%E6%A2%AF%E5%BA%A6%E4%B8%8B%E9%99%8D/4864937?fr=aladdin">梯度下降</a>呢？</p>
+<p>梯度下降则是，沿当前点的负梯度方向变化：$x \leftarrow x - \gamma \nabla$，其中$\gamma$为步长。如果步长足够小，则可以保证每一次迭代都在减小，但可能导致收敛太慢；如果步长太大，则不能保证每一次迭代都减少，也不能保证收敛。</p>
+<p>以函数$f(x) &#x3D; x^2$为例：</p>
+<p>其梯度函数为$\nabla &#x3D; 2x$。</p>
+<p>点$p(1,1)$处的梯度为$2$。</p>
+<p>设步长为0.2，点$p$处进行梯度下降后，下一个点则为$(0.6, 0.64)$。</p>
+<p>在BP神经网络中，采用梯度下降则是为了以最快速度调整参数，将误差降到极小(此处涉及到极小与最小的数学问题，有兴趣者可以看看西瓜书)。</p>
+<h3 id="2-3-算法步骤"><a href="#2-3-算法步骤" class="headerlink" title="2.3. 算法步骤"></a>2.3. 算法步骤</h3><p><img src="/python%E5%AE%9E%E7%8E%B0BP%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/17.png" alt="1"></p>
+<h3 id="2-4-算法流程"><a href="#2-4-算法流程" class="headerlink" title="2.4. 算法流程"></a>2.4. 算法流程</h3><p><img src="/python%E5%AE%9E%E7%8E%B0BP%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/18.png" alt="1"></p>
+<h3 id="2-5-算法实现"><a href="#2-5-算法实现" class="headerlink" title="2.5. 算法实现"></a>2.5. 算法实现</h3><p>编写一个三层神经网络的<code>BP</code>类，在构造函数中初始化神经网络：</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> random</span><br><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</span><br><span class="line"><span class="keyword">import</span> math</span><br><span class="line"><span class="keyword">from</span> tensorflow.examples.tutorials.mnist <span class="keyword">import</span> input_data</span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="string">&#x27;&#x27;&#x27;</span></span><br><span class="line"><span class="string">三层神经网络模型，包含：输入层、隐层、输出层</span></span><br><span class="line"><span class="string">&#x27;&#x27;&#x27;</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">BP</span>:</span><br><span class="line">    <span class="string">&#x27;&#x27;&#x27;</span></span><br><span class="line"><span class="string">    构造函数，初始化三层神网络的各参数</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    Args:</span></span><br><span class="line"><span class="string">        x_count: 输入层神经元个数</span></span><br><span class="line"><span class="string">        mid_count: 隐层神经元个数</span></span><br><span class="line"><span class="string">        y_count: 输出层神经元个数</span></span><br><span class="line"><span class="string">        eta: 学习率</span></span><br><span class="line"><span class="string">        train_count: 最大训练次数</span></span><br><span class="line"><span class="string">        precision: 误差精度</span></span><br><span class="line"><span class="string">    &#x27;&#x27;&#x27;</span></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, x_count, mid_count, y_count, eta=<span class="number">0.3</span>, train_count=<span class="number">100</span>, precision=<span class="number">0.00001</span></span>):</span><br><span class="line">        self.x_count = x_count</span><br><span class="line">        self.mid_count = mid_count</span><br><span class="line">        self.y_count = y_count</span><br><span class="line">        self.eta = eta</span><br><span class="line">        self.train_count = train_count</span><br><span class="line">        self.precision = precision</span><br><span class="line"></span><br><span class="line">        <span class="comment"># 输入层到隐层的权值</span></span><br><span class="line">        self.V = []</span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">0</span>, x_count):</span><br><span class="line">            temp = []</span><br><span class="line">            <span class="keyword">for</span> j <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">0</span>, mid_count):</span><br><span class="line">                temp.append(<span class="number">2</span>*random.random() - <span class="number">1</span>)</span><br><span class="line">            self.V.append(temp)</span><br><span class="line"></span><br><span class="line">        <span class="comment"># 输入层到隐层的阈值</span></span><br><span class="line">        self.gamma = []</span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">0</span>, mid_count):</span><br><span class="line">            self.gamma.append(<span class="number">2</span>*random.random() - <span class="number">1</span>)</span><br><span class="line"></span><br><span class="line">        <span class="comment"># 隐层到输出层的权值</span></span><br><span class="line">        self.W = []</span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">0</span>, mid_count):</span><br><span class="line">            temp = []</span><br><span class="line">            <span class="keyword">for</span> j <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">0</span>, y_count):</span><br><span class="line">                temp.append(<span class="number">2</span>*random.random() - <span class="number">1</span>)</span><br><span class="line">            self.W.append(temp)</span><br><span class="line"></span><br><span class="line">        <span class="comment"># 隐层到输出层的阈值</span></span><br><span class="line">        self.beta = []</span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">0</span>, y_count):</span><br><span class="line">            self.beta.append(<span class="number">2</span>*random.random() - <span class="number">1</span>)</span><br></pre></td></tr></table></figure>
+
+<p>其次，在<code>BP</code>类中，编写一个训练神经网络的类方法：</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">&#x27;&#x27;&#x27;</span></span><br><span class="line"><span class="string">神经网络训练函数</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">Args:</span></span><br><span class="line"><span class="string">    X: 列表，输入数据</span></span><br><span class="line"><span class="string">    Y: 列表，实际输出数据</span></span><br><span class="line"><span class="string">&#x27;&#x27;&#x27;</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">train</span>(<span class="params">self, X, Y</span>):</span><br><span class="line">    <span class="keyword">if</span> <span class="built_in">len</span>(X) != <span class="built_in">len</span>(Y):</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&quot;Error: len(X) and len(Y) is unequal!!!&quot;</span>)</span><br><span class="line">        <span class="keyword">return</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(self.train_count):</span><br><span class="line">        E = [] <span class="comment"># 每一组数据的误差</span></span><br><span class="line">        <span class="comment"># 遍历每一组输入数据</span></span><br><span class="line">        <span class="keyword">for</span> j <span class="keyword">in</span> <span class="built_in">range</span>(<span class="built_in">len</span>(X)):</span><br><span class="line">            <span class="comment"># 计算预测值</span></span><br><span class="line">            y_predict, mid_output = self.compute_y(X[j])</span><br><span class="line"></span><br><span class="line">            <span class="comment"># 计算当前样例(组)的均方误差</span></span><br><span class="line">            e = <span class="number">0.0</span></span><br><span class="line">            mid2y_g = [] <span class="comment"># 隐层到输出层的梯度项</span></span><br><span class="line">            <span class="keyword">for</span> k <span class="keyword">in</span> <span class="built_in">range</span>(self.y_count):</span><br><span class="line">                <span class="comment"># 计算输出层第k个神经元的误差</span></span><br><span class="line">                e += <span class="built_in">pow</span>(y_predict[k] - Y[j][k], <span class="number">2</span>)</span><br><span class="line">            E.append(e/<span class="number">2</span>)</span><br><span class="line"></span><br><span class="line">            <span class="comment"># 计算隐层到输出层的梯度项</span></span><br><span class="line">            mid2y_g = []</span><br><span class="line">            <span class="keyword">for</span> k <span class="keyword">in</span> <span class="built_in">range</span>(self.y_count):</span><br><span class="line">                <span class="comment"># 计算输出层第k个神经元对应的，隐层到输出层的梯度项</span></span><br><span class="line">                mid2y_g.append(y_predict[k] * (<span class="number">1</span> - y_predict[k]) * (Y[j][k] - y_predict[k]))</span><br><span class="line"></span><br><span class="line">            <span class="comment"># 计算输入层到隐层的梯度项</span></span><br><span class="line">            x2mid_g = []</span><br><span class="line">            <span class="keyword">for</span> k <span class="keyword">in</span> <span class="built_in">range</span>(self.mid_count):</span><br><span class="line">                temp = <span class="number">0</span></span><br><span class="line">                <span class="keyword">for</span> l <span class="keyword">in</span> <span class="built_in">range</span>(self.y_count):</span><br><span class="line">                    temp += self.W[k][l] * mid2y_g[l]</span><br><span class="line">                <span class="comment"># 计算隐层第k个神经元对应的，输入层到隐层的梯度项</span></span><br><span class="line">                x2mid_g.append(mid_output[k] * (<span class="number">1</span> - mid_output[k]) * temp)</span><br><span class="line"></span><br><span class="line">            <span class="comment"># 更新隐层到输出层的权值和阈值</span></span><br><span class="line">            <span class="keyword">for</span> k <span class="keyword">in</span> <span class="built_in">range</span>(self.mid_count):</span><br><span class="line">                <span class="keyword">for</span> l <span class="keyword">in</span> <span class="built_in">range</span>(self.y_count):</span><br><span class="line">                    self.W[k][l] += self.eta * mid2y_g[l] * mid_output[k]</span><br><span class="line">            <span class="keyword">for</span> k <span class="keyword">in</span> <span class="built_in">range</span>(self.y_count):</span><br><span class="line">                self.beta[k] -= self.eta * mid2y_g[k]</span><br><span class="line"></span><br><span class="line">            <span class="comment"># 更新输入层到隐层的权值和阈值</span></span><br><span class="line">            <span class="keyword">for</span> k <span class="keyword">in</span> <span class="built_in">range</span>(self.x_count):</span><br><span class="line">                <span class="keyword">for</span> l <span class="keyword">in</span> <span class="built_in">range</span>(self.mid_count):</span><br><span class="line">                    self.V[k][l] += self.eta * x2mid_g[l] * X[j][k]</span><br><span class="line">            <span class="keyword">for</span> k <span class="keyword">in</span> <span class="built_in">range</span>(self.mid_count):</span><br><span class="line">                self.gamma[k] -= self.eta * x2mid_g[k]</span><br><span class="line"></span><br><span class="line">        <span class="comment"># 计算累积误差</span></span><br><span class="line">        E_sum = <span class="number">0.0</span></span><br><span class="line">        <span class="keyword">for</span> e <span class="keyword">in</span> E:</span><br><span class="line">            E_sum += e</span><br><span class="line">        E_sum /= <span class="built_in">len</span>(E)</span><br><span class="line">        <span class="built_in">print</span>(E_sum)</span><br><span class="line"></span><br><span class="line">        <span class="comment"># 如果累计误差小于设定的误差精度，则停止训练</span></span><br><span class="line">        <span class="keyword">if</span> E_sum &lt; self.precision:</span><br><span class="line">            <span class="keyword">break</span></span><br></pre></td></tr></table></figure>
+
+<p>该函数用到的类方法如下：</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">&#x27;&#x27;&#x27;</span></span><br><span class="line"><span class="string">Sigmoid激活函数</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">Args:</span></span><br><span class="line"><span class="string">    x</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">Returns:</span></span><br><span class="line"><span class="string">    y: sigmoid(x)</span></span><br><span class="line"><span class="string">&#x27;&#x27;&#x27;</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">sigmoid</span>(<span class="params">self, x</span>):</span><br><span class="line">    <span class="keyword">return</span> <span class="number">1</span> / (<span class="number">1</span> + math.exp(-x))</span><br><span class="line"></span><br><span class="line"><span class="string">&#x27;&#x27;&#x27;</span></span><br><span class="line"><span class="string">计算一组预测值</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">Args:</span></span><br><span class="line"><span class="string">    x: 列表，一组多元或一元的输入数据</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">Returns:</span></span><br><span class="line"><span class="string">    y: 列表，一组多元或一元的输出数据</span></span><br><span class="line"><span class="string">    mid_output: 列表，隐层的输出数据</span></span><br><span class="line"><span class="string">&#x27;&#x27;&#x27;</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">compute_y</span>(<span class="params">self, x</span>):</span><br><span class="line">    <span class="comment"># 计算隐层输入</span></span><br><span class="line">    mid_input = []</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(self.mid_count):</span><br><span class="line">        temp = <span class="number">0</span></span><br><span class="line">        <span class="keyword">for</span> j <span class="keyword">in</span> <span class="built_in">range</span>(self.x_count):</span><br><span class="line">            temp += self.V[j][i] * x[j]</span><br><span class="line">        mid_input.append(temp)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 计算隐层输出</span></span><br><span class="line">    mid_output = []</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(self.mid_count):</span><br><span class="line">        mid_output.append(self.sigmoid(mid_input[i] - self.gamma[i]))</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 计算输出层的输入</span></span><br><span class="line">    y_input = []</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(self.y_count):</span><br><span class="line">        temp = <span class="number">0</span></span><br><span class="line">        <span class="keyword">for</span> j <span class="keyword">in</span> <span class="built_in">range</span>(self.mid_count):</span><br><span class="line">            temp += self.W[j][i] * mid_output[j]</span><br><span class="line">        y_input.append(temp)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 计算输出层的输出</span></span><br><span class="line">    y = []</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(self.y_count):</span><br><span class="line">        y.append(self.sigmoid(y_input[i] - self.beta[i]))</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> (y, mid_output)</span><br></pre></td></tr></table></figure>
+
+<p>最后，在<code>BP</code>类中，编写一个基于神经网络进行预测的类方法：</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">&#x27;&#x27;&#x27;</span></span><br><span class="line"><span class="string">神经网络预测函数</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">Args:</span></span><br><span class="line"><span class="string">    X: 列表，输入数据</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">Returns:</span></span><br><span class="line"><span class="string">    Y_predict: 列表，预测输出数据</span></span><br><span class="line"><span class="string">&#x27;&#x27;&#x27;</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">predict</span>(<span class="params">self, X</span>):</span><br><span class="line">    Y_predict = []</span><br><span class="line">    <span class="keyword">for</span> x <span class="keyword">in</span> X:</span><br><span class="line">        y_predict, _ = self.compute_y(x)</span><br><span class="line">        Y_predict.append(y_predict)</span><br><span class="line">    <span class="keyword">return</span> Y_predict</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-6-算法检验"><a href="#2-6-算法检验" class="headerlink" title="2.6. 算法检验"></a>2.6. 算法检验</h3><h4 id="2-6-1-预测-y-x3D-x-2-模型"><a href="#2-6-1-预测-y-x3D-x-2-模型" class="headerlink" title="2.6.1. 预测$y&#x3D;x^2$模型"></a>2.6.1. 预测$y&#x3D;x^2$模型</h4><figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">&#x27;&#x27;&#x27;</span></span><br><span class="line"><span class="string">预测 y=x^2 函数模型</span></span><br><span class="line"><span class="string">&#x27;&#x27;&#x27;</span></span><br><span class="line"><span class="comment"># 数据个数</span></span><br><span class="line">data_count = <span class="number">500</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 随机生成X数据</span></span><br><span class="line">X = []</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(data_count):</span><br><span class="line">    X.append([<span class="number">2</span>*random.random() - <span class="number">1</span>])</span><br><span class="line"></span><br><span class="line"><span class="comment"># 根据一元二次方程生成Y数据</span></span><br><span class="line">Y = []</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(data_count):</span><br><span class="line">    noise = random.random() / <span class="number">6</span> <span class="comment"># 生成噪音，使数据更真实</span></span><br><span class="line">    Y.append([<span class="built_in">pow</span>(X[i][<span class="number">0</span>], <span class="number">2</span>) + noise])</span><br><span class="line"></span><br><span class="line">plt.scatter(X, Y, label=<span class="string">&#x27;source data&#x27;</span>) <span class="comment"># 原始数据</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 创建神经网络</span></span><br><span class="line">bp = BP(x_count=<span class="number">1</span>, mid_count=<span class="number">10</span>, y_count=<span class="number">1</span>, eta=<span class="number">0.3</span>, train_count=<span class="number">1000</span>, precision=<span class="number">0.00001</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 未训练进行预测</span></span><br><span class="line">Y_predict = bp.predict(X) <span class="comment"># 预测</span></span><br><span class="line">plt.scatter(X, Y_predict, label=<span class="string">&#x27;predict firstly&#x27;</span>) <span class="comment"># 显示预测数据</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 训练</span></span><br><span class="line">bp.train(X, Y)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 训练之后进行预测</span></span><br><span class="line">Y_predict = bp.predict(X) <span class="comment"># 预测</span></span><br><span class="line">plt.scatter(X, Y_predict, label=<span class="string">&#x27;predict finally&#x27;</span>) <span class="comment"># 显示预测数据</span></span><br><span class="line"></span><br><span class="line">plt.legend()</span><br><span class="line">plt.show()</span><br></pre></td></tr></table></figure>
+
+<p>控制台输出每一轮训练后的累计误差如下：</p>
+<p><img src="/python%E5%AE%9E%E7%8E%B0BP%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/1.png" alt="1"></p>
+<p>显示的原数据与预测数据对比图如下：</p>
+<p><img src="/python%E5%AE%9E%E7%8E%B0BP%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/2.png" alt="1"></p>
+<h4 id="2-6-2-预测mnist手写数字图片数据集"><a href="#2-6-2-预测mnist手写数字图片数据集" class="headerlink" title="2.6.2. 预测mnist手写数字图片数据集"></a>2.6.2. 预测mnist手写数字图片数据集</h4><figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">&#x27;&#x27;&#x27;</span></span><br><span class="line"><span class="string">预测mnist数字图片数据集</span></span><br><span class="line"><span class="string">&#x27;&#x27;&#x27;</span></span><br><span class="line"><span class="comment"># 获取数据</span></span><br><span class="line">mnist = input_data.read_data_sets(<span class="string">&quot;MNIST_data/&quot;</span>, one_hot=<span class="literal">True</span>)</span><br><span class="line"><span class="comment"># print(mnist.train.images.shape, mnist.train.labels.shape) # 训练集</span></span><br><span class="line"><span class="comment"># print(mnist.test.images.shape, mnist.test.labels.shape) # 测试集</span></span><br><span class="line"><span class="comment"># print(mnist.validation.images.shape, mnist.validation.labels.shape) # 验证集</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 取验证集中的一部分为训练数据，一部分为测试数据</span></span><br><span class="line">X_train = mnist.validation.images[:<span class="number">100</span>].tolist() <span class="comment"># 将ndarray对象转换成列表</span></span><br><span class="line">Y_train = mnist.validation.labels[:<span class="number">100</span>].tolist()</span><br><span class="line">X_test = mnist.validation.images[<span class="number">100</span>:<span class="number">120</span>].tolist()</span><br><span class="line">Y_test = mnist.validation.labels[<span class="number">100</span>:<span class="number">120</span>].tolist()</span><br><span class="line"></span><br><span class="line"><span class="comment"># 创建神经网络，并用训练数据进行训练</span></span><br><span class="line">bp = BP(x_count=<span class="number">784</span>, mid_count=<span class="number">10</span>, y_count=<span class="number">10</span>, eta=<span class="number">0.3</span>, train_count=<span class="number">100</span>, precision=<span class="number">0.001</span>)</span><br><span class="line">bp.train(X_train, Y_train)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 训练结束后，用测试数据进行预测</span></span><br><span class="line">Y_predict = bp.predict(X_test)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 显示预测结果</span></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="built_in">len</span>(Y_predict)):</span><br><span class="line">    <span class="comment"># 求一组预测输出数据中值最大的神经元位置</span></span><br><span class="line">    max_pos = <span class="number">0</span></span><br><span class="line">    Max = <span class="number">0</span></span><br><span class="line">    <span class="keyword">for</span> j <span class="keyword">in</span> <span class="built_in">range</span>(<span class="built_in">len</span>(Y_predict[i])):</span><br><span class="line">        <span class="keyword">if</span> Y_predict[i][j] &gt; Max:</span><br><span class="line">            max_pos = j</span><br><span class="line">            Max = Y_predict[i][j]</span><br><span class="line"></span><br><span class="line">    image = X_test[i] <span class="comment"># 获取测试集中对应的数据</span></span><br><span class="line">    image = np.array(image).reshape(<span class="number">28</span>, <span class="number">28</span>) <span class="comment"># 将图像数据还原成28*28的分辨率，即28*28的数组</span></span><br><span class="line">    plt.imshow(image)</span><br><span class="line">    plt.title(<span class="string">&#x27;predict is: &#123;&#125;, real is: &#123;&#125;&#x27;</span>.<span class="built_in">format</span>(max_pos, Y_test[i].index(<span class="number">1</span>)))</span><br><span class="line">    plt.ion()</span><br><span class="line">    plt.pause(<span class="number">3</span>)</span><br><span class="line">    plt.close()</span><br></pre></td></tr></table></figure>
+
+<p>控制台输出每一轮训练后的累计误差如下：</p>
+<p><img src="/python%E5%AE%9E%E7%8E%B0BP%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/3.png" alt="1"></p>
+<p>挑选4张预测结果图片，如下：</p>
+<p><img src="/python%E5%AE%9E%E7%8E%B0BP%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/4.png" alt="1"></p>
+<h2 id="3-参考"><a href="#3-参考" class="headerlink" title="3. 参考"></a>3. 参考</h2><ul>
+<li>《机器学习》，周志华</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Python/" rel="tag"><i class="fa fa-tag"></i> Python</a>
+              <a href="/tags/DeepLearning/" rel="tag"><i class="fa fa-tag"></i> 深度学习</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/javascript%E9%87%8D%E9%9A%BE%E7%82%B9.html" rel="prev" title="Javascript重难点">
+                  <i class="fa fa-chevron-left"></i> Javascript重难点
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/junit%E5%85%A5%E9%97%A8.html" rel="next" title="junit入门">
+                  junit入门 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments gitalk-container"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">dounine</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/mist/" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+<script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.0/search.js" integrity="sha256-vXZMYLEqsROAXkEw93GGIvaB2ab+QW6w3+1ahD9nXXA=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.0/es5/tex-mml-chtml.js","integrity":"sha256-r+3itOMtGGjap0x+10hu6jW/gZCzxHsoKrOd7gyRSGY="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/gitalk/1.7.2/gitalk.css" integrity="sha256-AJnUHL7dBv6PGaeyPQJcgQPDjt/Hn/PvYZde1iqfp8U=" crossorigin="anonymous">
+
+<script class="next-config" data-name="gitalk" type="application/json">{"enable":true,"github_id":"99MyCql","repo":"99MyCql.github.io","client_id":"7c69ea063e9c78a72075","client_secret":"f222b18af36b2dffda7884ce5fd77bbb9172de54","admin_user":"99MyCql","distraction_free_mode":false,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token","language":"zh-CN","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/gitalk/1.7.2/gitalk.min.js","integrity":"sha256-Pmj85ojLaPOWwRtlMJwmezB/Qg8BzvJp5eTzvXaYAfA="},"path_md5":"b2921b97cd645f475b36c4bea46948ad"}</script>
+<script src="/js/third-party/comments/gitalk.js"></script>
+
+</body>
+</html>

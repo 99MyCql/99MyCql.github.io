@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.2.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/golang32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/golang16.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="baidu-site-verification" content="code-RpvRDWfflk">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" integrity="sha256-DfWjNxDkM94fVBWx1H5BMMp0Zq7luBlV8QRcSES7s+0=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"blog.dounine.live","root":"/","images":"/images","scheme":"Mist","darkmode":false,"version":"8.11.1","exturl":false,"sidebar":{"position":"right","display":"always","padding":18,"offset":12},"copycode":{"enable":true,"style":"flat"},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":"gitalk","storage":true,"lazyload":false,"nav":null,"activeClass":"gitalk"},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="[TOC] 0. 前言一篇关于linux简单命令的学习笔记。 在linux的&#x2F;bin&#x2F;目录下包含一些基础命令的可执行文件(二进制文件)。 以下命令格式中，略去命令选项。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="linux命令学习笔记">
+<meta property="og:url" content="https://blog.dounine.live/linux%E5%91%BD%E4%BB%A4%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0.html">
+<meta property="og:site_name" content="dounine&#39;s blog">
+<meta property="og:description" content="[TOC] 0. 前言一篇关于linux简单命令的学习笔记。 在linux的&#x2F;bin&#x2F;目录下包含一些基础命令的可执行文件(二进制文件)。 以下命令格式中，略去命令选项。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2018-12-08T16:26:21.000Z">
+<meta property="article:modified_time" content="2018-12-08T16:26:21.000Z">
+<meta property="article:author" content="dounine">
+<meta property="article:tag" content="计算机系统">
+<meta property="article:tag" content="Linux">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://blog.dounine.live/linux%E5%91%BD%E4%BB%A4%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0.html">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://blog.dounine.live/linux%E5%91%BD%E4%BB%A4%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0.html","path":"linux命令学习笔记.html","title":"linux命令学习笔记"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>linux命令学习笔记 | dounine's blog</title>
+  
+
+  <script src="/js/third-party/analytics/baidu-analytics.js"></script>
+  <script async src="https://hm.baidu.com/hm.js?66c7065aa71681df47eb23eff557978b"></script>
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">dounine's blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">18</span></a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">48</span></a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">75</span></a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#0-%E5%89%8D%E8%A8%80"><span class="nav-text">0. 前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E6%96%87%E4%BB%B6%E7%AE%A1%E7%90%86"><span class="nav-text">1. 文件管理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#cd"><span class="nav-text">cd</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ls"><span class="nav-text">ls</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#mkdir"><span class="nav-text">mkdir</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#rmdir"><span class="nav-text">rmdir</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#rm"><span class="nav-text">rm</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#mv"><span class="nav-text">mv</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#cp"><span class="nav-text">cp</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#pwd"><span class="nav-text">pwd</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#cat"><span class="nav-text">cat</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#head"><span class="nav-text">head</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#tail"><span class="nav-text">tail</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#file"><span class="nav-text">file</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#more"><span class="nav-text">more</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#less"><span class="nav-text">less</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#touch"><span class="nav-text">touch</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#chmod"><span class="nav-text">chmod</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#chown"><span class="nav-text">chown</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#chgrp"><span class="nav-text">chgrp</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#wc"><span class="nav-text">wc</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#find"><span class="nav-text">find</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#tar"><span class="nav-text">tar</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ln"><span class="nav-text">ln</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%A1%AC%E9%93%BE%E6%8E%A5"><span class="nav-text">硬链接</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%BD%AF%E9%93%BE%E6%8E%A5"><span class="nav-text">软链接</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%8C%BA%E5%88%AB"><span class="nav-text">区别</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E8%BF%9B%E7%A8%8B%E4%B8%8E%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86"><span class="nav-text">2.进程与内存管理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#ps"><span class="nav-text">ps</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#kill"><span class="nav-text">kill</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#top"><span class="nav-text">top</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#free"><span class="nav-text">free</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E7%94%A8%E6%88%B7%E7%AE%A1%E7%90%86"><span class="nav-text">3. 用户管理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#linux%E5%A4%9A%E7%94%A8%E6%88%B7%E6%A6%82%E5%BF%B5"><span class="nav-text">linux多用户概念</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#su"><span class="nav-text">su</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#useradd"><span class="nav-text">useradd</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#passwd"><span class="nav-text">passwd</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%B5%8B%E4%BA%88%E7%94%A8%E6%88%B7%E7%AE%A1%E7%90%86%E5%91%98%E6%9D%83%E9%99%90"><span class="nav-text">赋予用户管理员权限</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#userdel"><span class="nav-text">userdel</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-%E7%BD%91%E7%BB%9C%E7%AE%A1%E7%90%86"><span class="nav-text">4.网络管理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#netstat"><span class="nav-text">netstat</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ssh"><span class="nav-text">ssh</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#scp"><span class="nav-text">scp</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#curl"><span class="nav-text">curl</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-%E7%A3%81%E7%9B%98%E7%AE%A1%E7%90%86"><span class="nav-text">5.磁盘管理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#blkid"><span class="nav-text">blkid</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#mount"><span class="nav-text">mount</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#umount"><span class="nav-text">umount</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#du"><span class="nav-text">du</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#df"><span class="nav-text">df</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#fdisk"><span class="nav-text">fdisk</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-%E6%96%87%E6%9C%AC%E7%AE%A1%E7%90%86"><span class="nav-text">6. 文本管理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#grep"><span class="nav-text">grep</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#echo"><span class="nav-text">echo</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#sed"><span class="nav-text">sed</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#awk"><span class="nav-text">awk</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#tr"><span class="nav-text">tr</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-%E6%9D%82%E9%A1%B9"><span class="nav-text">7. 杂项</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#man"><span class="nav-text">man</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#history"><span class="nav-text">history</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#bc"><span class="nav-text">bc</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#alias"><span class="nav-text">alias</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#whereis"><span class="nav-text">whereis</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#which"><span class="nav-text">which</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#whoami"><span class="nav-text">whoami</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="dounine"
+      src="https://avatars.githubusercontent.com/u/41814469?s=400&u=48bf60a3428a3cb86a84a110c8688930cf6ceb08&v=4">
+  <p class="site-author-name" itemprop="name">dounine</p>
+  <div class="site-description" itemprop="description">回首向来萧瑟处</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">75</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">18</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">48</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/99MyCql" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;99MyCql" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+
+  <div class="links-of-blogroll site-overview-item animated">
+    <div class="links-of-blogroll-title"><i class="fa fa-globe fa-fw"></i>
+      Links
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://bkfish.gitee.io/" title="https:&#x2F;&#x2F;bkfish.gitee.io&#x2F;" rel="noopener" target="_blank">Kitty萌新的卧室</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://hitworld.github.io/" title="https:&#x2F;&#x2F;hitworld.github.io&#x2F;" rel="noopener" target="_blank">hirworld</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://wyjoutstanding.github.io/" title="https:&#x2F;&#x2F;wyjoutstanding.github.io&#x2F;" rel="noopener" target="_blank">wyjoutstanding</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://iwtf.github.io/" title="https:&#x2F;&#x2F;iwtf.github.io&#x2F;" rel="noopener" target="_blank">IWTF</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://wood1314.github.io/" title="https:&#x2F;&#x2F;wood1314.github.io&#x2F;" rel="noopener" target="_blank">wood</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://desperadoccy.github.io/" title="https:&#x2F;&#x2F;desperadoccy.github.io&#x2F;" rel="noopener" target="_blank">desperadoccy</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://doudouqaq.github.io/" title="https:&#x2F;&#x2F;doudouqaq.github.io&#x2F;" rel="noopener" target="_blank">doudouqaq</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://kylinnnnn.github.io/" title="https:&#x2F;&#x2F;kylinnnnn.github.io&#x2F;" rel="noopener" target="_blank">kylinnnnn</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://miaotony.xyz/" title="https:&#x2F;&#x2F;miaotony.xyz" rel="noopener" target="_blank">miaotony</a>
+        </li>
+    </ul>
+  </div>
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://github.com/99MyCql" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.dounine.live/linux%E5%91%BD%E4%BB%A4%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://avatars.githubusercontent.com/u/41814469?s=400&u=48bf60a3428a3cb86a84a110c8688930cf6ceb08&v=4">
+      <meta itemprop="name" content="dounine">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dounine's blog">
+      <meta itemprop="description" content="回首向来萧瑟处">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="linux命令学习笔记 | dounine's blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          linux命令学习笔记
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2018-12-09 00:26:21" itemprop="dateCreated datePublished" datetime="2018-12-09T00:26:21+08:00">2018-12-09</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Base/" itemprop="url" rel="index"><span itemprop="name">九层之台，起于累土</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Base/System/" itemprop="url" rel="index"><span itemprop="name">计算机系统</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p>[TOC]</p>
+<h2 id="0-前言"><a href="#0-前言" class="headerlink" title="0. 前言"></a>0. 前言</h2><p>一篇关于linux简单命令的学习笔记。</p>
+<p>在linux的<code>/bin/</code>目录下包含一些基础命令的可执行文件(二进制文件)。</p>
+<p>以下命令格式中，略去命令选项。</p>
+<span id="more"></span>
+
+<h2 id="1-文件管理"><a href="#1-文件管理" class="headerlink" title="1. 文件管理"></a>1. 文件管理</h2><h3 id="cd"><a href="#cd" class="headerlink" title="cd"></a>cd</h3><p><code>~</code> 到用户HOME目录<br><code>/</code> 到系统根目录<br><code>-</code> 退到上一个进入的目录</p>
+<h3 id="ls"><a href="#ls" class="headerlink" title="ls"></a>ls</h3><p>格式：<br><code>ls &lt;选项&gt; &lt;目录&gt;</code></p>
+<p>主要选项：<br><strong><code>-a</code></strong>  查看当前目录下所有文件和目录，包括隐藏文件<br><code>-A</code> 同 -a ，但不列出 “.” (目前目录) 及 “..” (父目录)<br><code>-S</code> 按文件大小排序列表<br><strong><code>-l</code></strong> 使用长列表格式列出详细信息<br><code>-t</code> 按文件的最后修改时间排序列表。<br><code>-c</code> (1)与-lt一起用时按照存取时间来排序列表，并在列表中显示存取时间的值，其中存取时间是文件状态信息中的最后修改时间；(2)与-l一起用时按照文件名来排序列表，但在列表中显示存取时间。<br><code>-full-time</code> 显示每个文件的完全日期和时间<br><strong><code>-h</code></strong> 以人们易读的格式显示文件大小(“K”,”M”,”G”)<br><strong><code>-i</code></strong> 显示文件的节点号<br><code>-r</code> 反序列表<br><code>-R</code> 递归显示子目录中的内容<br><code>-s</code> 以磁盘块个数的形式显示每个文件的大小<br><code>-time=WORD</code> 将WORD作为时间显示以代替文件的最后修改时间。</p>
+<p><code>ls -ilh</code> 后显示：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">total 28K</span><br><span class="line">658691 -rw-rw-r-- 1 <span class="built_in">test</span> <span class="built_in">test</span>   81 Dec 13 01:52 db_info</span><br><span class="line">658248 drwxrwxr-x 3 <span class="built_in">test</span> <span class="built_in">test</span> 4.0K Dec 11 19:44 douNine</span><br><span class="line">658064 drwxrwxr-x 5 <span class="built_in">test</span> <span class="built_in">test</span> 4.0K Dec 13 20:05 go</span><br><span class="line">658315 -rw-rw-r-- 1 <span class="built_in">test</span> <span class="built_in">test</span> 9.0K Nov 28 22:33 hist</span><br><span class="line">656748 drwxrwxr-x 2 <span class="built_in">test</span> <span class="built_in">test</span> 4.0K Dec  3 15:19 ziwen</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>第一字段：inode(文件或目录索引点，相当于指向文件在磁盘中数据的指针)</li>
+<li>第二字段：文件种类(<code>-</code>表示正常文件，<code>d</code>表示目录，<code>l</code>表示链接文件)和权限(rwx，共9位，分别控制<strong>文件属主</strong>、<strong>所属用户组</strong>以及<strong>其它用户</strong>的权限)</li>
+<li>第三字段：硬链接个数</li>
+<li>第四字段：文件属主</li>
+<li>第五字段：文件所归属的用户组</li>
+<li>第六字段：文件或目录的大小(字节)</li>
+<li>第七字段和第八字段：最后访问或修改时间</li>
+<li>第九字段：文件名或目录名</li>
+</ul>
+<h3 id="mkdir"><a href="#mkdir" class="headerlink" title="mkdir"></a>mkdir</h3><p>创建一个目录</p>
+<p>格式：<br><code>mkdir &lt;dir&gt;</code></p>
+<p>主要选项：<br><code>-m</code> 设置许可模式<br><code>-v</code> 为每一个创建的目录显示一条消息</p>
+<h3 id="rmdir"><a href="#rmdir" class="headerlink" title="rmdir"></a>rmdir</h3><p>删除一个空目录</p>
+<p>格式：<br><code>rmdir &lt;dir&gt;</code></p>
+<h3 id="rm"><a href="#rm" class="headerlink" title="rm"></a>rm</h3><p>删除(remove)</p>
+<p>格式：<br><code>rm &lt;选项&gt; &lt;文件或目录&gt;</code></p>
+<p>主要选项：<br><code>-i</code> 以询问的方式删除<br><code>-f</code> 强制删除<br><code>-r</code> 递归删除，删目录时</p>
+<p><code>rm -rf</code> 强制递归删除过于暴力，且删除后还无法复原。因此，我常自定义删除文件&#x2F;目录的命令，在<code>~/.bashrc</code>中添加：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">alias rm=<span class="string">&#x27;echo &quot;please use trash&quot;&#x27;</span></span><br><span class="line">alias trash=trash</span><br><span class="line">trash() &#123;</span><br><span class="line">    mv $@ ~/.trash/</span><br><span class="line">&#125;</span><br><span class="line">alias clearTrash=clearTrash</span><br><span class="line">clearTrash() &#123;</span><br><span class="line">    sudo /bin/rm -rf ~/.trash<span class="comment">/*</span></span><br><span class="line"><span class="comment">&#125;</span></span><br><span class="line"><span class="comment"></span></span><br></pre></td></tr></table></figure>
+
+<h3 id="mv"><a href="#mv" class="headerlink" title="mv"></a>mv</h3><p>移动(move)</p>
+<p>格式：<br><code>mv &lt;文件A或目录A&gt; &lt;文件B或目录B&gt;</code></p>
+<p>说明：<br>该命令有<strong>重命名</strong>的作用，当xxB不存在时，会将xxA重命名为xxB</p>
+<h3 id="cp"><a href="#cp" class="headerlink" title="cp"></a>cp</h3><p>复制(copy)</p>
+<p>格式：<br><code>cp &lt;文件A或目录A&gt; &lt;文件B或目录B&gt;</code></p>
+<h3 id="pwd"><a href="#pwd" class="headerlink" title="pwd"></a>pwd</h3><p>显示当前绝对路径</p>
+<h3 id="cat"><a href="#cat" class="headerlink" title="cat"></a>cat</h3><p>只读形式显示文件内容</p>
+<p>格式：<br><code>cat &lt;文件&gt;</code></p>
+<p>主要选项：<br><code>-b</code> 计算所有非空输出行，开始为1。<br><code>-e</code> 在每行末尾显示$符号。<br><strong><code>-n</code></strong> 计算所有输出行，开始为1。<br><code>-s</code> 将相连的多个空行用单一空行代替。</p>
+<h3 id="head"><a href="#head" class="headerlink" title="head"></a>head</h3><p>显示文件开头。</p>
+<p>常用选项：</p>
+<p><code>-n &lt;count&gt; == -&lt;count&gt;</code> 显示前 count 行，默认为 10 。</p>
+<p>常用：</p>
+<ul>
+<li><code>head -20 file.log</code> 显示前 20 行</li>
+</ul>
+<h3 id="tail"><a href="#tail" class="headerlink" title="tail"></a>tail</h3><p>显示文件结尾。</p>
+<p>常用选项：</p>
+<p><code>-n &lt;count&gt; == -&lt;count&gt;</code> 显示后 count 行，默认为 10 。<br><code>-f</code> 不断获取文件新添加的数据。</p>
+<p>常用：</p>
+<p><code>tail -f log</code> 查看不断更新的日志。</p>
+<h3 id="file"><a href="#file" class="headerlink" title="file"></a>file</h3><p>格式：<br><code>file &lt;file/dir&gt;</code></p>
+<p>查看文件类型</p>
+<h3 id="more"><a href="#more" class="headerlink" title="more"></a>more</h3><p>分页显示文件的内容</p>
+<p>格式：<br><code>more &lt;file&gt;</code></p>
+<p>说明：<br>分页显示文件内容查看时：</p>
+<ul>
+<li>上下左右键进行翻阅</li>
+<li><code>q</code>键退出。</li>
+</ul>
+<h3 id="less"><a href="#less" class="headerlink" title="less"></a>less</h3><p><code>more</code>命令的进阶版</p>
+<p>说明：<br><code>less</code> &#x3D; <code>more</code> + <code>vi</code><br>在分页查看文件内容时，还可以：</p>
+<ul>
+<li>使用<code>/pattern</code>从头向尾查找显示字符串</li>
+<li>使用<code>?pattren</code>从尾向头查找显示字符串</li>
+</ul>
+<h3 id="touch"><a href="#touch" class="headerlink" title="touch"></a>touch</h3><p>新建文件</p>
+<p>格式：<br><code>touch &lt;文件&gt;</code></p>
+<h3 id="chmod"><a href="#chmod" class="headerlink" title="chmod"></a>chmod</h3><p>修改文件权限。</p>
+<p>在linux中，一个文件的权限范围有：</p>
+<ul>
+<li><code>u</code>：User，即文件或目录的拥有者。</li>
+<li><code>g</code>：Group，即文件或目录的所属群组。</li>
+<li><code>o</code>：Other，除了文件或目录拥有者或所属群组之外，其他用户皆属于这个范围。</li>
+<li><code>a</code>：All，即全部的用户，包含拥有者，所属群组以及其他用户。</li>
+</ul>
+<p>而，文件的权限又分为：</p>
+<ul>
+<li><code>r</code>：读取权限，数字代号为 4</li>
+<li><code>w</code>：写入权限，数字代号为 2</li>
+<li><code>x</code>：执行或切换权限，数字代号为 1</li>
+<li><code>-</code>：不具任何权限，数字代号为 0</li>
+</ul>
+<p>查看文件权限用 <code>ls -l</code> 命令，就会显示每个文件u,g,o范围的权限。</p>
+<p>修改一个文件的权限大致有两种方法，如：</p>
+<p><code>chmod u+x &lt;file&gt;</code>  file 的 u(即文件所拥有者)<br>新增 x(执行权限)，<code>u-x</code>  即对该范围取消 x 权限</p>
+<p><code>chmod 755 &lt;file&gt;</code>  表示对file的 u,g,o 范围分别赋予 7,5,5 权限。7&#x3D;1+2+4，指rwx权限；5&#x3D;1+4，指r-x权限；同理，还有 0,2,4,6 等权限。</p>
+<p><strong>理解</strong>：</p>
+<p>为何任意一个小于7数字就能表示一种三个权限的组合呢？我猜想是因为这是个三位的二进制数。<code>x</code>是第一位，<code>w</code>是第二位，<code>r</code>是第三位，0和1表示权限关和开。所以，<code>7</code>的二进制为<code>111</code>，表示三个权限都开启；<code>5</code>的二进制为<code>101</code>，表示<code>r</code>和<code>x</code>权限开启。</p>
+<h3 id="chown"><a href="#chown" class="headerlink" title="chown"></a>chown</h3><p>修改文件&#x2F;目录的属主。</p>
+<p><code>chown root test/</code> 将<code>test/</code>目录的属主改为<code>root</code>。</p>
+<h3 id="chgrp"><a href="#chgrp" class="headerlink" title="chgrp"></a>chgrp</h3><p>修改文件&#x2F;目录的属组。</p>
+<p><code>chgrp root test/</code> 将<code>test/</code>目录的属组改为<code>root</code>。</p>
+<h3 id="wc"><a href="#wc" class="headerlink" title="wc"></a>wc</h3><p>依次显示文件的行数,单词数和字符数</p>
+<p>格式：<br><code>wc &lt;文件&gt;</code></p>
+<p>主要选项：<br><code>-l</code> 只显示行数<br><code>-w</code>  只显示单词数<br><code>-c</code>  只显示字符数</p>
+<h3 id="find"><a href="#find" class="headerlink" title="find"></a>find</h3><p>查找文件或目录</p>
+<p>主要选项：<br><code>-name &lt;文件&gt;</code> 匹配要名字相同的文件，要找的文件名字包括在引号中，可以使用通配符（*和？）<br><code>-perm &lt;模式&gt;</code> 匹配所有模式为指定数字型模式值的文件。不仅仅是读，写和执行，所有模式都必须匹配。如果在模式前是负号（-），表示采用除这个模式外的所有模式。<br><code>-user &lt;用户号&gt;</code> 匹配所有用户序列号是前面所指定的用户序列号的文件，可以是数字型的值或用户登录名。<br><code>-atime n</code> 匹配所有在前n天内访问过的文件。<br><code>-mtime n</code> 匹配所有在前n天内修改过的文件。<br><code>-newer &lt;文件&gt;</code> 匹配所有修改时间比file文件更新的文件。<br><code>-size n</code> 匹配所有大小为n 块的文件（若k在n后，则为1K字节块）。<br><code>-print</code> 显示整个文件路径和名称。一般来说,如果没有这个选项，find命令进行所要求的搜索是不会显示结果的。</p>
+<p>示例：<br><code>find ~/go/src/ -name &quot;beego&quot; -print</code> 通过文件名查找，并打印出文件或目录的路径<br><code>find ~/go/src/ -name &quot;bb*&quot; -print</code> 根据部分文件名查找。会匹配名字为 bba、bbhj、bbac 等文件或目录。<br><code>find /etc –size 2500b –print</code> 根据文件的特征查询。例如，知道一个文件尺寸小于为2500bytes</p>
+<p><strong>注解</strong>：</p>
+<p>通配符又称多义符。在描述文件时，有时在文件名部分用到一些通配符，以加强命令的功能。与正则表达式很像。</p>
+<ul>
+<li><code>?</code>：表示该位置可以是一个任意字符。</li>
+<li><code>*</code>：表示该位置可以是零个或多个任意字符。</li>
+<li><code>[charset]</code>：可选择charset集中的任何单个字符。例如：<code>ls name[1-5].png</code> 会列出name1.png、name2.png…</li>
+</ul>
+<h3 id="tar"><a href="#tar" class="headerlink" title="tar"></a>tar</h3><p>加密解密，此处参照<a target="_blank" rel="noopener" href="https://www.cnblogs.com/kaynet/p/6410722.html">大神博客</a>。</p>
+<p>常用选项：</p>
+<ul>
+<li><code>c</code> Create archive.tar from files. 压缩到 <code>.tar</code></li>
+<li><code>x</code> Extract all files from archive.tar. 从 <code>.tar</code> 解压</li>
+<li><code>f</code> 指定解&#x2F;压缩文件名</li>
+<li><code>v</code> 显示解压过程</li>
+<li><code>z</code> 解&#x2F;压缩 <code>.tar.gz</code> 结尾的压缩包</li>
+<li><code>C dir/</code> 解压到指定目录</li>
+</ul>
+<p>常用示例：</p>
+<ul>
+<li><code>tar -cvf archive.tar file/</code> 压缩成 tar</li>
+<li><code>tar -czvf archive.tar.gz file/</code> 压缩成 tar.gz</li>
+<li><code>tar -xvf archive.tar</code> 解压 tar</li>
+<li><code>tar -xzvf archive.tar.gz</code> 解压 tar.gz</li>
+</ul>
+<h3 id="ln"><a href="#ln" class="headerlink" title="ln"></a>ln</h3><p>对文件或目录建立链接(其中的软链接，类似于Windows的快捷方式)。</p>
+<p>分类：硬链接（Hard Link），符号链接（Symbolic Link）。</p>
+<h4 id="硬链接"><a href="#硬链接" class="headerlink" title="硬链接"></a>硬链接</h4><p>默认情况下，ln产生硬链接。</p>
+<p>建立硬链接时，链接文件和被链接文件必须位于同一个文件系统中，并且不能建立指向目录的硬链接。有硬链接关系的两个文件的inode值相同。</p>
+<p>当我们修改其中一个文件的内容时，互为硬链接的文件的内容也会跟着变化。可以这么理解，互为硬链接关系的文件，他们好象是克隆体，他们的属性几乎是完全一样；硬链接关系的文件是无法区别的。</p>
+<p>格式:<br><code>ln &lt;选项&gt; &lt;源目录/文件&gt; &lt;目标目录/文件&gt;</code></p>
+<p>说明：<br><code>ln a.c ~/</code> 如果最后一参数是一个已存在的目录，那么ln命令就在目录下创建与各个目标相连的链接，而且<strong>名字也与目标相同</strong>。<br><code>ln a.c ~/b.c</code> 如果给出了两个文件名，那么命令生成一个从第二个文件指向第一个文件的链接。<br><code>ln a.c</code> 如果只给出了一个目标，ln就在当前目录下生成一个指向目标的链接。</p>
+<h4 id="软链接"><a href="#软链接" class="headerlink" title="软链接"></a>软链接</h4><p>软链接也叫符号链接，其实就是快捷方式。</p>
+<p>格式：<br><code>ln -s 源文文件或目录  目标文件或目录</code></p>
+<p>示例:<br><code>$ ln -s /mnt/d/my_code/ ~/link_my_code</code> 软链接一个目录到另一个目录下时，用<strong>绝对路径</strong></p>
+<p><code>$ ln -s my_code/ ~/link_my_code</code>  这样是错误的，因为~&#x2F;下没有my_code这个目录</p>
+<h4 id="区别"><a href="#区别" class="headerlink" title="区别"></a>区别</h4><p>1）硬链接相当于拷贝了指向文件数据的“指针”(文件索引结点信息)过来。而软链接记住的，是文件索引结点所在的目录，似乎是一个“指针”的指针。</p>
+<p>2）若一个文件有多个硬链接，删除其中一个文件后，文件数据其实并未删除，还可以通过其它硬链接找到这个文件，只是文件的硬链接个数会减一。而软链接，删除源文件后，软链接就不可用了，此处很像window的快捷方式。</p>
+<p>注：不管软硬链接，修改一个文件，另一个文件也会被修改。</p>
+<h2 id="2-进程与内存管理"><a href="#2-进程与内存管理" class="headerlink" title="2.进程与内存管理"></a>2.进程与内存管理</h2><h3 id="ps"><a href="#ps" class="headerlink" title="ps"></a>ps</h3><p>查看进程(process)</p>
+<p>主要选项：<br><strong><code>-A</code></strong> 显示所有进程（等价于-e）<br><strong><code>-a</code></strong> 显示一个终端的所有进程，除了会话引线<br><code>-N</code> 忽略选择。<br><strong><code>-d</code></strong> 显示所有进程，但省略所有的会话引线<br><strong><code>-x</code></strong> 显示没有控制终端的进程，同时显示各个命令的具体路径。dx不可合用。<br><code>-p pid</code> 进程使用cpu的时间<br><strong><code>-u uid 或 username</code></strong> 选择有效的用户id或者是用户名，如 -u test 查看test用户<br><code>-g gid 或 groupname</code> 显示组的所有进程。<br><strong><code>U username</code></strong> 显示该用户下的所有进程，且显示各个命令的详细路径。如: U test<br><code>-f</code> 全部列出，通常和其他选项联用。如：ps -fa 或 ps -fx<br><code>-l</code> 长格式（有F,wchan,C 等字段）<br><code>-j</code> 操作格式<br><code>-o</code> 用户自定义格式。<br><code>v</code> 以虚拟存储器格式显示<br><code>s</code> 以信号格式显示<br><code>-m</code> 显示所有的线程<br><code>-H</code> 显示进程的层次(和其它的命令合用，如：ps -Ha)<br><code>e</code> 命令之后显示环境(如：ps -d e; ps -a e)<br><strong><code>h</code></strong> 不显示第一行</p>
+<p>常用：</p>
+<ul>
+<li><code>ps -aux</code>，执行后，<strong>显示的头部</strong>如下：</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">用户  进程id  CPU使用率  内存使用率  状态  开始日期  开始时间  命令</span><br><span class="line"></span><br><span class="line">USER  PID  %CPU  %MEM  VSZ  RSS  TTY  STAT  START  TIME  COMMAND</span><br></pre></td></tr></table></figure>
+
+<p>其中<code>STAT</code>有以下几种状态:</p>
+<ul>
+<li><code>D</code>: 不可中断的静止</li>
+<li><code>R</code>: 正在执行中</li>
+<li><code>S</code>: 静止状态</li>
+<li><code>T</code>: 暂停执行</li>
+<li><code>Z</code>: 不存在但暂时无法消除</li>
+<li><code>W</code>: 没有足够的记忆体分页可分配</li>
+<li><code>&lt;</code>: 高优先序的行程</li>
+<li><code>N</code>: 低优先序的行程</li>
+<li><code>L</code>: 有记忆体分页分配并锁在记忆体内 (即时系统或捱A I&#x2F;O)</li>
+</ul>
+<h3 id="kill"><a href="#kill" class="headerlink" title="kill"></a>kill</h3><p><code>kill -stop pid</code> 发送SIGSTOP (17,19,23)停止一个进程，而并不消灭这个进程。</p>
+<p><code>kill -cont pid</code> 发送SIGCONT (19,18,25)重新开始一个停止的进程。</p>
+<p><code>kill -kill pid</code> 发送SIGKILL (9)强迫进程立即停止，并且不实施清理操作。</p>
+<p><code>kill -9 -1</code> 终止你拥有的全部进程。</p>
+<h3 id="top"><a href="#top" class="headerlink" title="top"></a>top</h3><p>动态显示任务管理器。</p>
+<h3 id="free"><a href="#free" class="headerlink" title="free"></a>free</h3><p>查看内存使用情况。</p>
+<p><code>-h</code> 自动转换单位，显示 B K M 等。</p>
+<p>常用：</p>
+<ul>
+<li><code>free -h</code>，输出示例如下：</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ free -h</span><br><span class="line">              total        used        free      shared  buff/cache   available</span><br><span class="line">Mem:            62G         20G         13G         42M         28G         41G</span><br><span class="line">Swap:            0B          0B          0B</span><br></pre></td></tr></table></figure>
+
+<h2 id="3-用户管理"><a href="#3-用户管理" class="headerlink" title="3. 用户管理"></a>3. 用户管理</h2><h3 id="linux多用户概念"><a href="#linux多用户概念" class="headerlink" title="linux多用户概念"></a>linux多用户概念</h3><p>root 权限最高的主用户，HOME目录为 &#x2F;root&#x2F;</p>
+<p>其它(如test) 权限较小的用户，HOME目录一般为 &#x2F;home&#x2F;test&#x2F;</p>
+<p><code>~</code> 用户HOME目录。 <code>cd ~</code> 或 <code>cd</code> 回到HOME目录，<code>cd ~/go/src/</code> 去HOME目录下的go&#x2F;src&#x2F;目录</p>
+<p><code>/</code> 系统根目录。 &#x2F;bin&#x2F; 为系统根目录下的bin目录</p>
+<h3 id="su"><a href="#su" class="headerlink" title="su"></a>su</h3><p>切换用户</p>
+<p>格式：<br><code>su &lt;name&gt;</code> 切换到某个用户，没加用户名则默认登录root用户。</p>
+<h3 id="useradd"><a href="#useradd" class="headerlink" title="useradd"></a>useradd</h3><p>创建新用户</p>
+<p>格式：<br><code>useradd [-d home] [-s shell] [-c comment] [-m [-k template]] [-f inactive] [-e expire ] [-p passwd] [-r] name</code></p>
+<p>主要选项：<br><code>-c</code>：加上备注文字，备注文字保存在passwd的备注栏中。<br><code>-d</code>：指定用户登入时的主目录。默认值&#x2F;home&#x2F;&lt;用户名&gt;<br><code>-D</code>：变更预设值。<br><code>-e</code>：指定账号的失效日期，日期格式为MM&#x2F;DD&#x2F;YY，例如06&#x2F;30&#x2F;12。缺省表示永久有效。<br><code>-f</code>：指定在密码过期后多少天即关闭该账号。如果为0账号立即被停用；如果为-1则账号一直可用。默认值为-1.<br><code>-g</code>：指定用户所属的群组。值可以使组名也可以是GID。用户组必须已经存在的，期默认值为100，即users。<br><code>-G</code>：指定用户所属的附加群组。<br><code>-m</code>：自动建立用户的登入目录。<br><code>-M</code>：不要自动建立用户的登入目录。<br><code>-n</code>：取消建立以用户名称为名的群组。<br><code>-r</code>：建立系统账号。<br><code>-s</code>：指定用户登入后所使用的shell。默认值为&#x2F;bin&#x2F;bash。<br><code>-u</code>：指定用户ID号。该值在系统中必须是唯一的。0~499默认是保留给系统用户账号使用的，所以该值必须大于499。</p>
+<p>说明：<br>用 useradd 创建账号之后，<strong>再使用passwd设定账号的密码</strong>。<br>各<strong>用户</strong>的信息都保存在 <code>/etc/passwd</code> 文件中。<br>各<strong>用户组</strong>的信息都保存在 <code>/etc/group</code> 文件中。</p>
+<p>示例：<br><code>useradd -m test</code> 创建test用户并自动建立用户登录目录</p>
+<h3 id="passwd"><a href="#passwd" class="headerlink" title="passwd"></a>passwd</h3><p>格式：<br><code>passwd &lt;name&gt;</code> 为name用户创建密码</p>
+<h3 id="赋予用户管理员权限"><a href="#赋予用户管理员权限" class="headerlink" title="赋予用户管理员权限"></a>赋予用户管理员权限</h3><p>修改 <code>/etc/sudoers</code> 文件如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"># User privilege specification</span><br><span class="line">root    ALL=(ALL:ALL) ALL</span><br><span class="line">&lt;name&gt; ALL=(ALL:ALL) ALL</span><br></pre></td></tr></table></figure>
+
+<p><strong>注意：</strong> 该文件是<strong>只读</strong>权限，需要先给文件增加写权限，再进行修改。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">root@iZuf697sx3nms8k9zb2kw4Z:~<span class="comment"># chmod a+w /etc/sudoers</span></span><br><span class="line">root@iZuf697sx3nms8k9zb2kw4Z:~<span class="comment"># vim /etc/sudoers</span></span><br></pre></td></tr></table></figure>
+
+<p>修改完后还要将该文件<strong>改回</strong>只读权限，不然用户使用<code>sudo</code>时会报错：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">sudo: /etc/sudoers is world writable</span><br><span class="line">sudo: no valid sudoers sources found, quitting</span><br><span class="line">sudo: unable to initialize policy plugin</span><br></pre></td></tr></table></figure>
+
+<h3 id="userdel"><a href="#userdel" class="headerlink" title="userdel"></a>userdel</h3><p>格式：<br><code>userdel &lt;name&gt;</code> 删除名为name的用户</p>
+<h2 id="4-网络管理"><a href="#4-网络管理" class="headerlink" title="4.网络管理"></a>4.网络管理</h2><h3 id="netstat"><a href="#netstat" class="headerlink" title="netstat"></a>netstat</h3><p>主要选项：</p>
+<p><code>-t</code> 仅显示TCP相关选项<br><code>-u</code> 仅显示UDP相关选项<br><code>-n</code> 拒绝显示别名，能显示数字的全部转化为数字。直接通过ip地址，而不通过域名服务器<br><code>-l</code> 仅列出在Listen(监听)的服务状态<br><code>-p</code> 显示建立相关链接的程序名<br><code>-a</code> 显示所有连接中socket</p>
+<p>常用：</p>
+<p><code>netstat -tnlp</code></p>
+<h3 id="ssh"><a href="#ssh" class="headerlink" title="ssh"></a>ssh</h3><p>远程连接。</p>
+<p>一般默认安装，若不存在，则服务端需安装 <code>openssh-server</code> ，客户端需安装 <code>openssh-clients</code> 。</p>
+<p>ssh 服务名为 <code>sshd</code> ，可通过 <code>service sshd start</code> 启动。</p>
+<p>常用选项：</p>
+<p><code>-p</code> 指定端口。<br><code>-i</code> 指定密钥。</p>
+<p>示例：</p>
+<ul>
+<li><code>ssh root@192.168.0.20</code> 口令验证（密码）或密钥免密验证</li>
+<li><code>ssh -i test.key test@192.168.0.12</code> 密钥登录指定密钥</li>
+</ul>
+<p>若采用密钥登录且登录时不需指定密钥，则需：</p>
+<ol>
+<li><p><code>ssh-keygen</code> 生成公密钥，默认在 <code>~/.ssh</code> 下生成公钥 <code>id_ras.pub</code> 和密钥 <code>id_rsa</code> ，可重命名。</p>
+</li>
+<li><p><code>ssh-copy-id -i ~/.ssh/id_rsa.pub user@ip</code> 将公钥传到服务器。</p>
+</li>
+<li><p>登录时指定密钥，或在 <code>~/.ssh/config</code> 中指定，如下：</p>
+ <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Host <span class="number">192.168</span><span class="number">.0</span><span class="number">.20</span></span><br><span class="line">    Port <span class="number">22</span></span><br><span class="line">    User root</span><br><span class="line">    IdentityFile ~/.ssh/root.key</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h3 id="scp"><a href="#scp" class="headerlink" title="scp"></a>scp</h3><p>远程文件传输（上传&#x2F;下载）。</p>
+<p>常用选项：</p>
+<p><code>-p</code> 指定端口。<br><code>-i</code> 指定密钥。<br><code>-r</code> 递归文件夹，用于传文件。</p>
+<p>常用：</p>
+<ul>
+<li><code>scp -r dir/ root@ip:~/dir</code> 上传文件夹。</li>
+<li><code>scp root@ip:~/file file</code> 下载文件。</li>
+</ul>
+<h3 id="curl"><a href="#curl" class="headerlink" title="curl"></a>curl</h3><p>用于网络请求。</p>
+<p>常用选项：</p>
+<p><code>-X &lt;method&gt;</code> 指定请求方法 <code>GET</code> <code>POST</code> 等。<br><code>-d &lt;data&gt;</code> 参数用于发送 POST 请求的数据体，上传文件内的数据时，使用 <code>@file</code> 。<br><code>-H &lt;header&gt;</code> 参数添加 HTTP 请求的标头。<br><code>-x &lt;proxy&gt;</code> 参数指定 HTTP 请求的代理。<br><code>-v</code> 参数输出通信的整个过程，用于调试。<br><code>-o &lt;output file&gt;</code> 参数将服务器的回应保存成文件</p>
+<p>常用：</p>
+<ul>
+<li>POST 发送 json 数据：</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl -d <span class="string">&#x27;&#123;&quot;name&quot;: 6&#125;&#x27;</span> -X POST 192.168.0.1:8080/report</span><br></pre></td></tr></table></figure>
+
+<p>参考：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="http://www.ruanyifeng.com/blog/2019/09/curl-reference.html">http://www.ruanyifeng.com/blog/2019/09/curl-reference.html</a></li>
+</ul>
+<h2 id="5-磁盘管理"><a href="#5-磁盘管理" class="headerlink" title="5.磁盘管理"></a>5.磁盘管理</h2><h3 id="blkid"><a href="#blkid" class="headerlink" title="blkid"></a>blkid</h3><p>查看Linux系统上所有设备与分区（可以理解为每个硬盘）的文件系统类型、UUID、LABEL标签、挂载目录等信息。</p>
+<p>换而言之，就是查看系统中的如磁盘、CD&#x2F;DVD、U盘之类的文件(linux将所有储存的东西都称为文件)位置及信息。</p>
+<h3 id="mount"><a href="#mount" class="headerlink" title="mount"></a>mount</h3><p>将设备挂载到Linux上。</p>
+<p>格式：<br><code>mount [-t vfstype] [-o options] &lt;device&gt; &lt;dir&gt;</code></p>
+<p>主要选项：</p>
+<p>1.<code>-t vfstype</code> 指定文件系统的类型，通常不必指定。mount 会自动选择正确的类型。<br>常用类型有：<br>光盘或光盘镜像：iso9660<br>DOS fat16文件系统：msdos<br>Windows 9x fat32文件系统：vfat<br>Windows NT ntfs文件系统：ntfs<br>Mount Windows文件网络共享：smbfs<br>UNIX(LINUX) 文件网络共享：nfs</p>
+<p>2.<code>-o options</code> 主要用来描述设备或档案的挂接方式。常用的参数有：<br>loop：用来把一个文件当成硬盘分区挂接上系统<br>ro：采用只读方式挂接设备<br>rw：采用读写方式挂接设备<br>iocharset：指定访问文件系统所用字符集</p>
+<p>3.<code>device</code>指明要挂载的设备(是一个文件)，设备文件通常在<code>/dev/</code>目录下。比如插入的CD&#x2F;DVD会是<code>/dev/sr0</code>文件。</p>
+<p>4.<code>dir</code>设备在系统上的挂载点(是一个目录)。</p>
+<p>示例：<code>mount /dev/sr0 /data</code> 将设备挂载到 <code>/data</code> 目录下。</p>
+<h3 id="umount"><a href="#umount" class="headerlink" title="umount"></a>umount</h3><p>取消挂载，类似于弹出u盘</p>
+<p>格式：</p>
+<p><code>umount &lt;dir&gt;</code></p>
+<p><code>dir</code>是挂载点目录</p>
+<h3 id="du"><a href="#du" class="headerlink" title="du"></a>du</h3><p>说明:</p>
+<p>显示文件和目录的磁盘使用空间大小。</p>
+<p>命令选项：</p>
+<p><code>-a</code> 显示目录中文件的大小，单位KB。</p>
+<p><code>-b</code> 显示目录中文件的大小，以字节byte为单位。</p>
+<p><code>-c</code> 显示目录中文件的大小，同时也显示总和；单位KB。</p>
+<p><code>-k</code>\<code>-m</code> 显示目录中文件的大小，-k 单位KB，-m 单位MB。</p>
+<p><code>-s</code> 仅显示目录的总值，单位KB。</p>
+<p><code>-h</code> 以K  M  G为单位显示，提高可读性。</p>
+<p><code>-x</code> 以一开始处理时的文件系统为准，若遇上其它不同的文件系统目录则略过。</p>
+<p><code>-L</code> 显示选项中所指定符号链接的源文件大小。</p>
+<p><code>-S</code> 显示个别目录的大小时，并不含其子目录的大小。</p>
+<p><code>-X</code> 在&lt;文件&gt;指定目录或文件。</p>
+<p><code>--exclude=&lt;目录或文件&gt;</code> 略过指定的目录或文件。</p>
+<p><code>-D</code> 显示指定符号链接的源文件大小。</p>
+<p><code>-H\--si</code> 与-h选项相同，但是K，M，G是以1000为换算单位。</p>
+<p><code>-l</code> 重复计算硬件链接的文件。</p>
+<p>常用：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 显示当前目录下各文件/文件夹的大小</span></span><br><span class="line"><span class="built_in">du</span> -sh *</span><br></pre></td></tr></table></figure>
+
+<h3 id="df"><a href="#df" class="headerlink" title="df"></a>df</h3><p>显示系统上可使用的磁盘空间。</p>
+<p>主要选项：</p>
+<p><code>-h</code> 以容易阅读的方式显示<br><code>-T</code> 输出时显示文件系统类型</p>
+<p>常用：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">df</span> -hT</span><br></pre></td></tr></table></figure>
+
+<h3 id="fdisk"><a href="#fdisk" class="headerlink" title="fdisk"></a>fdisk</h3><p>划分磁盘分区。</p>
+<p>常用：</p>
+<ul>
+<li>查看所有磁盘信息：</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">fdisk -l</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>对 &#x2F;dev&#x2F;sdb 磁盘进行分区操作：</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">$ fdisk /dev/sdb</span><br><span class="line">Command (m <span class="keyword">for</span> <span class="built_in">help</span>): m</span><br><span class="line">Command action</span><br><span class="line">   a   toggle a bootable flag</span><br><span class="line">   b   edit bsd disklabel</span><br><span class="line">   c   toggle the dos compatibility flag</span><br><span class="line">   d   delete a partition</span><br><span class="line">   l   list known partition types</span><br><span class="line">   m   <span class="built_in">print</span> this menu</span><br><span class="line">   n   add a new partition</span><br><span class="line">   o   create a new empty DOS partition table</span><br><span class="line">   p   <span class="built_in">print</span> the partition table</span><br><span class="line">   q   quit without saving changes</span><br><span class="line">   s   create a new empty Sun disklabel</span><br><span class="line">   t   change a partition<span class="string">&#x27;s system id</span></span><br><span class="line"><span class="string">   u   change display/entry units</span></span><br><span class="line"><span class="string">   v   verify the partition table</span></span><br><span class="line"><span class="string">   w   write table to disk and exit</span></span><br><span class="line"><span class="string">   x   extra functionality (experts only)</span></span><br></pre></td></tr></table></figure>
+
+<p>对于 fdisk 各子命令的使用，请参考：<a target="_blank" rel="noopener" href="https://blog.51cto.com/caochun/1722886">df、du、fdisk：Linux磁盘管理命令整理</a></p>
+<h2 id="6-文本管理"><a href="#6-文本管理" class="headerlink" title="6. 文本管理"></a>6. 文本管理</h2><h3 id="grep"><a href="#grep" class="headerlink" title="grep"></a>grep</h3><p>查找字符串。在一个或多个输入文件中查找含有与指定模式(正则表达式)相匹配的字符串的行。</p>
+<p>格式：<br><code>grep &lt;string&gt; &lt;dir&gt;</code></p>
+<p>主要选项：</p>
+<p><code>-c</code> 对匹配的行计数<br><code>-l</code> 只显示包含匹配的文件的文件名<br><code>-h</code> 抑制包含匹配文件的文件名的显示<br><code>-n</code> 每个匹配行只按照相对的行号显示<br><code>-i</code> 产生不区分大小写的匹配，缺省状态是区分大小写<br><code>-v</code> 列出不匹配的行<br><code>-E</code> 使用正则表达式<br><code>-o</code> 只打印匹配的部分<br><code>-P/--perl-regexp</code> 高级正则。Interpret PATTERN as a Perl regular expression.  This is highly experimental and grep -P  may  warn  of unimplemented features.</p>
+<p>示例：</p>
+<ul>
+<li><p><code>grep magic /usr/src/*</code> 在‘&#x2F;usr&#x2F;src’目录下搜索带字符串‘magic’的文件。</p>
+</li>
+<li><p><code>cat hello.c | grep hello</code> 在 cat hello.c 后显示出来的内容中，查找hello字符串</p>
+</li>
+<li><p><code>blkid | grep -oP &#39;(?&lt;=UUID=&quot;).*?(?=&quot;)&#39;</code> 获取磁盘的UUID</p>
+</li>
+</ul>
+<h3 id="echo"><a href="#echo" class="headerlink" title="echo"></a>echo</h3><p>将文本原样（参数）输出。</p>
+<p>示例：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ <span class="built_in">echo</span> hello world</span><br><span class="line">hello world</span><br></pre></td></tr></table></figure>
+
+<p><code>-n</code> 默认情况下，echo输出的文本末尾会有一个回车符，-n 可以取消末尾的回车符。<br><code>-e</code> 默认情况下，echo参数加引号（双引号和单引号）会让特殊字符变成普通字符，-e会解释引号里面的特殊字符（比如换行符\n）。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ <span class="built_in">echo</span> -e <span class="string">&quot;Hello\nWorld&quot;</span></span><br><span class="line">Hello</span><br><span class="line">World</span><br></pre></td></tr></table></figure>
+
+<h3 id="sed"><a href="#sed" class="headerlink" title="sed"></a>sed</h3><p>强大的文本编辑工具，可以使用模式匹配进行替换编辑，与 vim 类似，但 sed 使用的是<strong>流式编辑</strong>：</p>
+<ol>
+<li>每次仅读取一行内容；</li>
+<li>根据提供的规则命令匹配并修改数据。注意，sed <strong>默认不会直接修改源文件数据</strong>，而是会将数据复制到缓冲区中，修改也仅限于缓冲区中的数据；</li>
+<li>将执行结果输出。</li>
+</ol>
+<p>常用选项：</p>
+<p><code>-i</code> 直接修改源文件，慎用。</p>
+<p>常用示例：</p>
+<ul>
+<li><code>sed &quot;s/my/your/g&quot; pets.txt</code></li>
+</ul>
+<p>详情参考：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://coolshell.cn/articles/9104.html">SED 简明教程</a></li>
+<li><a target="_blank" rel="noopener" href="http://c.biancheng.net/view/4028.html">Linux sed命令完全攻略（超级详细）</a></li>
+</ul>
+<h3 id="awk"><a href="#awk" class="headerlink" title="awk"></a>awk</h3><p>一个强大的文本文件处理分析工具，和 sed 命令类似，awk 命令也是逐行扫描文件。</p>
+<p>经典格式：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">awk <span class="string">&#x27;&lt;pattern&gt;&#123;&lt;action&gt;&#125;&#x27;</span> &lt;file&gt;</span><br></pre></td></tr></table></figure>
+
+<p>pattern模式对每一行进行匹配，若匹配成功则对当前行执行action操作。模式和操作都是可选的，如果没有模式，则action应用到全部记录，如果没有action，则输出匹配全部记录。</p>
+<p>常用选项：</p>
+<p><code>-F</code> 指定分割符，默认分割符为<strong>空格</strong>或<strong>Tab</strong>，awk 会根据分隔符将<strong>每行</strong>分成多个字段。示例：<code>-F :</code> 指定冒号、<code>-F &#39;[;:]&#39;</code> 指定多个。</p>
+<p>常用内建变量：</p>
+<ul>
+<li><code>$0</code> 当前记录（这个变量中存放着整个行的内容）</li>
+<li><code>$1~$n</code> 当前记录的第n个字段，字段间由FS分隔</li>
+<li><code>FS</code> 输入字段分隔符，默认是空格或Tab</li>
+<li><code>NF</code> 当前记录中的字段个数，就是有多少列</li>
+<li><code>NR</code> 已经读出的记录数，就是行号，从1开始，如果有多个文件话，这个值也是不断累加中。</li>
+<li><code>FNR</code> 当前记录数，与NR不同的是，这个值会是各个文件自己的行号</li>
+<li><code>RS</code> 输入的记录分隔符，默认为换行符</li>
+<li><code>OFS</code> 输出字段分隔符，默认也是空格</li>
+<li><code>ORS</code> 输出的记录分隔符，默认为换行符</li>
+<li><code>FILENAME</code> 当前输入文件的名字</li>
+</ul>
+<p>常用示例：</p>
+<ul>
+<li><p>输出第1列和第4列</p>
+  <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">$ netstat -tnlp | awk <span class="string">&#x27;&#123;print $1, $4&#125;&#x27;</span></span><br><span class="line">Proto Local</span><br><span class="line">tcp 0.0.0.0:29503</span><br><span class="line">tcp 127.0.0.1:1988</span><br><span class="line">tcp 0.0.0.0:8648</span><br><span class="line">tcp 0.0.0.0:8649</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>条件判断、输出表头、格式化输出</p>
+  <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">$ netstat -tnlp | awk <span class="string">&#x27;$3==0 &amp;&amp; $6==&quot;LISTEN&quot; || NR==1 &#123;printf &quot;%-20s %-20s %s\n&quot;,$4,$5,$6&#125;&#x27;</span></span><br><span class="line">Local                Address              Foreign</span><br><span class="line">0.0.0.0:29503        0.0.0.0:*            LISTEN</span><br><span class="line">127.0.0.1:1988       0.0.0.0:*            LISTEN</span><br><span class="line">0.0.0.0:8648         0.0.0.0:*            LISTEN</span><br><span class="line">0.0.0.0:8649         0.0.0.0:*            LISTEN</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>指定分隔符和输出分隔符：</p>
+  <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ awk  -F: <span class="string">&#x27;&#123;print $1,$3,$6&#125;&#x27;</span> OFS=<span class="string">&quot;\t&quot;</span> /etc/passwd</span><br><span class="line">root    0       /root</span><br><span class="line">bin     1       /bin</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>模式匹配（正则），格式如<code>/模式/</code>、<code>~</code>表示匹配正则、<code>!~</code>表示不匹配正则：</p>
+  <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ netstat -tnlp | awk <span class="string">&#x27;$6~/LIS*/ || NR==1 &#123;print NR,$4,$5,$6&#125;&#x27;</span> netstat.txt</span><br><span class="line">1 Local Address Foreign</span><br><span class="line">2 0.0.0.0:29503 0.0.0.0:* LISTEN</span><br><span class="line">3 127.0.0.1:1988 0.0.0.0:* LISTEN</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>可自定义变量、<code>BEGIN&#123;&#125;</code> 指定读取文件前运行的动作、<code>END&#123;&#125;</code> 指定读取文件后运行的动作，如下示例统计文件的行数：</p>
+  <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">awk <span class="string">&#x27;BEGIN&#123;count=0&#125;&#123;count=count+1&#125;END&#123;print count&#125;&#x27;</span> /etc/passwd</span><br></pre></td></tr></table></figure></li>
+</ul>
+<p>详情参考：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://coolshell.cn/articles/9070.html">AWK 简明教程</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/8c6a0d0d4f0d">awk 简明教程</a></li>
+</ul>
+<h3 id="tr"><a href="#tr" class="headerlink" title="tr"></a>tr</h3><p>将输入字符串中，属于集合一的字符都替换成集合二中对应位置的字符，并输出。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">tr</span> [OPTION] SET1 [SET2]</span><br></pre></td></tr></table></figure>
+
+<p>常用选项：</p>
+<p><code>-d</code> 删除集合一中的字符<br><code>-s</code> 删除所有连续重复出现的属于集合一的字符，只保留第一个<br><code>-c</code> 用集合一的<strong>补集</strong>替换此集合，通常 <code>-cd</code> 连用</p>
+<p>示例：</p>
+<ul>
+<li>小写转大写：</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">tr</span> [:lower:] [:upper:] <span class="string">&quot;adasfa&quot;</span></span><br><span class="line"><span class="built_in">tr</span> a-z A-Z <span class="string">&quot;asdafa&quot;</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>删除非数字：</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">echo</span> asdf121341hjhio9h0 | <span class="built_in">tr</span> -<span class="built_in">cd</span> 0-9 <span class="comment"># 12134190</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>将多个空格转换为一个减号：</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">echo</span> <span class="string">&quot;20       1         3&quot;</span> | <span class="built_in">tr</span> -s <span class="string">&quot; &quot;</span> <span class="string">&quot;-&quot;</span> <span class="comment"># 20-1-3</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="7-杂项"><a href="#7-杂项" class="headerlink" title="7. 杂项"></a>7. 杂项</h2><h3 id="man"><a href="#man" class="headerlink" title="man"></a>man</h3><p>查看命令介绍。</p>
+<h3 id="history"><a href="#history" class="headerlink" title="history"></a>history</h3><p>显示历史的输入指令。</p>
+<h3 id="bc"><a href="#bc" class="headerlink" title="bc"></a>bc</h3><p>进入计算器模式，输入 <code>quit</code> 退出。</p>
+<h3 id="alias"><a href="#alias" class="headerlink" title="alias"></a>alias</h3><p>为命令取别名。例如： 执行 <code>alias look=&#39;ll -a&#39;</code> ，即使得命令 <code>look</code> 等价于 <code>ll -a</code> 。当然，这样的别名意义不大。</p>
+<p>我们可以用 <code>unalias look</code> 来删除这个别名。</p>
+<p>我们也可以在bash配置文件添加这个自定义的命令(别名)，<code>vim ~/.bashrc</code> 或 <code>vim /etc/bashrc</code> ，一个相对于当前用户，一个相对于全体用户。</p>
+<p>在**~&#x2F;.bashrc<strong>中加入：<code>alias serverOpen=&quot;python -m SimpleHTTPServer $1&quot;</code>。保存退出后，再</strong>执行 <code>source ~/.bashrc</code> 使得该配置生效**。这样之后，我们就可以用 <code>serverOpen 8080</code> 开启一个简单的8080端口的web服务器，不加端口则默认是8000端口。</p>
+<h3 id="whereis"><a href="#whereis" class="headerlink" title="whereis"></a>whereis</h3><p>whereis命令只能用于搜索程序名，而且只搜索二进制文件（选项-b）、man说明文件（选项-m）和源代码文件（选项-s）。如果省略选项，则返回所有信息。</p>
+<p>主要选项：<br><code>-b</code> 搜索二进制文件<br><code>-m</code> man说明文件<br><code>-s</code> 源码文件</p>
+<p>示例：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ whereis vim</span><br><span class="line">vim: /usr/bin/vim.basic /usr/bin/vim.tiny /usr/bin/vim /etc/vim /usr/share/vim /usr/share/man/man1/vim.1.gz</span><br><span class="line">$ whereis python</span><br><span class="line">python: /usr/bin/python2.7 /usr/bin/python3.5 /usr/bin/python3.5m /usr/bin/python /usr/lib/python2.7 /usr/lib/python3.5 /etc/python2.7 /etc/python3.5 /etc/python /usr/local/lib/python2.7 /usr/local/lib/python3.5 /usr/share/python /usr/share/man/man1/python.1.gz</span><br></pre></td></tr></table></figure>
+
+<h3 id="which"><a href="#which" class="headerlink" title="which"></a>which</h3><p>which命令是查找命令是否存在，以及命令的存放位置在哪儿。</p>
+<p>示例：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ <span class="built_in">which</span> vim</span><br><span class="line">/usr/bin/vim</span><br><span class="line">$ <span class="built_in">which</span> python</span><br><span class="line">/usr/bin/python</span><br></pre></td></tr></table></figure>
+
+<h3 id="whoami"><a href="#whoami" class="headerlink" title="whoami"></a>whoami</h3><p>显示当前用户的用户名</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/System/" rel="tag"><i class="fa fa-tag"></i> 计算机系统</a>
+              <a href="/tags/Linux/" rel="tag"><i class="fa fa-tag"></i> Linux</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/git%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0.html" rel="prev" title="git学习笔记">
+                  <i class="fa fa-chevron-left"></i> git学习笔记
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/go%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%E5%8D%B8%E8%BD%BD-linux%E7%B3%BB%E7%BB%9F.html" rel="next" title="go从入门到重装(linux系统)">
+                  go从入门到重装(linux系统) <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments gitalk-container"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">dounine</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/mist/" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+<script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.0/search.js" integrity="sha256-vXZMYLEqsROAXkEw93GGIvaB2ab+QW6w3+1ahD9nXXA=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">false</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.0/es5/tex-mml-chtml.js","integrity":"sha256-r+3itOMtGGjap0x+10hu6jW/gZCzxHsoKrOd7gyRSGY="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/gitalk/1.7.2/gitalk.css" integrity="sha256-AJnUHL7dBv6PGaeyPQJcgQPDjt/Hn/PvYZde1iqfp8U=" crossorigin="anonymous">
+
+<script class="next-config" data-name="gitalk" type="application/json">{"enable":true,"github_id":"99MyCql","repo":"99MyCql.github.io","client_id":"7c69ea063e9c78a72075","client_secret":"f222b18af36b2dffda7884ce5fd77bbb9172de54","admin_user":"99MyCql","distraction_free_mode":false,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token","language":"zh-CN","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/gitalk/1.7.2/gitalk.min.js","integrity":"sha256-Pmj85ojLaPOWwRtlMJwmezB/Qg8BzvJp5eTzvXaYAfA="},"path_md5":"cd56a6b656a74db69aaac9cd0c03d5f3"}</script>
+<script src="/js/third-party/comments/gitalk.js"></script>
+
+</body>
+</html>

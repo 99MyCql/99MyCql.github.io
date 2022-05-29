@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.2.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/golang32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/golang16.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="baidu-site-verification" content="code-RpvRDWfflk">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" integrity="sha256-DfWjNxDkM94fVBWx1H5BMMp0Zq7luBlV8QRcSES7s+0=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"blog.dounine.live","root":"/","images":"/images","scheme":"Mist","darkmode":false,"version":"8.11.1","exturl":false,"sidebar":{"position":"right","display":"always","padding":18,"offset":12},"copycode":{"enable":true,"style":"flat"},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":"gitalk","storage":true,"lazyload":false,"nav":null,"activeClass":"gitalk"},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="论文：Dean J, Ghemawat S. MapReduce: Simplified data processing on large clusters[J]. 2004. 前言MIT6.824分布式课程第一课的课前阅读要求。 MapReduce是谷歌提出的面向大规模数据的分布式并行计算模式，给大数据并行计算带来了革命性影响，MapReduce也是著名的Hadoop中相当重要的一部分。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="分布式之MapReduce——解读《MapReduce》">
+<meta property="og:url" content="https://blog.dounine.live/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BMapReduce%E2%80%94%E2%80%94%E8%A7%A3%E8%AF%BB%E3%80%8AMapReduce%E3%80%8B.html">
+<meta property="og:site_name" content="dounine&#39;s blog">
+<meta property="og:description" content="论文：Dean J, Ghemawat S. MapReduce: Simplified data processing on large clusters[J]. 2004. 前言MIT6.824分布式课程第一课的课前阅读要求。 MapReduce是谷歌提出的面向大规模数据的分布式并行计算模式，给大数据并行计算带来了革命性影响，MapReduce也是著名的Hadoop中相当重要的一部分。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://blog.dounine.live/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BMapReduce%E2%80%94%E2%80%94%E8%A7%A3%E8%AF%BB%E3%80%8AMapReduce%E3%80%8B/image.png">
+<meta property="article:published_time" content="2021-12-22T09:36:29.000Z">
+<meta property="article:modified_time" content="2021-12-22T09:36:29.000Z">
+<meta property="article:author" content="dounine">
+<meta property="article:tag" content="分布式">
+<meta property="article:tag" content="MapReduce">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://blog.dounine.live/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BMapReduce%E2%80%94%E2%80%94%E8%A7%A3%E8%AF%BB%E3%80%8AMapReduce%E3%80%8B/image.png">
+
+
+<link rel="canonical" href="https://blog.dounine.live/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BMapReduce%E2%80%94%E2%80%94%E8%A7%A3%E8%AF%BB%E3%80%8AMapReduce%E3%80%8B.html">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://blog.dounine.live/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BMapReduce%E2%80%94%E2%80%94%E8%A7%A3%E8%AF%BB%E3%80%8AMapReduce%E3%80%8B.html","path":"分布式之MapReduce——解读《MapReduce》.html","title":"分布式之MapReduce——解读《MapReduce》"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>分布式之MapReduce——解读《MapReduce》 | dounine's blog</title>
+  
+
+  <script src="/js/third-party/analytics/baidu-analytics.js"></script>
+  <script async src="https://hm.baidu.com/hm.js?66c7065aa71681df47eb23eff557978b"></script>
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">dounine's blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">18</span></a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">48</span></a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">75</span></a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-text">前言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%AE%BA%E6%96%87%E8%A7%A3%E8%AF%BB"><span class="nav-text">论文解读</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Abstract"><span class="nav-text">Abstract</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-Introduction"><span class="nav-text">1 Introduction</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-Programming-Model"><span class="nav-text">2 Programming Model</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-Example"><span class="nav-text">2.1 Example</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-Types"><span class="nav-text">2.2 Types</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-More-Examples"><span class="nav-text">2.3 More Examples</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-Implementation"><span class="nav-text">3 Implementation</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-Execution-Overview"><span class="nav-text">3.1 Execution Overview</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-Master-Data-Structures"><span class="nav-text">3.2 Master Data Structures</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-3-Fault-Tolerance"><span class="nav-text">3.3 Fault Tolerance</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Worker-Failure"><span class="nav-text">Worker Failure</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Master-Failure"><span class="nav-text">Master Failure</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Semantics-in-the-Presence-of-Failures"><span class="nav-text">Semantics in the Presence of Failures</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-4-Locality"><span class="nav-text">3.4 Locality</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-5-Task-Granularity"><span class="nav-text">3.5 Task Granularity</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-6-Backup-Tasks"><span class="nav-text">3.6 Backup Tasks</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-Refinements"><span class="nav-text">4 Refinements</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-1-Partitioning-Function"><span class="nav-text">4.1 Partitioning Function</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-Ordering-Guarantees"><span class="nav-text">4.2 Ordering Guarantees</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-3-Combiner-Function"><span class="nav-text">4.3 Combiner Function</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-4-Input-and-Output-Types"><span class="nav-text">4.4 Input and Output Types</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-5-Side-effects"><span class="nav-text">4.5 Side-effects</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-6-Skipping-Bad-Records"><span class="nav-text">4.6 Skipping Bad Records</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-7-Local-Execution"><span class="nav-text">4.7 Local Execution</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-8-Status-Information"><span class="nav-text">4.8 Status Information</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-9-Counters"><span class="nav-text">4.9 Counters</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-Performance"><span class="nav-text">5 Performance</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-Experience"><span class="nav-text">6 Experience</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-Related-Work"><span class="nav-text">7 Related Work</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#8-Conclusions"><span class="nav-text">8 Conclusions</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="dounine"
+      src="https://avatars.githubusercontent.com/u/41814469?s=400&u=48bf60a3428a3cb86a84a110c8688930cf6ceb08&v=4">
+  <p class="site-author-name" itemprop="name">dounine</p>
+  <div class="site-description" itemprop="description">回首向来萧瑟处</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">75</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">18</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">48</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/99MyCql" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;99MyCql" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+
+  <div class="links-of-blogroll site-overview-item animated">
+    <div class="links-of-blogroll-title"><i class="fa fa-globe fa-fw"></i>
+      Links
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://bkfish.gitee.io/" title="https:&#x2F;&#x2F;bkfish.gitee.io&#x2F;" rel="noopener" target="_blank">Kitty萌新的卧室</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://hitworld.github.io/" title="https:&#x2F;&#x2F;hitworld.github.io&#x2F;" rel="noopener" target="_blank">hirworld</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://wyjoutstanding.github.io/" title="https:&#x2F;&#x2F;wyjoutstanding.github.io&#x2F;" rel="noopener" target="_blank">wyjoutstanding</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://iwtf.github.io/" title="https:&#x2F;&#x2F;iwtf.github.io&#x2F;" rel="noopener" target="_blank">IWTF</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://wood1314.github.io/" title="https:&#x2F;&#x2F;wood1314.github.io&#x2F;" rel="noopener" target="_blank">wood</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://desperadoccy.github.io/" title="https:&#x2F;&#x2F;desperadoccy.github.io&#x2F;" rel="noopener" target="_blank">desperadoccy</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://doudouqaq.github.io/" title="https:&#x2F;&#x2F;doudouqaq.github.io&#x2F;" rel="noopener" target="_blank">doudouqaq</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://kylinnnnn.github.io/" title="https:&#x2F;&#x2F;kylinnnnn.github.io&#x2F;" rel="noopener" target="_blank">kylinnnnn</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://miaotony.xyz/" title="https:&#x2F;&#x2F;miaotony.xyz" rel="noopener" target="_blank">miaotony</a>
+        </li>
+    </ul>
+  </div>
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://github.com/99MyCql" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.dounine.live/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BMapReduce%E2%80%94%E2%80%94%E8%A7%A3%E8%AF%BB%E3%80%8AMapReduce%E3%80%8B.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://avatars.githubusercontent.com/u/41814469?s=400&u=48bf60a3428a3cb86a84a110c8688930cf6ceb08&v=4">
+      <meta itemprop="name" content="dounine">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dounine's blog">
+      <meta itemprop="description" content="回首向来萧瑟处">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="分布式之MapReduce——解读《MapReduce》 | dounine's blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          分布式之MapReduce——解读《MapReduce》
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-12-22 17:36:29" itemprop="dateCreated datePublished" datetime="2021-12-22T17:36:29+08:00">2021-12-22</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Pro/" itemprop="url" rel="index"><span itemprop="name">欲穷千里目，更上一层楼</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Pro/Distributed/" itemprop="url" rel="index"><span itemprop="name">分布式</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p>论文：Dean J, Ghemawat S. MapReduce: Simplified data processing on large clusters[J]. 2004.</p>
+<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p><a target="_blank" rel="noopener" href="https://pdos.csail.mit.edu/6.824/index.html">MIT6.824</a>分布式课程第一课的课前阅读要求。</p>
+<p>MapReduce是谷歌提出的面向大规模数据的分布式并行计算模式，给大数据并行计算带来了革命性影响，MapReduce也是著名的Hadoop中相当重要的一部分。</p>
+<span id="more"></span>
+
+<h1 id="论文解读"><a href="#论文解读" class="headerlink" title="论文解读"></a>论文解读</h1><h2 id="Abstract"><a href="#Abstract" class="headerlink" title="Abstract"></a>Abstract</h2><p>MapReduce用于大数据的计算。</p>
+<p>用户可定义一个 map 函数，用于处理一个键值对，并生成一堆中间键值对；同时，用户再定义一个 reduce 函数，它用于合并所有 key 相同的中间键值对。</p>
+<h2 id="1-Introduction"><a href="#1-Introduction" class="headerlink" title="1 Introduction"></a>1 Introduction</h2><p>map 和 reduct 的设计理念受 Lisp 等函数式语言的启发。</p>
+<p>我们意识到大部分计算都可以：先用一个 map 操作去计算输入中的每个逻辑单位，得出一个包含中间态键值对的集合；然后再用一个 reduce 操作去合并所有 key 相同的 value 。</p>
+<blockquote>
+<p>We realized that most of our computations involved applying a map operation to each logical “record” in our input in order to compute a set of intermediate key&#x2F;value pairs, and then applying a reduce operation to all the values that shared the same key, in order to combine the derived data appropriately.</p>
+</blockquote>
+<p>容错的主要机制：重新执行。</p>
+<p>第2节介绍基础的程序模型和几个样例；第3节介绍在集群计算环境下， MapReduce 接口的简单实现；第4节介绍几种我们认为有用的程序模型的改良；第5节展示在各种各样任务上的测量；第6节展示 MapReduce 在谷歌内部的使用，包括使用经验；第7节讨论未来相关的工作。</p>
+<h2 id="2-Programming-Model"><a href="#2-Programming-Model" class="headerlink" title="2 Programming Model"></a>2 Programming Model</h2><p>程序的输入和输出都是键值对集合。使用 MapReduce 的用户需要将计算过程表示成两个函数：Map 和 Reduce 。</p>
+<ul>
+<li>Map 函数。由用户自定义，输入一个键值对，进行处理后，输出一组中间键值对。MapReduce 会将其中 key 相同的键值对的 value 合并起来，关联到同一个 key ，并将其传给 Reduce 函数。</li>
+<li>Reduce 函数。也由用户自定义，接收一个中间键值对的 key 和该 key 对应的一组 value 。Reduce 会将这些 value 合并起来，输出一组新的 value ，不过通常它只输出零或一个值。输入中的一组 value 会通过一个迭代器传递，防止数据量太大而导致内存无法容纳。</li>
+</ul>
+<h3 id="2-1-Example"><a href="#2-1-Example" class="headerlink" title="2.1 Example"></a>2.1 Example</h3><p>统计大量文档中各单词出现的次数：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">map</span>(String key, String value):</span><br><span class="line">  <span class="comment">// key: document name</span></span><br><span class="line">  <span class="comment">// value: document contents</span></span><br><span class="line">  <span class="keyword">for</span> each word w in value:</span><br><span class="line">    EmitIntermediate(w, <span class="string">&quot;1&quot;</span>);</span><br><span class="line"></span><br><span class="line">reduce(String key, Iterator values):</span><br><span class="line">  <span class="comment">// key: a word</span></span><br><span class="line">  <span class="comment">// values: a list of counts</span></span><br><span class="line">  <span class="type">int</span> result = <span class="number">0</span>;</span><br><span class="line">  <span class="keyword">for</span> each v in values:</span><br><span class="line">    result += ParseInt(v);</span><br><span class="line">  Emit(AsString(result));</span><br></pre></td></tr></table></figure>
+
+
+<h3 id="2-2-Types"><a href="#2-2-Types" class="headerlink" title="2.2 Types"></a>2.2 Types</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">map</span>    (k1,v1)       → <span class="built_in">list</span>(k2,v2)</span><br><span class="line">reduce (k2,<span class="built_in">list</span>(v2)) → <span class="built_in">list</span>(v2)</span><br></pre></td></tr></table></figure>
+
+
+<p>map函数输入的键值对<code>(k1,v1)</code> 和输出的中间键值对<code>(k2,v2)</code>属于不同域，比如在上述示例中：对于map函数，<code>(k1,v1)</code>是文档名和文档内容，而<code>(k2,v2)</code>则是单词和出现次数，；而对于reduce函数，输入的<code>v2</code>是单词出现次数，输出也是单词出现次数，属于同一域。</p>
+<h3 id="2-3-More-Examples"><a href="#2-3-More-Examples" class="headerlink" title="2.3 More Examples"></a>2.3 More Examples</h3><ul>
+<li>Distributed Grep：map函数输出被匹配的行，reduce函数则只是拷贝输入到输出。</li>
+<li>Count of URL Access Frequency：map输入请求日志并输出<code>&lt;URL, 1&gt;</code>，reduce求和URL相同的键值对的值并输出<code>&lt;URL, total count&gt;</code>。</li>
+<li>Reverse Web-Link Graph：map函数输出<code>&lt;target, source&gt;</code>，target是指向目标URL的链接，source是链接所在页面的名称；reduce函数将所有target相同的source集合起来，输出<code>&lt;target, list(source)&gt;</code>。</li>
+<li>Term-Vector per Host</li>
+<li>Inverted Index</li>
+<li>Distributed Sort</li>
+</ul>
+<h2 id="3-Implementation"><a href="#3-Implementation" class="headerlink" title="3 Implementation"></a>3 Implementation</h2><p>本节所介绍的MapReduce实现将基于大规模计算机集群。</p>
+<h3 id="3-1-Execution-Overview"><a href="#3-1-Execution-Overview" class="headerlink" title="3.1 Execution Overview"></a>3.1 Execution Overview</h3><p>Map函数分布在多个机器上，输入数据将被自动分为M片，每一片可被不同机器并行地处理。中间键值对通过一个分区函数（partitioning function）分为R片，R和分区函数由用户自定义。</p>
+<p>MapReduce调用过程如下：</p>
+<p><img src="/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BMapReduce%E2%80%94%E2%80%94%E8%A7%A3%E8%AF%BB%E3%80%8AMapReduce%E3%80%8B/image.png" alt="1"></p>
+<ol>
+<li>MapReduce库先将输入文件分为M片，每片通常16MB到64MB。然后它将唤醒程序对应的集群。</li>
+<li>集群存在一个特殊的节点master，其余都为worker。总共有M个Map任务和R个Reduce任务，由master分配给相应的worker。</li>
+<li>负责Map任务的worker，从对应的片段中读取输入数据（M个Map worker与输入的M个片段一一对应）。它从输入中解析出键值对，然后将每一个传递给用户定义的Map函数。Map函数处理后输出中间键值对，并缓存在内存中。</li>
+<li>缓存的中间键值对会周期性地写入磁盘中，并被分区函数（比如<code>hash(key) mod R</code>，保证不同map输出的相同key都在同一个序号的分区中）分为R个分区（对应R个Reduce任务，比如第i个分区对应第i个Reduce）。这些缓存的中间键值对的位置会被告知给master，master会将位置传达给Reduce worker。</li>
+<li>当Reduce worker被master告知中间键值对位置后，它会通过远程调用读取对应Map worker磁盘中的数据（第i个Reduce读取所有Map中第i个分区的数据）。当Reduce worker读取了所有的中间键值对，<strong>它会根据key进行排序</strong> ，因此相同key的中间键值对会组合在一起。如果数据量太大无法放入内存，则需进行外部排序。</li>
+<li>Reduce worker会遍历排好序的中间键值对，将每一个唯一的key和对应的一组value传递给用户定义的Reduce函数，输出结果将追加到当前reduce分区对应的最终文件。</li>
+<li>当所有map和reduce任务完成，master将唤醒并返回用户程序。</li>
+</ol>
+<p>当MapReduce成功执行完成，结果将会存放在R个输出文件中（对应Reduce任务个数）。用户并不需要合并这R个文件，它们通常会作为下一个MapReduce任务的输入或者应用到下一个分布式任务。</p>
+<h3 id="3-2-Master-Data-Structures"><a href="#3-2-Master-Data-Structures" class="headerlink" title="3.2 Master Data Structures"></a>3.2 Master Data Structures</h3><p>master节点保存每个map和reduce任务的状态、每态计算机的标识、已完成的map worker的输出数据的位置和大小。</p>
+<h3 id="3-3-Fault-Tolerance"><a href="#3-3-Fault-Tolerance" class="headerlink" title="3.3 Fault Tolerance"></a>3.3 Fault Tolerance</h3><h4 id="Worker-Failure"><a href="#Worker-Failure" class="headerlink" title="Worker Failure"></a>Worker Failure</h4><p>master定期ping每一个worker，如果某个worker一段时间内没有响应，则将其标记为failed失败。</p>
+<p><strong>对于失败worker中的map任务，不管任务已完成还是在进行中，都将被重置为idle初始状态，并分配给另一个worker。</strong> 因为，失败worker中map任务的输出被保存在失败worker电脑的本地磁盘。</p>
+<p>对于失败worker中的reduce任务，若任务已完成则不需要被重新执行，因为它们的输出被保存在全局文件系统。</p>
+<p>当一个map任务先被worker A执行再被worker B执行（A出现异常）时，所有从A读取输入数据的正在执行的reduce任务将被通知重新执行。</p>
+<h4 id="Master-Failure"><a href="#Master-Failure" class="headerlink" title="Master Failure"></a>Master Failure</h4><p>将master的相关数据周期性地写入checkpoint检查点，如果master失效，一个新的副本将从最近一次的checkpoint启动。然而，master只有一个节点，是不可能失效的（？）。如果master失效，将中止MapReduce计算。客户端可检查此条件，并重试MapReduce计算。</p>
+<blockquote>
+<p>It is easy to make the master write periodic checkpoints of the master data structures described above. If the master task dies, a new copy can be started from the last checkpointed state. However, given that there is only a single master, its failure is unlikely; therefore our current implementation aborts the MapReduce computation if the master fails. Clients can check for this condition and retry the MapReduce operation if they desire.</p>
+</blockquote>
+<h4 id="Semantics-in-the-Presence-of-Failures"><a href="#Semantics-in-the-Presence-of-Failures" class="headerlink" title="Semantics in the Presence of Failures"></a>Semantics in the Presence of Failures</h4><p>map和reduce任务的提交都是原子操作。</p>
+<p><strong>每一个正在运行的任务会将输出写到私有的暂存文件中</strong> ，reduce任务产生一个这样的文件，map任务产生R个这样的文件（每个对应一个reduce任务？）。</p>
+<p><strong>当map任务完成时，worker会向master发送一条消息，包含R个暂存文件的名字</strong> 。如果master已接受过该消息，则忽略，否则将消息数据记录到本地。</p>
+<p><strong>当reduce任务完成时，worker会原子地将其输出的暂存文件重命名为最终输出文件</strong> 。如果相同的reduce任务被多台机器执行，多个重命名操作会被执行在最终输出文件上，但由于原子性，我们能保证最终文件仅包含一个reduce任务所产生的数据。</p>
+<h3 id="3-4-Locality"><a href="#3-4-Locality" class="headerlink" title="3.4 Locality"></a>3.4 Locality</h3><p>master在调度map任务时会考虑输入数据文件的位置信息。尽量在包含该相关输入数据的副本的机器上执行map任务。如果任务失败，master会尝试在保存输入数据副本的邻近机器上执行map任务（比如同一网络中）。</p>
+<h3 id="3-5-Task-Granularity"><a href="#3-5-Task-Granularity" class="headerlink" title="3.5 Task Granularity"></a>3.5 Task Granularity</h3><p>我们将map任务划分成M个，reduce任务划分成R个，同时M和R远远大于worker的数量。</p>
+<p>master必须执行O(M+R)次调度，并在内存中保存O(M*R)个状态。</p>
+<p>R通常由用户定义，因为最终会有R个输出文件。实际中，M的值会保证每份独立的输入数据在16MB在64MB之间，R的值则应该是worker的倍数。比如：2000个worker，M&#x3D;200000，R&#x3D;5000。</p>
+<h3 id="3-6-Backup-Tasks"><a href="#3-6-Backup-Tasks" class="headerlink" title="3.6 Backup Tasks"></a>3.6 Backup Tasks</h3><p>导致MapReduce总时间延长的一个常见原因是存在“落伍者”——一台机器在执行最后几个map或reduce时，花费了比平时更长的时间。“落伍者”出现的原因有很多，比如磁盘出现了错误，读写速度从30MB&#x2F;s下降到1MB&#x2F;s。</p>
+<p>我们有一个常用方法来解决“落伍者”问题，当MapReduce任务快完成时，master将会<strong>备份执行</strong> 正在运行中的剩余任务，只要主任务或备份任务完成，任务就会被标记为已完成。</p>
+<p>使用该机制只会比不使用多花费几个百分比的计算资源，但能显著减少运行大型计算所需要的时间。</p>
+<h2 id="4-Refinements"><a href="#4-Refinements" class="headerlink" title="4 Refinements"></a>4 Refinements</h2><h3 id="4-1-Partitioning-Function"><a href="#4-1-Partitioning-Function" class="headerlink" title="4.1 Partitioning Function"></a>4.1 Partitioning Function</h3><p>reduce任务&#x2F;输出文件数量R由用户定义，中间键值对被分区函数分为R份。一个默认的分区函数通常使用HASH，比如：<code>hash(key) mod R</code>，再比如：中间key是URL，且想要域名相同的最终在一个输出文件中，分区函数可定义为<code>hash(Hostname(urlkey)) mod R</code>。</p>
+<h3 id="4-2-Ordering-Guarantees"><a href="#4-2-Ordering-Guarantees" class="headerlink" title="4.2 Ordering Guarantees"></a>4.2 Ordering Guarantees</h3><p>对于一个给定的分区，中间键值对会根据key升序排列。这种顺序能保证分区对应的输出文件是有序的。有时这很有用。</p>
+<h3 id="4-3-Combiner-Function"><a href="#4-3-Combiner-Function" class="headerlink" title="4.3 Combiner Function"></a>4.3 Combiner Function</h3><p>在很多情况下，不同map任务会产生相同的中间键值对。比如在单词统计的MapReduce程序中，每个map任务都会产生数以千计的<code>&lt;the, 1&gt;</code>键值对，所有这些键值对会被发送给单个reduce任务。我们允许<strong>用户定义一个Combiner函数，在数据发送之前，可以通过该函数将数据进行部分合并</strong> 。</p>
+<p>Combiner函数在map任务运行的每台机器上执行。通常Combiner函数和Reduce函数代码一样（？），不同在于Reduce函数输出到最终文件，Combiner函数输出到中间文件。</p>
+<p>部分合并会明显提升某类MapReduce操作的速度。</p>
+<h3 id="4-4-Input-and-Output-Types"><a href="#4-4-Input-and-Output-Types" class="headerlink" title="4.4 Input and Output Types"></a>4.4 Input and Output Types</h3><p>MapReduce支持读取不同形式的输入数据，例如：对于文本数据，每一行当作一对key&#x2F;value。</p>
+<p>用户可以使用预定义的输入格式，也可以实现reader接口用来支持新的输入格式。reader函数不仅可以从文件中读取数据，也可以从数据库、内存中读取。</p>
+<p>同样，我们也提供预定义的输出格式用于产生输出，当然用户也可以自定义。</p>
+<h3 id="4-5-Side-effects"><a href="#4-5-Side-effects" class="headerlink" title="4.5 Side-effects"></a>4.5 Side-effects</h3><p>在某些情况下，用户为了便利，会在执行map或reduce任务时产生额外的辅助文件。我们需要用户保证这些副作用(side-effects)的原子性和幂等性(idempotent)。</p>
+<p>我们不支持一个任务产生多个输出文件所带来的两段原子提交。。。（没搞懂，原文如下）</p>
+<blockquote>
+<p>We do not provide support for atomic two-phase commits of multiple output fifiles produced by a single task.Therefore, tasks that produce multiple output fifiles withcross-fifile consistency requirements should be deterministic. This restriction has never been an issue in practice.</p>
+</blockquote>
+<h3 id="4-6-Skipping-Bad-Records"><a href="#4-6-Skipping-Bad-Records" class="headerlink" title="4.6 Skipping Bad Records"></a>4.6 Skipping Bad Records</h3><p>有时，某个记录(record)会导致Map或Reduce函数崩溃，这些bug会阻止MapReduce的完成。</p>
+<p>通常的方法是去修复这个bug，但有时候是不可修复的，比如bug在第三方库中。我们提供了一种<strong>可选的执行模式</strong> ，MapReduce检测到某个记录会导致崩溃时，将会跳过这个记录。</p>
+<p>具体细节是，worker上运行一个捕获内存段异常(segmentation violation)和总线错误(bus error)的handler。在调用Map或Reduce函数之前，MapReduce会保存参数的序号。如果程序产生错误信号(signal)，handler就会向master发送一个包含参数序号的”last gasp”UDP包。如果master发现这个记录出现了不止一次错误，就会标记这个记录，并让重新执行的Map或Reduce任务跳过它。</p>
+<h3 id="4-7-Local-Execution"><a href="#4-7-Local-Execution" class="headerlink" title="4.7 Local Execution"></a>4.7 Local Execution</h3><p>调试分布式系统是一个棘手的问题，为了方便调试，我们实现了另一种MapReduce——可以在本地机器上顺序执行所有操作。</p>
+<h3 id="4-8-Status-Information"><a href="#4-8-Status-Information" class="headerlink" title="4.8 Status Information"></a>4.8 Status Information</h3><p>在master中，运行着一个HTTP服务器，它向用户展示一些状态页面。这些状态页面展示计算的进度，比如：<code>how many tasks have been completed, how many are inprogress, bytes of input, bytes of intermediate data, bytes of output, processing rates, etc</code>。页面还包含每个任务产生的错误和输出文件的链接。用户可以通过页面估计时间、添加计算资源、分析调试等等。</p>
+<h3 id="4-9-Counters"><a href="#4-9-Counters" class="headerlink" title="4.9 Counters"></a>4.9 Counters</h3><p>MapReduce还提供计数器counter用于记录不同事件发生的次数，比如已处理单词的个数。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Counter* uppercase;</span><br><span class="line">uppercase = GetCounter(<span class="string">&quot;uppercase&quot;</span>);</span><br><span class="line"><span class="built_in">map</span>(String name, String contents):</span><br><span class="line">  <span class="keyword">for</span> each word w in contents:</span><br><span class="line">    <span class="keyword">if</span> (IsCapitalized(w)):</span><br><span class="line">      uppercase-&gt;Increment();</span><br><span class="line">    EmitIntermediate(w, <span class="string">&quot;1&quot;</span>);</span><br></pre></td></tr></table></figure>
+
+
+<p>每隔一段时间，计数器的值会从不同worker上报给master。来自已成功完成的map和reduce任务的counter值，会被master集合起来，并在MapReduce完成后返回给用户代码。同时，counter值也在状态页面展示给用户。聚合counter值时，master会剔除重复执行的任务。</p>
+<h2 id="5-Performance"><a href="#5-Performance" class="headerlink" title="5 Performance"></a>5 Performance</h2><p>略</p>
+<h2 id="6-Experience"><a href="#6-Experience" class="headerlink" title="6 Experience"></a>6 Experience</h2><p>略</p>
+<h2 id="7-Related-Work"><a href="#7-Related-Work" class="headerlink" title="7 Related Work"></a>7 Related Work</h2><p>略</p>
+<h2 id="8-Conclusions"><a href="#8-Conclusions" class="headerlink" title="8 Conclusions"></a>8 Conclusions</h2><p>MapReduce成功的原因：</p>
+<ol>
+<li>易于使用（抽象性好）。</li>
+<li>很多问题都能用MapReduce表示。</li>
+<li>已经成熟，可以扩展到数千台机器上使用。</li>
+</ol>
+<p>这项工作中的启发：</p>
+<ol>
+<li>通过<strong>限制编程模式</strong> 可以让并行分布式计算和计算容错更加容易。</li>
+<li><strong>网络是一种紧缺资源</strong> 。因此我们进行了许多优化，比如：从本地读取数据、将中间数据暂存到本地。</li>
+<li>可以使用<strong>冗余执行</strong> ，来减少速度比较慢的机器所带来的影响，以及处理计算机故障和数据丢失。</li>
+</ol>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Distributed/" rel="tag"><i class="fa fa-tag"></i> 分布式</a>
+              <a href="/tags/MapReduce/" rel="tag"><i class="fa fa-tag"></i> MapReduce</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BRaft%E2%80%94%E2%80%94%E8%A7%A3%E8%AF%BB%E3%80%8ARaft%E3%80%8B.html" rel="prev" title="分布式之Raft——解读《Raft》">
+                  <i class="fa fa-chevron-left"></i> 分布式之Raft——解读《Raft》
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/%E5%8C%BA%E5%9D%97%E9%93%BE%E4%B9%8B%E5%85%B1%E8%AF%86%E2%80%94%E2%80%94%E8%A7%A3%E8%AF%BB%E3%80%8A%E5%8C%BA%E5%9D%97%E9%93%BE%E5%85%B1%E8%AF%86%E5%8D%8F%E8%AE%AE%E7%BB%BC%E8%BF%B0%E3%80%8B.html" rel="next" title="区块链之共识——解读《区块链共识协议综述》">
+                  区块链之共识——解读《区块链共识协议综述》 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments gitalk-container"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">dounine</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/mist/" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+<script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.0/search.js" integrity="sha256-vXZMYLEqsROAXkEw93GGIvaB2ab+QW6w3+1ahD9nXXA=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.0/es5/tex-mml-chtml.js","integrity":"sha256-r+3itOMtGGjap0x+10hu6jW/gZCzxHsoKrOd7gyRSGY="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/gitalk/1.7.2/gitalk.css" integrity="sha256-AJnUHL7dBv6PGaeyPQJcgQPDjt/Hn/PvYZde1iqfp8U=" crossorigin="anonymous">
+
+<script class="next-config" data-name="gitalk" type="application/json">{"enable":true,"github_id":"99MyCql","repo":"99MyCql.github.io","client_id":"7c69ea063e9c78a72075","client_secret":"f222b18af36b2dffda7884ce5fd77bbb9172de54","admin_user":"99MyCql","distraction_free_mode":false,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token","language":"zh-CN","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/gitalk/1.7.2/gitalk.min.js","integrity":"sha256-Pmj85ojLaPOWwRtlMJwmezB/Qg8BzvJp5eTzvXaYAfA="},"path_md5":"e6d868276d109bc0c82cdd4cb780512c"}</script>
+<script src="/js/third-party/comments/gitalk.js"></script>
+
+</body>
+</html>

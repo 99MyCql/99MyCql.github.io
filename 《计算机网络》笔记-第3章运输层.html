@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.2.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/golang32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/golang16.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="baidu-site-verification" content="code-RpvRDWfflk">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" integrity="sha256-DfWjNxDkM94fVBWx1H5BMMp0Zq7luBlV8QRcSES7s+0=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"blog.dounine.live","root":"/","images":"/images","scheme":"Mist","darkmode":false,"version":"8.11.1","exturl":false,"sidebar":{"position":"right","display":"always","padding":18,"offset":12},"copycode":{"enable":true,"style":"flat"},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":"gitalk","storage":true,"lazyload":false,"nav":null,"activeClass":"gitalk"},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="[TOC] 0. 前言 Chapter 3 Transport Layer  应用层处理应用之间的通信，而运输层则负责：把同台主机上各进程发送的数据收集起来交给网络层，并将从网络层收到的数据分发给各进程。 与此同时，运输层的TCP协议还向应用层提供了极其重要的可靠数据传输。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="《计算机网络》笔记-第3章运输层">
+<meta property="og:url" content="https://blog.dounine.live/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC3%E7%AB%A0%E8%BF%90%E8%BE%93%E5%B1%82.html">
+<meta property="og:site_name" content="dounine&#39;s blog">
+<meta property="og:description" content="[TOC] 0. 前言 Chapter 3 Transport Layer  应用层处理应用之间的通信，而运输层则负责：把同台主机上各进程发送的数据收集起来交给网络层，并将从网络层收到的数据分发给各进程。 与此同时，运输层的TCP协议还向应用层提供了极其重要的可靠数据传输。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://blog.dounine.live/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC3%E7%AB%A0%E8%BF%90%E8%BE%93%E5%B1%82/1.png">
+<meta property="og:image" content="https://blog.dounine.live/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC3%E7%AB%A0%E8%BF%90%E8%BE%93%E5%B1%82/2.png">
+<meta property="og:image" content="https://blog.dounine.live/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC3%E7%AB%A0%E8%BF%90%E8%BE%93%E5%B1%82/3.png">
+<meta property="og:image" content="https://blog.dounine.live/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC3%E7%AB%A0%E8%BF%90%E8%BE%93%E5%B1%82/4.png">
+<meta property="og:image" content="https://blog.dounine.live/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC3%E7%AB%A0%E8%BF%90%E8%BE%93%E5%B1%82/5.png">
+<meta property="og:image" content="https://blog.dounine.live/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC3%E7%AB%A0%E8%BF%90%E8%BE%93%E5%B1%82/6.png">
+<meta property="og:image" content="https://blog.dounine.live/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC3%E7%AB%A0%E8%BF%90%E8%BE%93%E5%B1%82/7.png">
+<meta property="og:image" content="https://blog.dounine.live/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC3%E7%AB%A0%E8%BF%90%E8%BE%93%E5%B1%82/8.png">
+<meta property="og:image" content="https://blog.dounine.live/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC3%E7%AB%A0%E8%BF%90%E8%BE%93%E5%B1%82/9.png">
+<meta property="og:image" content="https://blog.dounine.live/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC3%E7%AB%A0%E8%BF%90%E8%BE%93%E5%B1%82/10.png">
+<meta property="og:image" content="https://blog.dounine.live/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC3%E7%AB%A0%E8%BF%90%E8%BE%93%E5%B1%82/11.png">
+<meta property="og:image" content="https://blog.dounine.live/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC3%E7%AB%A0%E8%BF%90%E8%BE%93%E5%B1%82/12.png">
+<meta property="og:image" content="https://blog.dounine.live/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC3%E7%AB%A0%E8%BF%90%E8%BE%93%E5%B1%82/13.png">
+<meta property="og:image" content="https://blog.dounine.live/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC3%E7%AB%A0%E8%BF%90%E8%BE%93%E5%B1%82/16.png">
+<meta property="og:image" content="https://blog.dounine.live/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC3%E7%AB%A0%E8%BF%90%E8%BE%93%E5%B1%82/14.png">
+<meta property="og:image" content="https://blog.dounine.live/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC3%E7%AB%A0%E8%BF%90%E8%BE%93%E5%B1%82/15.png">
+<meta property="og:image" content="https://blog.dounine.live/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC3%E7%AB%A0%E8%BF%90%E8%BE%93%E5%B1%82/17.png">
+<meta property="og:image" content="https://blog.dounine.live/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC3%E7%AB%A0%E8%BF%90%E8%BE%93%E5%B1%82/18.png">
+<meta property="og:image" content="https://blog.dounine.live/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC3%E7%AB%A0%E8%BF%90%E8%BE%93%E5%B1%82/19.png">
+<meta property="og:image" content="https://blog.dounine.live/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC3%E7%AB%A0%E8%BF%90%E8%BE%93%E5%B1%82/20.png">
+<meta property="og:image" content="https://blog.dounine.live/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC3%E7%AB%A0%E8%BF%90%E8%BE%93%E5%B1%82/21.png">
+<meta property="og:image" content="https://blog.dounine.live/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC3%E7%AB%A0%E8%BF%90%E8%BE%93%E5%B1%82/22.png">
+<meta property="og:image" content="https://blog.dounine.live/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC3%E7%AB%A0%E8%BF%90%E8%BE%93%E5%B1%82/23.png">
+<meta property="og:image" content="https://blog.dounine.live/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC3%E7%AB%A0%E8%BF%90%E8%BE%93%E5%B1%82/24.png">
+<meta property="og:image" content="https://blog.dounine.live/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC3%E7%AB%A0%E8%BF%90%E8%BE%93%E5%B1%82/25.png">
+<meta property="og:image" content="https://blog.dounine.live/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC3%E7%AB%A0%E8%BF%90%E8%BE%93%E5%B1%82/26.png">
+<meta property="og:image" content="https://blog.dounine.live/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC3%E7%AB%A0%E8%BF%90%E8%BE%93%E5%B1%82/27.png">
+<meta property="og:image" content="https://blog.dounine.live/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC3%E7%AB%A0%E8%BF%90%E8%BE%93%E5%B1%82/28.png">
+<meta property="og:image" content="https://blog.dounine.live/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC3%E7%AB%A0%E8%BF%90%E8%BE%93%E5%B1%82/29.png">
+<meta property="og:image" content="https://blog.dounine.live/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC3%E7%AB%A0%E8%BF%90%E8%BE%93%E5%B1%82/30.png">
+<meta property="og:image" content="https://blog.dounine.live/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC3%E7%AB%A0%E8%BF%90%E8%BE%93%E5%B1%82/31.png">
+<meta property="og:image" content="https://blog.dounine.live/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC3%E7%AB%A0%E8%BF%90%E8%BE%93%E5%B1%82/32.png">
+<meta property="og:image" content="https://blog.dounine.live/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC3%E7%AB%A0%E8%BF%90%E8%BE%93%E5%B1%82/33.png">
+<meta property="og:image" content="https://blog.dounine.live/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC3%E7%AB%A0%E8%BF%90%E8%BE%93%E5%B1%82/35.png">
+<meta property="og:image" content="https://blog.dounine.live/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC3%E7%AB%A0%E8%BF%90%E8%BE%93%E5%B1%82/34.png">
+<meta property="og:image" content="https://blog.dounine.live/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC3%E7%AB%A0%E8%BF%90%E8%BE%93%E5%B1%82/36.png">
+<meta property="og:image" content="https://blog.dounine.live/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC3%E7%AB%A0%E8%BF%90%E8%BE%93%E5%B1%82/37.png">
+<meta property="article:published_time" content="2020-03-12T05:07:28.000Z">
+<meta property="article:modified_time" content="2020-03-12T05:07:28.000Z">
+<meta property="article:author" content="dounine">
+<meta property="article:tag" content="计算机网络">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://blog.dounine.live/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC3%E7%AB%A0%E8%BF%90%E8%BE%93%E5%B1%82/1.png">
+
+
+<link rel="canonical" href="https://blog.dounine.live/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC3%E7%AB%A0%E8%BF%90%E8%BE%93%E5%B1%82.html">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://blog.dounine.live/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC3%E7%AB%A0%E8%BF%90%E8%BE%93%E5%B1%82.html","path":"《计算机网络》笔记-第3章运输层.html","title":"《计算机网络》笔记-第3章运输层"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>《计算机网络》笔记-第3章运输层 | dounine's blog</title>
+  
+
+  <script src="/js/third-party/analytics/baidu-analytics.js"></script>
+  <script async src="https://hm.baidu.com/hm.js?66c7065aa71681df47eb23eff557978b"></script>
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">dounine's blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">18</span></a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">48</span></a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">75</span></a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#0-%E5%89%8D%E8%A8%80"><span class="nav-text">0. 前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-Introduction-and-Transport-Layer-Services-%E6%A6%82%E8%BF%B0%E5%92%8C%E8%BF%90%E8%BE%93%E5%B1%82%E6%9C%8D%E5%8A%A1"><span class="nav-text">1. Introduction and Transport-Layer Services(概述和运输层服务)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-Multiplexing-and-Demultiplexing-%E5%A4%9A%E8%B7%AF%E5%A4%8D%E7%94%A8%E5%92%8C%E5%A4%9A%E8%B7%AF%E5%88%86%E8%A7%A3"><span class="nav-text">2. Multiplexing and Demultiplexing(多路复用和多路分解)</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-%E5%A5%97%E6%8E%A5%E5%AD%97"><span class="nav-text">2.1. 套接字</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-%E6%97%A0%E8%BF%9E%E6%8E%A5%EF%BC%88UDP%EF%BC%89%E7%9A%84%E5%A4%9A%E8%B7%AF%E5%A4%8D%E7%94%A8%E5%92%8C%E5%A4%9A%E8%B7%AF%E5%88%86%E8%A7%A3"><span class="nav-text">2.2. 无连接（UDP）的多路复用和多路分解</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-%E9%9D%A2%E5%90%91%E8%BF%9E%E6%8E%A5%EF%BC%88TCP%EF%BC%89%E7%9A%84%E5%A4%9A%E8%B7%AF%E5%A4%8D%E7%94%A8%E5%92%8C%E5%A4%9A%E8%B7%AF%E5%88%86%E8%A7%A3"><span class="nav-text">2.3. 面向连接（TCP）的多路复用和多路分解</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-Connectionless-Transport-UDP-%E6%97%A0%E8%BF%9E%E6%8E%A5%E8%BF%90%E8%BE%93%EF%BC%9AUDP"><span class="nav-text">3. Connectionless Transport: UDP(无连接运输：UDP)</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-UDP%E6%8A%A5%E6%96%87%E6%AE%B5%E7%BB%93%E6%9E%84"><span class="nav-text">3.1. UDP报文段结构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-UDP%E6%A0%A1%E9%AA%8C%E5%92%8C"><span class="nav-text">3.2. UDP校验和</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-Principles-of-Reliable-Data-Transfer-%E5%8F%AF%E9%9D%A0%E6%95%B0%E6%8D%AE%E4%BC%A0%E8%BE%93%E5%8E%9F%E7%90%86"><span class="nav-text">4. Principles of Reliable Data Transfer(可靠数据传输原理)</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-1-%E6%9E%84%E9%80%A0%E5%8F%AF%E9%9D%A0%E6%95%B0%E6%8D%AE%E4%BC%A0%E8%BE%93%E5%8D%8F%E8%AE%AE"><span class="nav-text">4.1. 构造可靠数据传输协议</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#4-1-1-%E7%BB%8F%E5%AE%8C%E5%85%A8%E5%8F%AF%E9%9D%A0%E4%BF%A1%E9%81%93%E7%9A%84%E5%8F%AF%E9%9D%A0%E6%95%B0%E6%8D%AE%E4%BC%A0%E8%BE%93%EF%BC%9Ardt1-0"><span class="nav-text">4.1.1. 经完全可靠信道的可靠数据传输：rdt1.0</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-1-2-%E7%BB%8F%E5%85%B7%E6%9C%89%E6%AF%94%E7%89%B9%E5%B7%AE%E9%94%99%E4%BF%A1%E9%81%93%E7%9A%84%E5%8F%AF%E9%9D%A0%E6%95%B0%E6%8D%AE%E4%BC%A0%E8%BE%93%EF%BC%9Ardt2-x-%E8%87%AA%E5%8A%A8%E9%87%8D%E4%BC%A0%E8%AF%B7%E6%B1%82%E5%8D%8F%E8%AE%AEARQ"><span class="nav-text">4.1.2. 经具有比特差错信道的可靠数据传输：rdt2.x - 自动重传请求协议ARQ</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#4-1-2-1-rdt2-0-%E5%81%9C%E7%AD%89%E5%8D%8F%E8%AE%AE"><span class="nav-text">4.1.2.1. rdt2.0 - 停等协议</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#4-1-2-2-rdt2-1"><span class="nav-text">4.1.2.2. rdt2.1</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#4-1-2-3-rdt2-2"><span class="nav-text">4.1.2.3. rdt2.2</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-1-3-%E7%BB%8F%E5%85%B7%E6%9C%89%E6%AF%94%E7%89%B9%E5%B7%AE%E9%94%99%E7%9A%84%E4%B8%A2%E5%8C%85%E4%BF%A1%E9%81%93%E7%9A%84%E5%8F%AF%E9%9D%A0%E6%95%B0%E6%8D%AE%E4%BC%A0%E8%BE%93%EF%BC%9Ardt3-0-%E6%AF%94%E7%89%B9%E4%BA%A4%E6%9B%BF%E5%8D%8F%E8%AE%AE"><span class="nav-text">4.1.3. 经具有比特差错的丢包信道的可靠数据传输：rdt3.0 - 比特交替协议</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-%E6%B5%81%E6%B0%B4%E7%BA%BF%E5%8F%AF%E9%9D%A0%E6%95%B0%E6%8D%AE%E4%BC%A0%E8%BE%93%E5%8D%8F%E8%AE%AE"><span class="nav-text">4.2. 流水线可靠数据传输协议</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#4-2-1-%E5%9B%9E%E9%80%80N%E6%AD%A5%EF%BC%88GBN%EF%BC%89-x2F-%E6%BB%91%E5%8A%A8%E7%AA%97%E5%8F%A3"><span class="nav-text">4.2.1. 回退N步（GBN）&#x2F; 滑动窗口</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-2-2-%E9%80%89%E6%8B%A9%E9%87%8D%E4%BC%A0%EF%BC%88SR%EF%BC%89"><span class="nav-text">4.2.2. 选择重传（SR）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-2-3-%E6%9C%89%E9%99%90%E5%BA%8F%E5%8F%B7%E8%8C%83%E5%9B%B4%E7%9A%84%E9%97%AE%E9%A2%98"><span class="nav-text">4.2.3. 有限序号范围的问题</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-3-%E5%8F%AF%E9%9D%A0%E6%95%B0%E6%8D%AE%E4%BC%A0%E8%BE%93%E6%9C%BA%E5%88%B6%E5%8F%8A%E5%85%B6%E7%94%A8%E9%80%94%E7%9A%84%E6%80%BB%E7%BB%93"><span class="nav-text">4.3. 可靠数据传输机制及其用途的总结</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-Connection-Oriented-Transport-TCP-%E9%9D%A2%E5%90%91%E8%BF%9E%E6%8E%A5%E7%9A%84%E8%BF%90%E8%BE%93%EF%BC%9ATCP"><span class="nav-text">5. Connection-Oriented Transport: TCP (面向连接的运输：TCP)</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#5-1-TCP-%E6%8A%A5%E6%96%87%E7%BB%93%E6%9E%84"><span class="nav-text">5.1. TCP 报文结构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-2-TCP-%E5%8F%AF%E9%9D%A0%E6%95%B0%E6%8D%AE%E4%BC%A0%E8%BE%93"><span class="nav-text">5.2. TCP 可靠数据传输</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-3-TCP-%E6%B5%81%E9%87%8F%E6%8E%A7%E5%88%B6"><span class="nav-text">5.3. TCP 流量控制</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-4-TCP-%E6%8B%A5%E5%A1%9E%E6%8E%A7%E5%88%B6"><span class="nav-text">5.4. TCP 拥塞控制</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#5-4-1-%E6%85%A2%E5%90%AF%E5%8A%A8%EF%BC%88Slow-start%EF%BC%89"><span class="nav-text">5.4.1. 慢启动（Slow start）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5-4-2-%E6%8B%A5%E5%A1%9E%E9%81%BF%E5%85%8D%EF%BC%88Congestion-Avoidance%EF%BC%89"><span class="nav-text">5.4.2. 拥塞避免（Congestion Avoidance）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5-4-3-%E5%BF%AB%E9%80%9F%E6%81%A2%E5%A4%8D%EF%BC%88Fast-Recovery%EF%BC%89"><span class="nav-text">5.4.3. 快速恢复（Fast Recovery）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5-4-4-%E6%80%BB%E7%BB%93"><span class="nav-text">5.4.4. 总结</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-5-TCP-%E4%B8%89%E6%AC%A1%E6%8F%A1%E6%89%8B%E4%B8%8E%E5%9B%9B%E6%AC%A1%E6%8C%A5%E6%89%8B"><span class="nav-text">5.5. TCP 三次握手与四次挥手</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#5-5-1-%E4%B8%89%E6%AC%A1%E6%8F%A1%E6%89%8B"><span class="nav-text">5.5.1. 三次握手</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5-5-2-%E5%9B%9B%E6%AC%A1%E6%8C%A5%E6%89%8B"><span class="nav-text">5.5.2. 四次挥手</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-socket-%E5%A5%97%E6%8E%A5%E5%AD%97%E7%BC%96%E7%A8%8B"><span class="nav-text">6. socket 套接字编程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-%E8%A1%A5%E5%85%85"><span class="nav-text">7. 补充</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#7-1-IP-%E5%88%86%E7%89%87-%E4%B8%8E-TCP-%E5%88%86%E6%AE%B5"><span class="nav-text">7.1. IP 分片 与 TCP 分段</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="dounine"
+      src="https://avatars.githubusercontent.com/u/41814469?s=400&u=48bf60a3428a3cb86a84a110c8688930cf6ceb08&v=4">
+  <p class="site-author-name" itemprop="name">dounine</p>
+  <div class="site-description" itemprop="description">回首向来萧瑟处</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">75</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">18</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">48</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/99MyCql" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;99MyCql" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+
+  <div class="links-of-blogroll site-overview-item animated">
+    <div class="links-of-blogroll-title"><i class="fa fa-globe fa-fw"></i>
+      Links
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://bkfish.gitee.io/" title="https:&#x2F;&#x2F;bkfish.gitee.io&#x2F;" rel="noopener" target="_blank">Kitty萌新的卧室</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://hitworld.github.io/" title="https:&#x2F;&#x2F;hitworld.github.io&#x2F;" rel="noopener" target="_blank">hirworld</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://wyjoutstanding.github.io/" title="https:&#x2F;&#x2F;wyjoutstanding.github.io&#x2F;" rel="noopener" target="_blank">wyjoutstanding</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://iwtf.github.io/" title="https:&#x2F;&#x2F;iwtf.github.io&#x2F;" rel="noopener" target="_blank">IWTF</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://wood1314.github.io/" title="https:&#x2F;&#x2F;wood1314.github.io&#x2F;" rel="noopener" target="_blank">wood</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://desperadoccy.github.io/" title="https:&#x2F;&#x2F;desperadoccy.github.io&#x2F;" rel="noopener" target="_blank">desperadoccy</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://doudouqaq.github.io/" title="https:&#x2F;&#x2F;doudouqaq.github.io&#x2F;" rel="noopener" target="_blank">doudouqaq</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://kylinnnnn.github.io/" title="https:&#x2F;&#x2F;kylinnnnn.github.io&#x2F;" rel="noopener" target="_blank">kylinnnnn</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://miaotony.xyz/" title="https:&#x2F;&#x2F;miaotony.xyz" rel="noopener" target="_blank">miaotony</a>
+        </li>
+    </ul>
+  </div>
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://github.com/99MyCql" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.dounine.live/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC3%E7%AB%A0%E8%BF%90%E8%BE%93%E5%B1%82.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://avatars.githubusercontent.com/u/41814469?s=400&u=48bf60a3428a3cb86a84a110c8688930cf6ceb08&v=4">
+      <meta itemprop="name" content="dounine">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dounine's blog">
+      <meta itemprop="description" content="回首向来萧瑟处">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="《计算机网络》笔记-第3章运输层 | dounine's blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          《计算机网络》笔记-第3章运输层
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-03-12 13:07:28" itemprop="dateCreated datePublished" datetime="2020-03-12T13:07:28+08:00">2020-03-12</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Base/" itemprop="url" rel="index"><span itemprop="name">九层之台，起于累土</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Base/Network/" itemprop="url" rel="index"><span itemprop="name">计算机网络</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p>[TOC]</p>
+<h2 id="0-前言"><a href="#0-前言" class="headerlink" title="0. 前言"></a>0. 前言</h2><blockquote>
+<p>Chapter 3 Transport Layer</p>
+</blockquote>
+<p>应用层处理应用之间的通信，而运输层则负责：把同台主机上各进程发送的数据<strong>收集</strong>起来交给网络层，并将从网络层收到的数据<strong>分发</strong>给各进程。</p>
+<p>与此同时，运输层的TCP协议还向应用层提供了极其重要的<strong>可靠数据传输</strong>。</p>
+<span id="more"></span>
+
+<h2 id="1-Introduction-and-Transport-Layer-Services-概述和运输层服务"><a href="#1-Introduction-and-Transport-Layer-Services-概述和运输层服务" class="headerlink" title="1. Introduction and Transport-Layer Services(概述和运输层服务)"></a>1. Introduction and Transport-Layer Services(概述和运输层服务)</h2><p>运输层接收<strong>应用层传来的应用报文</strong>，划分为较小的块，转换成运输层分组，称为<strong>运输层报文段（segment）</strong>。</p>
+<p>运输层 vs 网络层：</p>
+<ul>
+<li>运输层提供不同主机上进程之间的通信</li>
+<li>网络层提供主机之间的通信</li>
+</ul>
+<p>将主机间交付扩展到进程间交付，被称为<strong>运输层的多路复用（transport-layer multiplexing）和多路分解（demultiplexing）</strong>。</p>
+<p>因特网运输层的主要协议和提供的服务如下：</p>
+<ul>
+<li><strong>UDP（用户数据报协议）</strong>：<ul>
+<li>进程到进程的数据交付</li>
+<li>差错检查</li>
+</ul>
+</li>
+<li><strong>TCP（传输控制协议）</strong>：<ul>
+<li>进程到进程的数据交付</li>
+<li>差错检查</li>
+<li>可靠数据传输</li>
+<li>拥塞控制</li>
+</ul>
+</li>
+</ul>
+<h2 id="2-Multiplexing-and-Demultiplexing-多路复用和多路分解"><a href="#2-Multiplexing-and-Demultiplexing-多路复用和多路分解" class="headerlink" title="2. Multiplexing and Demultiplexing(多路复用和多路分解)"></a>2. Multiplexing and Demultiplexing(多路复用和多路分解)</h2><h3 id="2-1-套接字"><a href="#2-1-套接字" class="headerlink" title="2.1. 套接字"></a>2.1. 套接字</h3><p>在第2章，我们知道，套接字是<strong>应用层与运输层之间的接口</strong>。</p>
+<p>发送数据时，应用层通过套接字将数据交付给运输层；运输层从网络层接收数据时，它需要将所接收的数据发给对应的套接字，从而到达应用层。</p>
+<p>任一时刻，主机上可能有不止一个套接字，<strong>每个套接字都有唯一的标识符</strong>，其格式取决于它是UDP还是TCP。</p>
+<p>将运输层报文段中的数据交付到正确的套接字的工作称为<strong>多路分解（demultiplexing）</strong>；从不同套接字接收数据，并为每个数据块封装上首部信息从而生成报文段，然后将报文段传给网络层，这些工作称为<strong>多路复用（multiplexing）</strong>。</p>
+<p><img src="/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC3%E7%AB%A0%E8%BF%90%E8%BE%93%E5%B1%82/1.png" alt="pic"></p>
+<p><strong>值得注意的是：一个进程通常有一个或多个套接字，例如：当今高性能Web服务器（HTTP服务器）只使用一个进程，但为每个新的客户连接创建一个具有套接字的新线程。</strong></p>
+<h3 id="2-2-无连接（UDP）的多路复用和多路分解"><a href="#2-2-无连接（UDP）的多路复用和多路分解" class="headerlink" title="2.2. 无连接（UDP）的多路复用和多路分解"></a>2.2. 无连接（UDP）的多路复用和多路分解</h3><p>一个 <strong>UDP套接字</strong> 由 <strong>（目的IP地址，目的端口号）组成的二元组</strong> 标识。</p>
+<p><strong>因此</strong>：如果两个UDP报文段有<strong>不同的源IP地址或源端口号</strong>，但具有<strong>相同的目的IP地址和目的端口号</strong>，那么这两个报文段将通过<strong>相同的目的套接字</strong>，定向到相同的进程。</p>
+<p>例如：主机A和主机B，都向主机C的99端口发送UDP报文段，两个报文段将到达主机C上的同一个套接字。</p>
+<h3 id="2-3-面向连接（TCP）的多路复用和多路分解"><a href="#2-3-面向连接（TCP）的多路复用和多路分解" class="headerlink" title="2.3. 面向连接（TCP）的多路复用和多路分解"></a>2.3. 面向连接（TCP）的多路复用和多路分解</h3><p>一个 <strong>TCP套接字</strong> 由 <strong>（源IP地址，源端口号，目的IP地址，目的端口号）组成的四元组</strong> 标识。</p>
+<p><strong>因此</strong>：与UDP不同的是，两个具有<strong>不同源IP地址或源端口号</strong>的TCP报文段，即便<strong>目的IP地址和目的端口号相同</strong>，也将被定向到两个<strong>不同的套接字</strong>。</p>
+<p>以使用TCP服务的HTTP为例：同台主机上不同的HTTP会话（源IP地址相同，源端口不相同），将对应服务器上不同的套接字；不同主机上的HTTP会话（源IP地址不相同，源端口可能不相同），更对应服务器上不同的套接字。如下：</p>
+<p><img src="/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC3%E7%AB%A0%E8%BF%90%E8%BE%93%E5%B1%82/2.png" alt="pic"></p>
+<h2 id="3-Connectionless-Transport-UDP-无连接运输：UDP"><a href="#3-Connectionless-Transport-UDP-无连接运输：UDP" class="headerlink" title="3. Connectionless Transport: UDP(无连接运输：UDP)"></a>3. Connectionless Transport: UDP(无连接运输：UDP)</h2><p>UDP的工作：</p>
+<ul>
+<li>多路复用&#x2F;分解</li>
+<li>少量的差错检测</li>
+</ul>
+<p>UDP的特点：</p>
+<ul>
+<li>不可靠数据传输，不保证数据到达目的地</li>
+<li>将接收到的数据立即发送，不会因链路拥塞而等待</li>
+<li>无须建立连接，不会引入连接时延</li>
+<li>无连接状态，不需要额外存储状态数据</li>
+<li>分组首部开销小</li>
+</ul>
+<p>使用UDP的运输层协议：DNS等。</p>
+<h3 id="3-1-UDP报文段结构"><a href="#3-1-UDP报文段结构" class="headerlink" title="3.1. UDP报文段结构"></a>3.1. UDP报文段结构</h3><p>UDP报文段由 <strong>首部字段（8字节）</strong> 和 <strong>数据</strong> 组成。</p>
+<p><img src="/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC3%E7%AB%A0%E8%BF%90%E8%BE%93%E5%B1%82/3.png" alt="pic"></p>
+<ul>
+<li><strong>源端口号（Source port）</strong>：源主机上发送UDP报文段的进程所在的端口。</li>
+<li><strong>目的端口号（Dest port）</strong>：目的主机上UDP服务器进程所在的端口。</li>
+<li><strong>长度（Length）</strong>：UDP报文段中的字节数。</li>
+<li><strong>校验和（Checksum）</strong>：用来检查该报文段是否出现差错。</li>
+<li><strong>应用数据（Application data）</strong></li>
+</ul>
+<h3 id="3-2-UDP校验和"><a href="#3-2-UDP校验和" class="headerlink" title="3.2. UDP校验和"></a>3.2. UDP校验和</h3><p>发送方：</p>
+<ol>
+<li><p>首先将UDP报文段的<strong>校验和字段</strong>置为0。</p>
+</li>
+<li><p>将UDP报文段中所有的16比特字相加，求和时遇到任何溢出都要<strong>回卷（将溢出加到结果的低位上）</strong>。示例：</p>
+<p> <img src="/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC3%E7%AB%A0%E8%BF%90%E8%BE%93%E5%B1%82/4.png" alt="pic"></p>
+</li>
+<li><p>对和的结果进行反码运算。</p>
+</li>
+<li><p>将最后结果放在UDP报文段的<strong>校验和字段</strong>中。</p>
+</li>
+</ol>
+<p>接收方：</p>
+<ol>
+<li><p>将UDP报文段中所有的16比特字相加。</p>
+</li>
+<li><p>如果没有出现差错，则和的结果为：<code>1111 1111 1111 1111</code>。</p>
+</li>
+</ol>
+<p>虽然UDP提供差错检测，但它对差错恢复无能为力。</p>
+<h2 id="4-Principles-of-Reliable-Data-Transfer-可靠数据传输原理"><a href="#4-Principles-of-Reliable-Data-Transfer-可靠数据传输原理" class="headerlink" title="4. Principles of Reliable Data Transfer(可靠数据传输原理)"></a>4. Principles of Reliable Data Transfer(可靠数据传输原理)</h2><p>在介绍TCP之前，我们需要先了解可靠数据传输的原理——网络中最为重要的问题之一。</p>
+<p>其服务模型和服务实现概况如下：</p>
+<p><img src="/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC3%E7%AB%A0%E8%BF%90%E8%BE%93%E5%B1%82/5.png" alt="pic"></p>
+<p>实现这种服务抽象是<strong>可靠数据传输协议（reliable data transfer protocol, rdt）</strong>。</p>
+<p><strong>注意：此处使用的术语为分组，而不是运输层的报文段</strong>。</p>
+<h3 id="4-1-构造可靠数据传输协议"><a href="#4-1-构造可靠数据传输协议" class="headerlink" title="4.1. 构造可靠数据传输协议"></a>4.1. 构造可靠数据传输协议</h3><p>由浅入深完善一个可靠数据传输协议，此书的独到之处，好评！！！</p>
+<h4 id="4-1-1-经完全可靠信道的可靠数据传输：rdt1-0"><a href="#4-1-1-经完全可靠信道的可靠数据传输：rdt1-0" class="headerlink" title="4.1.1. 经完全可靠信道的可靠数据传输：rdt1.0"></a>4.1.1. 经完全可靠信道的可靠数据传输：rdt1.0</h4><p>最简单情况下，底层信道是完全可靠的。</p>
+<p>发送方和接收方只需要发送和接收数据即可。</p>
+<p><strong>发送方</strong>的状态转换图（有限状态机）如下：</p>
+<p><img src="/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC3%E7%AB%A0%E8%BF%90%E8%BE%93%E5%B1%82/6.png" alt="pic"></p>
+<p><strong>接收方</strong>的状态转换图（有限状态机）如下：</p>
+<p><img src="/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC3%E7%AB%A0%E8%BF%90%E8%BE%93%E5%B1%82/7.png" alt="pic"></p>
+<p>图释：</p>
+<ul>
+<li>圆表示一个状态，箭头表示状态变迁。</li>
+<li>横线上为引起变迁的事件，横线下为事件发生时所采取的动作。</li>
+<li><code>rdt_send(data)</code>：发送高层传来的数据。其动作包括：<code>make_pkt(data)</code> 将数据封装为分组，<code>udt_send(packet)</code> 发送分组（udt表示不可靠数据传输）。</li>
+<li><code>rdt_rcv(packet)</code>：接收底层接收一个分组。其动作包括：<code>extract(packet, data)</code> 从分组中取出数据，<code>deliver_data(data)</code> 将数据传递给高层。</li>
+</ul>
+<h4 id="4-1-2-经具有比特差错信道的可靠数据传输：rdt2-x-自动重传请求协议ARQ"><a href="#4-1-2-经具有比特差错信道的可靠数据传输：rdt2-x-自动重传请求协议ARQ" class="headerlink" title="4.1.2. 经具有比特差错信道的可靠数据传输：rdt2.x - 自动重传请求协议ARQ"></a>4.1.2. 经具有比特差错信道的可靠数据传输：rdt2.x - 自动重传请求协议ARQ</h4><p>此情况下，数据在信道中传输，有可能发生比特差错。</p>
+<p>为了让<strong>接收方</strong>最终得到无差错的数据，我们可以如下操作：</p>
+<ol>
+<li><strong>差错检测</strong>。接收方检测接收的数据是否出现比特差错，通过分组中的校验和字段实现。</li>
+<li><strong>接收方反馈</strong>。如果无差错，则反馈**肯定确认<code>ACK</code><strong>；反之，则反馈</strong>否定确认<code>NAK</code>**。</li>
+<li><strong>重传</strong>。如果发送方收到否定确认<code>NAK</code>，则重传该分组。</li>
+</ol>
+<p>基于这样重传机制的可靠数据传输协议，被称为<strong>自动重传请求协议（Automatic Repeat reQuest protocols, ARQ）</strong>。</p>
+<h5 id="4-1-2-1-rdt2-0-停等协议"><a href="#4-1-2-1-rdt2-0-停等协议" class="headerlink" title="4.1.2.1. rdt2.0 - 停等协议"></a>4.1.2.1. rdt2.0 - 停等协议</h5><p><strong>发送方</strong>的状态图：</p>
+<p><img src="/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC3%E7%AB%A0%E8%BF%90%E8%BE%93%E5%B1%82/8.png" alt="pic"></p>
+<ul>
+<li><code>checksum</code>：用于差错检测的数据。</li>
+<li><code>Wait for ACK or NAK</code>：等待ACK或NAK。</li>
+<li><code>isNAK(rcvpkt)</code>：接收到的为否定确认。</li>
+<li><code>isACK(rcvpkt)</code>：接收到的为肯定确认</li>
+<li><code>∧</code>：不进行任何动作。</li>
+</ul>
+<p><strong>接收方</strong>的状态图：</p>
+<p><img src="/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC3%E7%AB%A0%E8%BF%90%E8%BE%93%E5%B1%82/9.png" alt="pic"></p>
+<ul>
+<li><code>corrupt(rcvpkt)</code>：接受的分组存在差错。</li>
+<li><code>nocorrupt(rcvplt)</code>：接收的分组不存在差错。</li>
+</ul>
+<p><strong>发送方</strong>在发送完一个分组后，并不会发送新的分组，除非<strong>发送方</strong>确信<strong>接收方</strong>已正确接收当前分组。由于这种行为，<code>rdt2.0</code>这样的协议又被称为<strong>停等协议</strong>。</p>
+<h5 id="4-1-2-2-rdt2-1"><a href="#4-1-2-2-rdt2-1" class="headerlink" title="4.1.2.2. rdt2.1"></a>4.1.2.2. rdt2.1</h5><p>rdt2.0看似完美，但它存在一个致命的缺陷：没有考虑ACK或NAK分组受损的可能性！！！</p>
+<p><strong>处理受损ACK或NAK</strong>有3种方法：</p>
+<ol>
+<li><p>当发送方接收到“含糊不清”的ACK或NAK时，它将反问接收方：“你在说神魔？”。但是，如果发送方的“你在说神魔？”也发生了差错，那将出现更大问题！</p>
+</li>
+<li><p>增加足够的检验和比特，使发送方不仅可以检测差错，还可以恢复差错。但，这样将花费很多比特。</p>
+</li>
+<li><p>当发送方收到受损的ACK或NAK时，直接重传当前分组。但，问题在于接收方并不能区分：这是重传的分组，还是新的分组。</p>
+</li>
+</ol>
+<p>为了解决第3种方法产生的问题，有一个简单的办法：<strong>序号（sequence number）</strong>。让发送方对其分组编号，接收方只需要检查序号，即可知道这是重传还是新的分组。</p>
+<p>而对于rdt2.0这种简单情况，只需要<code>0</code>和<code>1</code>两个序号就足够了。</p>
+<p><strong>发送方</strong>状态图：</p>
+<p><img src="/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC3%E7%AB%A0%E8%BF%90%E8%BE%93%E5%B1%82/10.png" alt="pic"></p>
+<ul>
+<li><code>Wait for call 0 from above</code>：等待高层对发送0号分组的调用。</li>
+<li><code>sndpkt=make_pkt(0,data,checksum)</code>中的<code>0</code>：分组序号。</li>
+<li><code>(corrupt(rcvpkt) || isNAK(rcvpkt))</code> 表示：接收到受损的ACK&#x2F;NAK分组，或者 接收方返回<code>NAK</code>。</li>
+<li><code>(nocorrupt(rcvpkt) &amp;&amp; isACK(rcvpkt))</code> 表示：接收到无损的ACK&#x2F;NAK分组，且 接收方返回<code>ACK</code>。</li>
+<li>在<code>Wait for ACK or NAK 0</code>等待接收方返回0号分组的ACK&#x2F;NAK分组时：<ul>
+<li>如果接收到受损的ACK&#x2F;NAK分组，或者 接收方返回的是<code>NAK</code>，则重传0号分组。</li>
+<li>如果接收到无损的ACK&#x2F;NAK分组，且 接收方返回的是<code>ACK</code>，则转入<code>Wait for call 1 from above</code>状态。</li>
+</ul>
+</li>
+</ul>
+<p><strong>接收方</strong>状态图：</p>
+<p><img src="/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC3%E7%AB%A0%E8%BF%90%E8%BE%93%E5%B1%82/11.png" alt="pic"></p>
+<ul>
+<li><code>has_seq0(rcvpkt)</code>：分组序号是否为0。</li>
+<li><code>sndpkt=make_pkt(ACK,checksum)</code>中的<code>checksum</code>：用于ACK&#x2F;NAK分组的差错检测数据。</li>
+<li>当在<code>Wait for 1 from below</code>状态等待1号分组时：<ul>
+<li>如果接收到受损的分组，则返回<code>NAK</code>分组；</li>
+<li>如果接收到无损的0号分组，则返回<code>ACK</code>分组；</li>
+<li>如果接收到无损的1号分组，则返回<code>ACK</code>分组，并转入状态<code>Wait for 0 from below</code>。</li>
+</ul>
+</li>
+</ul>
+<h5 id="4-1-2-3-rdt2-2"><a href="#4-1-2-3-rdt2-2" class="headerlink" title="4.1.2.3. rdt2.2"></a>4.1.2.3. rdt2.2</h5><p>在rdt2.1的基础上，我们考虑能否不需要NAK呢？</p>
+<p>以<code>rdt2.1</code>中<strong>接收方</strong>的<code>Wait for 1 from below</code>状态为例：</p>
+<ul>
+<li>接收到无损的0号分组，则返回对0号分组的<code>ACK</code>；</li>
+<li>接收到无损的1号分组，则返回对1号分组的<code>ACK</code>，并转入下一状态；</li>
+<li>接收到受损的分组，则返回<code>NAK</code>。如果不发送<code>NAK</code>，而是对上次正确接收的分组发送<code>ACK</code>，我们也能实现与<code>NAK</code>相同的效果。在<code>Wait for 1 from below</code>状态中，即返回对0号分组的<code>ACK</code>。</li>
+</ul>
+<p>而<strong>发送方</strong>在<code>Wait for ACK or NAK 1</code>状态下，接收到0号分组的<code>ACK</code>，则相当于接收到<code>NAK</code>，将重传1号分组。</p>
+<p>对<code>ACK</code>编号，这就是rdt2.2的改进。</p>
+<p><strong>发送方</strong>如下：</p>
+<p><img src="/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC3%E7%AB%A0%E8%BF%90%E8%BE%93%E5%B1%82/12.png" alt="pic"></p>
+<ul>
+<li><code>isACK(rcvpkt,1)</code>：接收到1号分组的<code>ACK</code>。</li>
+<li><code>isACK(rcvpkt,0)</code>：接收到0好分组的<code>ACK</code>。</li>
+</ul>
+<p><strong>接收方</strong>如下：</p>
+<p><img src="/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC3%E7%AB%A0%E8%BF%90%E8%BE%93%E5%B1%82/13.png" alt="pic"></p>
+<ul>
+<li><code>sndpkt=make_pkt(ACK,0,checksum)</code>：封装0号<code>ACK</code>分组。</li>
+<li><code>sndpkt=make_pkt(ACK,0,checksum)</code>：封装1号<code>ACK</code>分组。</li>
+</ul>
+<h4 id="4-1-3-经具有比特差错的丢包信道的可靠数据传输：rdt3-0-比特交替协议"><a href="#4-1-3-经具有比特差错的丢包信道的可靠数据传输：rdt3-0-比特交替协议" class="headerlink" title="4.1.3. 经具有比特差错的丢包信道的可靠数据传输：rdt3.0 - 比特交替协议"></a>4.1.3. 经具有比特差错的丢包信道的可靠数据传输：rdt3.0 - 比特交替协议</h4><p>在此情况下，信道不仅会发生比特差错，还会丢包。</p>
+<p>那怎么解决丢包问题呢？<strong>重传</strong>呗。</p>
+<p>发送方如果在一段时间后，还没有收到对应分组的<code>ACK</code>，则重传该分组。</p>
+<p><strong>发送方</strong>状态转换图如下：</p>
+<p><img src="/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC3%E7%AB%A0%E8%BF%90%E8%BE%93%E5%B1%82/16.png" alt="pic"></p>
+<ul>
+<li><code>start_timer</code>：表示开始计时器。</li>
+<li>在<code>Wait for ACK 0</code>状态下：<ul>
+<li>如果接收到受损的ACK分组，或1号ACK分组，则啥都不干，坐等超时；</li>
+<li>如果<code>timeout</code>超时事件发生，则将重传0号分组，并<strong>重置计时器</strong>；</li>
+<li>如果接收到正确的0号ACK分组，则暂停计时器，转入下一状态。</li>
+</ul>
+</li>
+<li>在<code>Wait for call 1 from above</code>状态下，接收到任何分组都置之不理，因为可能是由于延时而产生的冗余分组。</li>
+</ul>
+<p><strong>接收方</strong>同rdt2.2。</p>
+<p>rdt3.0在各种情况下的运行过程：</p>
+<p><img src="/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC3%E7%AB%A0%E8%BF%90%E8%BE%93%E5%B1%82/14.png" alt="pic"><br><img src="/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC3%E7%AB%A0%E8%BF%90%E8%BE%93%E5%B1%82/15.png" alt="pic"></p>
+<p>rdt3.0有时被称为<strong>比特交替协议（alternating-bit protocol）</strong>。</p>
+<p>至此，我们得到了一个可靠数据传输协议！！！</p>
+<h3 id="4-2-流水线可靠数据传输协议"><a href="#4-2-流水线可靠数据传输协议" class="headerlink" title="4.2. 流水线可靠数据传输协议"></a>4.2. 流水线可靠数据传输协议</h3><p>rdt3.0虽然是一个可靠数据传输协议，但性能并不令人满意。其性能问题的核心在于它是一个<strong>停等协议</strong>。</p>
+<p>我们定义<strong>发送方（或信道）的利用率</strong>为：发送方实际忙于将发送比特送进信道的那部分时间与发送时间之比：</p>
+<p>$$<br>U_{sender} &#x3D; \frac {L&#x2F;R} {RTT + L&#x2F;R}<br>$$</p>
+<ul>
+<li>$L$：分组字节长度</li>
+<li>$R$：发送方发送速率</li>
+<li>$RTT$：往返传播时延</li>
+</ul>
+<p>可以看出，当$RTT$较大时，利用率将会非常低。</p>
+<p>为了解决这个问题，我们可以：不以停等协议运行，允许发送方<strong>同时发送</strong>多个分组而无须等待确认，即<strong>流水线</strong>技术。</p>
+<p><img src="/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC3%E7%AB%A0%E8%BF%90%E8%BE%93%E5%B1%82/17.png" alt="pic"><br><img src="/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC3%E7%AB%A0%E8%BF%90%E8%BE%93%E5%B1%82/18.png" alt="pic"></p>
+<p>但新的技术总伴随着新的问题：</p>
+<ul>
+<li>必须增加序号范围，因为每个发送的分组必须有一个唯一的序号。</li>
+<li>发送方和接收方不得不缓存多个分组。</li>
+<li>连续发送的分组中，如何解决分组的差错恢复、丢包重传等问题。两种解决方法：<ul>
+<li><strong>回退N步（Go-Back-N，GBN）&#x2F; 滑动窗口协议</strong></li>
+<li><strong>选择重传（Selective Repeat，SR）</strong></li>
+</ul>
+</li>
+</ul>
+<h4 id="4-2-1-回退N步（GBN）-x2F-滑动窗口"><a href="#4-2-1-回退N步（GBN）-x2F-滑动窗口" class="headerlink" title="4.2.1. 回退N步（GBN）&#x2F; 滑动窗口"></a>4.2.1. 回退N步（GBN）&#x2F; 滑动窗口</h4><p>在回退N步协议中，发送方可以同时发送多个分组，但它受限于某个最大数N。</p>
+<p>发送方所维护的GBN协议的序号空间和窗口如下：</p>
+<p><img src="/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC3%E7%AB%A0%E8%BF%90%E8%BE%93%E5%B1%82/19.png" alt="pic"></p>
+<p>图示：</p>
+<ul>
+<li><code>base</code>：基序号，指向第一个发送但未收到确认<code>ACK</code>的分组。永远指向窗口头部。</li>
+<li><code>nextseqnum</code>：下一个序号，指向第一个待发送的分组。会在窗口中前后滑动。</li>
+<li><code>Window size N</code>：滑动窗口的长度<code>N</code>。</li>
+<li>包含四种状态的分组：<ul>
+<li><code>Already ACK&#39;d - 深蓝</code>：已收到<code>ACK</code>确认的分组。</li>
+<li><code>Sent, not yet ACK&#39;d - 浅蓝</code>：已发送，但还未收到<code>ACK</code>确认的分组。</li>
+<li><code>Usable, not yet send - 灰色</code>：待发送的分组。</li>
+<li><code>Not Usable - 白色</code>：还未准备好的分组。</li>
+</ul>
+</li>
+</ul>
+<p>随着协议的运行，窗口在序号空间中向前滑动。实际中，<code>N</code>的大小，受信道拥塞程度的影响。</p>
+<p>在GBN协议中，<strong>发送方</strong>需要响应三种类型的事件：</p>
+<ul>
+<li><p>上层调用其发送数据。发送方首先检查发送窗口是否已满，即<code>nextseqnum - base = N</code>，是否有N个已发送但未收到<code>ACK</code>确认的分组：</p>
+<ul>
+<li>如果窗口未满，则产生一个分组并发送，更新相应变量；</li>
+<li>如果窗口已满，则将数据返回上一层，并指示窗口已满。</li>
+</ul>
+</li>
+<li><p>收到一个ACK。<br>-GBN协议采用<strong>累计确认</strong>的方式：<strong>收到序号为<code>n</code>的<code>ACK</code>分组（对<code>n</code>号分组的确认），表明接收方已正确接收到序号 $\leq n$ 的所有分组</strong>；</p>
+<ul>
+<li>重启定时器，如果所有分组都已发送和确认，则停止该定时器</li>
+</ul>
+</li>
+<li><p>超时事件。如果出现超时，发送方将重传所有<strong>已发送但未被确认</strong>的分组，这就像协议的名字“回退N步”所说的那样。</p>
+</li>
+</ul>
+<p>在GBN协议中，<strong>接收方</strong>的工作也很简单：</p>
+<ul>
+<li>如果一个序号为<code>n</code>的分组被正确接收，**并且按序，即上次接收到的分组的序号为<code>n-1</code>**，接收方则返回序号为<code>n</code>的<code>ACK</code>分组。</li>
+<li>而对于其它情况，接收方则丢弃接收到的分组，并发送<strong>最近按序接收到的分组</strong>的<code>ACK</code>分组。比如，序号为<code>n</code>的分组被正确接收，但上次收到的分组的序号为<code>n-2</code>，则丢弃<code>n</code>号分组，并发送序号为<code>n-2</code>的<code>ACK</code>分组。</li>
+</ul>
+<p>下图是一个GBN协议运行的例子：</p>
+<p><img src="/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC3%E7%AB%A0%E8%BF%90%E8%BE%93%E5%B1%82/20.png" alt="pic"></p>
+<h4 id="4-2-2-选择重传（SR）"><a href="#4-2-2-选择重传（SR）" class="headerlink" title="4.2.2. 选择重传（SR）"></a>4.2.2. 选择重传（SR）</h4><p><strong>GBN协议的缺点在于：单个分组的差错将会导致大量分组的重传，而许多分组根本没必要重传</strong>。</p>
+<p>而选择重传协议，通过让发送方仅重传那些出现差错的分组，而避免了不必要的重传。</p>
+<p>发送方和接收方的序号空间和窗口如下：</p>
+<p><img src="/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC3%E7%AB%A0%E8%BF%90%E8%BE%93%E5%B1%82/21.png" alt="pic"></p>
+<p>图示：</p>
+<ul>
+<li><code>send_base</code>：指向发送方第一个发送但未收到确认<code>ACK</code>的分组，永远指向发送方窗口头部。</li>
+<li><code>rcv_base</code>：指向接收方第一个期待接收的分组，永远指向接收方窗口头部。</li>
+<li>接收方四种状态的分组：<ul>
+<li><code>Out of order but already ACK&#39;d - 深蓝</code>：失序但已背确认的分组；</li>
+<li><code>Expexted, not yet rec - 浅蓝</code>：期待接收的分组；</li>
+<li><code>Acceptable - 灰色</code>：可接受的分组；</li>
+<li><code>Not usable - 白色</code>：不可用的分组；</li>
+</ul>
+</li>
+</ul>
+<p><strong>发送方</strong>的事件和动作：</p>
+<ul>
+<li><p>上层调用其发送数据。与GBN协议一样。</p>
+</li>
+<li><p>收到一个ACK。发送方将该<code>ACK</code>对应的分组标记为已接收，如果该分组的序号为<code>send_base</code>，则窗口向前滑动到具有最小序号的<strong>未确认分组</strong>处。</p>
+</li>
+<li><p>超时事件。每个分组都必须拥有自己的逻辑定时器，超时发生后只能发送一个分组。</p>
+</li>
+</ul>
+<p><strong>接收方</strong>的事件和动作：</p>
+<ul>
+<li><p>滑动窗口内的分组（序号在<code>[rcv_base, rcv_base+N-1]</code>内）被正确接收：</p>
+<ul>
+<li>如果该分组以前没收到过，则缓存该分组；</li>
+<li>如果该分组的序号等于<code>rcv_base</code>，则将该序号之后连续的<strong>已缓存分组</strong>交付给上层，并将窗口向前移动到具有最小序号的<strong>期待接受分组</strong>处。</li>
+</ul>
+</li>
+<li><p>滑动窗口前的分组（序号在<code>[rcv_base-N, rcv_base-1]</code>内）被正确接收。<strong>产生一个ACK，即使接收方已经确认接收过该分组（防止ACK未到达发送方）</strong>。</p>
+</li>
+<li><p>其他情况，忽略该分组。</p>
+</li>
+</ul>
+<p>下图是一个SR协议运行的例子：</p>
+<p><img src="/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC3%E7%AB%A0%E8%BF%90%E8%BE%93%E5%B1%82/22.png" alt="pic"></p>
+<h4 id="4-2-3-有限序号范围的问题"><a href="#4-2-3-有限序号范围的问题" class="headerlink" title="4.2.3. 有限序号范围的问题"></a>4.2.3. 有限序号范围的问题</h4><p>当面对有限序号范围时，由于发送方和接收方窗口之间不可能同步，所以，<strong>接收方面临的困境就是：无法判断该序号的分组是一个新分组还是一次重传</strong>。</p>
+<p>包括4个分组序号、窗口长度为3的示例如下：</p>
+<p>接收方收到的0号分组为<strong>一次重传</strong>：</p>
+<p><img src="/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC3%E7%AB%A0%E8%BF%90%E8%BE%93%E5%B1%82/23.png" alt="pic"></p>
+<p>接收方收到的0号分组为<strong>一个新分组</strong>：</p>
+<p><img src="/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC3%E7%AB%A0%E8%BF%90%E8%BE%93%E5%B1%82/24.png" alt="pic"></p>
+<p><strong>解决方法</strong>：窗口长度必须小于或等于序号空间大小的一半。</p>
+<h3 id="4-3-可靠数据传输机制及其用途的总结"><a href="#4-3-可靠数据传输机制及其用途的总结" class="headerlink" title="4.3. 可靠数据传输机制及其用途的总结"></a>4.3. 可靠数据传输机制及其用途的总结</h3><p><img src="/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC3%E7%AB%A0%E8%BF%90%E8%BE%93%E5%B1%82/25.png" alt="pic"></p>
+<h2 id="5-Connection-Oriented-Transport-TCP-面向连接的运输：TCP"><a href="#5-Connection-Oriented-Transport-TCP-面向连接的运输：TCP" class="headerlink" title="5. Connection-Oriented Transport: TCP (面向连接的运输：TCP)"></a>5. Connection-Oriented Transport: TCP (面向连接的运输：TCP)</h2><p><strong>TCP&#x2F;IP协议（传输控制协议&#x2F;网际协议，Transmission Control Protocol&#x2F;Internet Protocol）</strong>，是当今因特网的支柱性协议。</p>
+<p>TCP概述：</p>
+<ul>
+<li><strong>面向连接</strong>：在发送数据之前，客户端需要与服务端建立一个连接。三次握手、四次挥手。</li>
+<li><strong>可靠传输</strong>：TCP提供可靠数据传输。</li>
+<li>全双工：TCP连接提供<strong>全双工服务</strong>。</li>
+<li><strong>TCP报文段（TCP segments）</strong>：TCP报文的称呼。</li>
+</ul>
+<h3 id="5-1-TCP-报文结构"><a href="#5-1-TCP-报文结构" class="headerlink" title="5.1. TCP 报文结构"></a>5.1. TCP 报文结构</h3><p>TCP报文段由两部分组成：</p>
+<ul>
+<li><strong>首部字段</strong>：一般20字节</li>
+<li><strong>数据部分</strong>：数据部分大小受限于<strong>最大报文段长度（MSS，maximum segment size）</strong>。MSS又受限于<strong>最大链路层帧长度&#x2F;最大传输单元（MTU，maximum transmission unit）</strong>，MTU &#x3D; TCP&#x2F;IP首部（一般40字节）+ MSS。以太网和PPP链路层协议的MTU都为1500字节，因此MSS典型值为1460字节。当TCP发送一个大文件时，例如某Web页面的一个图像，TCP会将该文件划分长度为MSS的若干块。</li>
+</ul>
+<p><img src="/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC3%E7%AB%A0%E8%BF%90%E8%BE%93%E5%B1%82/26.png" alt="pic"></p>
+<ul>
+<li><p><strong>源端口号（Source Port）</strong> 和 <strong>目的端口号（Dest Port）</strong>：用于标识源主机和目的主机上的进程。</p>
+</li>
+<li><p><strong>序号（Sequence Numbers）</strong> 和 <strong>确认号（Acknowledgment Numbers）</strong>：用于实现可靠数据传输。</p>
+<ul>
+<li><p><strong>序号</strong>：TCP将数据看成有序的字节流，序号是TCP报文段中<strong>数据部分首字节的字节流编号</strong>。如下图，500000字节的文件，MSS为1000字节，文件被划分成500个TCP报文段，第一个报文段序号为0，第二个报文段序号为1000，以此类推。示例中初始序号为0，实际上<strong>初始序号是随机产生的</strong>——由于网络中有可能存活着旧连接的TCP报文段，这样可以防止新连接阴差阳错地接收到旧连接残留的报文。</p>
+<p><img src="/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC3%E7%AB%A0%E8%BF%90%E8%BE%93%E5%B1%82/27.png" alt="pic"></p>
+</li>
+<li><p><strong>确认号</strong>：由于TCP是全双工的，因此主机A在向主机B发送数据时，也会接收来自主机B的数据。主机A报文段中的确认号，就是主机A期望从主机B收到的下一个字节的序号。<strong>同时，表明主机A已经成功收到确认号之前的数据</strong>，这样可以实现可靠数据传输中<strong>累计确认</strong>的功能。</p>
+</li>
+<li><p>示例（<code>Seq</code>：序号，<code>ACK</code>：确认号）：</p>
+<p><img src="/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC3%E7%AB%A0%E8%BF%90%E8%BE%93%E5%B1%82/28.png" alt="pic"></p>
+</li>
+</ul>
+</li>
+<li><p><strong>4比特的首部长度（Header length）</strong>：TCP首部的长度，以4字节为单位。</p>
+</li>
+<li><p><strong>8比特位的标志字段</strong>：</p>
+<ul>
+<li><code>URG</code>：紧急数据标志位</li>
+<li><code>ACK</code>：确认标志位</li>
+<li><code>PSH</code>：请求推送位，接收端应尽快把数据传送给应用层</li>
+<li><code>RST</code>：连接复位，通常，如果TCP收到的一个分段明显不属于该主机的任何一个连接，则向远程发送一个复位包</li>
+<li><code>SYN</code>：建立连接时使用</li>
+<li><code>FIN</code>：释放连接时使用</li>
+</ul>
+</li>
+<li><p><strong>接收窗口（Recieve window）</strong>：用于流量控制。</p>
+</li>
+<li><p><strong>检验和（Internet checksum）</strong>：与UDP检验和字段一样。</p>
+</li>
+<li><p><strong>紧急数据指针（Urgent data pointer）</strong>：只有当紧急标志置位时URG，该16位的字段才有效。</p>
+</li>
+<li><p><strong>可选与变长的选项字段（Options）</strong></p>
+</li>
+<li><p><strong>数据（Data）</strong></p>
+</li>
+</ul>
+<h3 id="5-2-TCP-可靠数据传输"><a href="#5-2-TCP-可靠数据传输" class="headerlink" title="5.2. TCP 可靠数据传输"></a>5.2. TCP 可靠数据传输</h3><p>TCP在IP不可靠的尽力而为服务之上创建了一种可靠数据传输服务，<strong>TCP可靠数据传输服务 &#x3D; rdt3.0 + 流水线</strong>。</p>
+<p><strong>发送方</strong>：</p>
+<ul>
+<li><p>上层调用其发送数据。生成具有<strong>序号</strong>的TCP报文段，并启动定时器（只有一个，如果已经启动则不需重启）。</p>
+</li>
+<li><p>收到一个ACK。</p>
+<ul>
+<li>采用<strong>累计确认</strong>的方式：收到<strong>确认号</strong>为<code>n</code>的ACK分组，表明接收方已正确接收到序号<code>n</code>之前的所有分组；</li>
+<li>重启定时器。如果所有分组都已发送和确认，则停止该定时器。</li>
+</ul>
+</li>
+<li><p>收到3个冗余ACK（冗余ACK是对已确认报文段的再次确认）。一旦收到3个冗余ACK，发送方则<strong>快速重传</strong>冗余ACK报文确认号对应的报文段。</p>
+</li>
+<li><p>超时事件。如果出现超时，发送方将重传<strong>第一个（序号最小）已发送但未被确认</strong>的分组（与滑动窗口不同的是：只重传一个！），并启动定时器。</p>
+</li>
+</ul>
+<p><img src="/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC3%E7%AB%A0%E8%BF%90%E8%BE%93%E5%B1%82/29.png" alt="pic"></p>
+<p><img src="/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC3%E7%AB%A0%E8%BF%90%E8%BE%93%E5%B1%82/30.png" alt="pic"></p>
+<p><strong>接收方</strong>：</p>
+<ul>
+<li><p>报文段按序到达。延迟的ACK，对下一个按序报文段等待500ms，如果没有到达，则发送一个ACK；如果到达，则立即<strong>发送累积ACK</strong>。</p>
+</li>
+<li><p>比期望序号大的报文段到达。立即发送冗余ACK，即期望序号的ACK。</p>
+</li>
+<li><p>中间缺失的报文段到达。立即发送ACK。</p>
+</li>
+</ul>
+<p>TCP是回退N步还是选择重传呢？</p>
+<p>TCP更类似于回退N步（滑动窗口），但不同点在于：GBN中，如果超时，则重传<strong>所有</strong>已发送但未被确认的报文段；但TCP中，超时只重传<strong>第一个</strong>已发送但未被确认的报文段。</p>
+<p><img src="/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC3%E7%AB%A0%E8%BF%90%E8%BE%93%E5%B1%82/31.png" alt="pic"></p>
+<h3 id="5-3-TCP-流量控制"><a href="#5-3-TCP-流量控制" class="headerlink" title="5.3. TCP 流量控制"></a>5.3. TCP 流量控制</h3><p><strong>问题</strong>：如果某应用读取数据时相对缓慢，而发送方又发送得太多、太快，接收方的接受缓存就会出现溢出。</p>
+<p>为此，TCP为它的应用程序提供了 <strong>流量控制（flow-control）</strong> 服务。</p>
+<p>发送方维护一个 <strong>接收窗口的变量 <code>rwnd</code></strong> 来实现流程控制，该变量表示接收方还有多少可用的缓存空间。发送方已发送但未被确认报文段的<strong>总字节数</strong>，不能超过接收窗口的值。</p>
+<p>接收方会将当前剩余的缓存空间，通过TCP确认报文中的<strong>接收窗口字段</strong>告诉发送方。</p>
+<p><strong>新的问题</strong>：假如接收方缓存空间已满，它通过TCP确认报文告诉发送方，发送方接收窗口的变量变为0，发送方将不再发送报文段。此时，若接收方缓存出现空余，它将不能告诉发送方。</p>
+<p>解决：<strong>接收窗口变量为0时，发送方将继续发送只有一个字节的报文段</strong>，如果接收方缓存开始清空，则会返回确认报文，并将接收窗口字段设为非0值。</p>
+<h3 id="5-4-TCP-拥塞控制"><a href="#5-4-TCP-拥塞控制" class="headerlink" title="5.4. TCP 拥塞控制"></a>5.4. TCP 拥塞控制</h3><p>众所周知，网络是存在拥塞的。如果拥塞时，还向网络发送数据，那将加剧拥塞。这就像交通堵塞一样。</p>
+<p>那么，TCP是如何进行交通管制的呢？它首先要解决<strong>三个问题</strong>：</p>
+<ol>
+<li>TCP发送方如何限制其发送速率？</li>
+<li>TCP如何感知路径上存在拥塞的呢？</li>
+<li>当感知到拥塞时，采用何种算法来改变发送速率呢？</li>
+</ol>
+<p>跟流量控制一样，发送方也维护着一个**拥塞窗口的变量 <code>cwnd</code>**，发送方已发送但未被确认报文段的总字节数，不能超过<code>min&#123;rwnd, cwnd&#125;</code>。</p>
+<p>但在讨论拥塞控制时，我们假设接收方缓存是无限大的，即发送方的已发送但未被确认报文段的总字节数，只取决于拥塞窗口变量。</p>
+<p>并且，我们需要知道网络中没有明确的拥塞状态信号，TCP通常通过隐式地感知拥塞：<strong>超时事件</strong> 和 <strong>3个冗余ACK</strong>。</p>
+<p>接下来，我们将介绍广受赞誉的<strong>TCP拥塞控制算法（TCP congestion-control algorithm）</strong>，它包含3个主要部分：</p>
+<ul>
+<li><strong>慢启动</strong></li>
+<li><strong>拥塞避免</strong></li>
+<li><strong>快速恢复</strong></li>
+</ul>
+<p>其中，慢启动和拥塞避免最为关键。有时，也算上快速重传算法，即4个部分。</p>
+<h4 id="5-4-1-慢启动（Slow-start）"><a href="#5-4-1-慢启动（Slow-start）" class="headerlink" title="5.4.1. 慢启动（Slow start）"></a>5.4.1. 慢启动（Slow start）</h4><p>思想：从一个较小值开始，逐渐增加拥塞窗口值。</p>
+<p>具体：</p>
+<ul>
+<li>初始拥塞窗口值设置为 1~4 个MSS（最大报文段长度）；</li>
+<li>每收到一个按序的确认报文后，则将拥塞窗口值增加 1 MSS：<code>cwnd = cwnd + 1MSS</code>。</li>
+</ul>
+<p><img src="/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC3%E7%AB%A0%E8%BF%90%E8%BE%93%E5%B1%82/32.png" alt="pic"></p>
+<p>由于每次接收到的报文数，即为拥塞窗口值&#x2F;MSS，所以，拥塞窗口值呈倍数增长，一点也不慢！</p>
+<p>考虑慢启动中的3种特殊情况：</p>
+<ul>
+<li>当拥塞窗口值<code>cwnd</code>达到慢启动阈值<code>ssthresh</code>时，将进入<strong>拥塞避免</strong>状态；</li>
+<li>当遇到超时事件时，慢启动阈值<code>ssthresh</code>将被设置为<code>cwnd/2</code>，再将拥塞窗口值<code>cwnd</code>重置为 <code>1 MSS</code>；</li>
+<li>当遇到3个冗余ACK时，慢启动阈值<code>ssthresh</code>也将被设置为<code>cwnd/2</code>，但拥塞窗口值<code>cwnd</code>被设为<code>ssthresh</code>，并执行<strong>快速重传</strong>，然后进入<strong>快速恢复</strong>状态。</li>
+</ul>
+<h4 id="5-4-2-拥塞避免（Congestion-Avoidance）"><a href="#5-4-2-拥塞避免（Congestion-Avoidance）" class="headerlink" title="5.4.2. 拥塞避免（Congestion Avoidance）"></a>5.4.2. 拥塞避免（Congestion Avoidance）</h4><p>思想：缓慢增加拥塞窗口值。</p>
+<p>具体：</p>
+<ul>
+<li>当每一轮发送的所有报文段，都收到确认报文时，拥塞窗口值加 1 MSS：<code>cwnd = cwnd + 1MSS</code>。</li>
+</ul>
+<p><img src="/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC3%E7%AB%A0%E8%BF%90%E8%BE%93%E5%B1%82/33.png" alt="pic"></p>
+<p>考虑拥塞避免中的2种特殊情况：</p>
+<ul>
+<li>当遇到超时事件时，慢启动阈值<code>ssthresh</code>将被设置为<code>cwnd/2</code>，拥塞窗口值<code>cwnd</code>将被重置为 <code>1 MSS</code>，并进入<strong>慢启动</strong>状态；</li>
+<li>当遇到3个冗余ACK时，慢启动阈值<code>ssthresh</code>将被设置为<code>cwnd/2</code>，拥塞窗口值<code>cwnd</code>被设为<code>ssthresh</code>，并<strong>快速重传</strong>冗余ACK指定的报文段，然后进入<strong>快速恢复</strong>状态。</li>
+</ul>
+<h4 id="5-4-3-快速恢复（Fast-Recovery）"><a href="#5-4-3-快速恢复（Fast-Recovery）" class="headerlink" title="5.4.3. 快速恢复（Fast Recovery）"></a>5.4.3. 快速恢复（Fast Recovery）</h4><p>思想：收到3个冗余ACK说明网络并不像超时那么糟糕。</p>
+<p>具体：</p>
+<ul>
+<li>在快速恢复状态中，也会发送报文段。</li>
+<li>如果收到冗余ACK，那么拥塞窗口值增加 1 MSS：<code>cwnd = cwnd + 1MSS</code>。由于进入快速恢复状态时，已经收到 3 个冗余ACK，所以进入快速恢复状态的初始拥塞窗口值为：<code>cwnd = ssthresh + 3MSS</code>。</li>
+</ul>
+<p>考虑快速恢复中的2中特殊情况：</p>
+<ul>
+<li>当遇到超时事件时，慢启动阈值<code>ssthresh</code>将被设置为<code>cwnd/2</code>，拥塞窗口值<code>cwnd</code>将被重置为 <code>1 MSS</code>，并进入<strong>慢启动</strong>状态；</li>
+<li>当遇到新的ACK时，拥塞窗口值<code>cwnd</code>被设为<code>ssthresh</code>，并进入<strong>拥塞避免</strong>状态。</li>
+</ul>
+<h4 id="5-4-4-总结"><a href="#5-4-4-总结" class="headerlink" title="5.4.4. 总结"></a>5.4.4. 总结</h4><p>TCP拥塞控制算法概括：<strong>加性增，乘性减</strong>。</p>
+<p>状态图：</p>
+<p><img src="/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC3%E7%AB%A0%E8%BF%90%E8%BE%93%E5%B1%82/35.png" alt="pic"></p>
+<p>拥塞窗口值<code>cwnd</code>变化示例（在<code>TCP Reno</code>版本中加入了快速恢复状态）：</p>
+<p><img src="/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC3%E7%AB%A0%E8%BF%90%E8%BE%93%E5%B1%82/34.png" alt="pic"></p>
+<h3 id="5-5-TCP-三次握手与四次挥手"><a href="#5-5-TCP-三次握手与四次挥手" class="headerlink" title="5.5. TCP 三次握手与四次挥手"></a>5.5. TCP 三次握手与四次挥手</h3><p>TCP是面向连接的，那么TCP是如何建立、释放连接的呢？</p>
+<h4 id="5-5-1-三次握手"><a href="#5-5-1-三次握手" class="headerlink" title="5.5.1. 三次握手"></a>5.5.1. 三次握手</h4><ul>
+<li><p>第一步：客户端TCP首先向服务端TCP发送一个特殊的TCP报文段，不包含应用层数据，报文段首部的一个标志位 <code>SYN</code> 被置为 1 ，序号字段 <code>seq</code> 被置为一个随机值 <code>client_isn</code>。这个特殊报文段被称为<strong>SYN 报文段</strong>。</p>
+</li>
+<li><p>第二步：服务端收到 SYN 报文段后，也返回一个特殊的TCP报文段，不包含应用层数据，首部的标志位 <code>SYN</code> 被置为 1 ，确认号字段 <code>ack</code> 被置为 <code>client_isn + 1</code>，序号字段 <code>seq</code> 被置为一个随机值 <code>server_isn</code>。这个特殊报文段被称为<strong>SYNACK 报文段</strong>。</p>
+</li>
+<li><p>第三步：客户端收到 SYNACK 报文段后，可以返回普通的TCP报文段，可以包含应用层数据，首部的标志位 <code>SYN</code> 被置为 0 ，确认号字段 <code>ack</code> 被置为 <code>server_isn + 1</code>，序号字段 <code>seq</code> 被置为 <code>client_isn + 1</code>。</p>
+</li>
+</ul>
+<p><img src="/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC3%E7%AB%A0%E8%BF%90%E8%BE%93%E5%B1%82/36.png" alt="pic"></p>
+<p><strong>为什么需要三次握手呢？</strong></p>
+<p>TCP连接是双向的，第一次和第二次的成功能够保证服务端听得到客户端的声音，第二次和第三次的成功能够保证客户端听得到服务端的声音。这可以类比打电话：</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">“喂，你听得到吗？”</span><br><span class="line">“我听得到呀，你听得到我吗？”</span><br><span class="line">“我能听到你，今天 balabala……”</span><br></pre></td></tr></table></figure>
+
+<p><strong>为什么不是两次握手呢？</strong></p>
+<p>因为，握手阶段结束后，服务端将会为新连接分配变量和缓存。如果两次握手中第二次的 SYNACK 报文段丢失，客户端接收不到确认报文段，不会发送数据，这导致服务器会白白分配变量和缓存、苦苦等待，浪费空间和时间。</p>
+<p><strong>为什么不是四次握手呢？</strong></p>
+<p>多余。通过第二次握手，服务端不仅可以告诉客户端自己听得到，也可以验证客户端是否听得到自己。</p>
+<h4 id="5-5-2-四次挥手"><a href="#5-5-2-四次挥手" class="headerlink" title="5.5.2. 四次挥手"></a>5.5.2. 四次挥手</h4><p>天下没有不散的宴席，TCP通过四次挥手断开连接：</p>
+<ul>
+<li><p>客户端&#x2F;服务端发送 <strong>FIN 报文段</strong>，首部 <code>FIN</code> 字段被置为 1 ，表明自己已经发送完所有数据。</p>
+</li>
+<li><p>服务端&#x2F;客户端返回 ACK 报文段，表明自己知道对方已经发送完数据了。</p>
+</li>
+<li><p>服务端&#x2F;客户端发送 <strong>FIN 报文段</strong>，首部 <code>FIN</code> 字段被置为 1 ，表明自己已经发送完所有数据。</p>
+</li>
+<li><p>客户端&#x2F;服务端返回 ACK 报文段，表明自己知道对方已经发送完数据了。</p>
+</li>
+</ul>
+<p><img src="/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B%E7%AC%94%E8%AE%B0-%E7%AC%AC3%E7%AB%A0%E8%BF%90%E8%BE%93%E5%B1%82/37.png" alt="pic"></p>
+<p><strong>为什么四次挥手呢？</strong></p>
+<p>很简单，因为TCP是全双工的，一方发送完数据，不代表另一方也发送完数据。</p>
+<h2 id="6-socket-套接字编程"><a href="#6-socket-套接字编程" class="headerlink" title="6. socket 套接字编程"></a>6. socket 套接字编程</h2><ul>
+<li>UDP 客户端：</li>
+</ul>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> socket <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line">serverName = <span class="string">&#x27;localhost&#x27;</span>    <span class="comment"># 服务端地址</span></span><br><span class="line">serverPort = <span class="number">12000</span>          <span class="comment"># 服务端端口</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 创建客户端套接字。AF_INET: 使用IPv4协议， SOCK_DGRAM: 使用UDP协议</span></span><br><span class="line">clientSocket = socket(AF_INET, SOCK_DGRAM)</span><br><span class="line"></span><br><span class="line">message = <span class="built_in">input</span>(<span class="string">&#x27;Input lowercase sentence: &#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 向服务端发送消息。UDP发送的每条消息，都必须附上服务端地址</span></span><br><span class="line">clientSocket.sendto(message.encode(), (serverName, serverPort))</span><br><span class="line"></span><br><span class="line"><span class="comment"># 接收服务端的消息</span></span><br><span class="line">recvMessage, serverAddress = clientSocket.recvfrom(<span class="number">2048</span>)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&#x27;From Server:&#x27;</span>, recvMessage.decode())</span><br><span class="line"></span><br><span class="line">clientSocket.close()</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>UDP 服务端：</li>
+</ul>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> socket <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line">serverName = <span class="string">&#x27;localhost&#x27;</span>    <span class="comment"># 服务端地址</span></span><br><span class="line">serverPort = <span class="number">12000</span>          <span class="comment"># 服务端端口</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 创建服务端套接字。AF_INET: 使用IPv4协议，SOCK_DGRAM: 使用UDP协议</span></span><br><span class="line">serverSocket = socket(AF_INET, SOCK_DGRAM)</span><br><span class="line">serverSocket.bind((serverName, serverPort)) <span class="comment"># 将套接字绑定到之前指定的端口</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;The server in ready to receive&quot;</span>)</span><br><span class="line"><span class="comment"># 服务器将一直接收UDP报文</span></span><br><span class="line"><span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">    message, clientAddress = serverSocket.recvfrom(<span class="number">2048</span>) <span class="comment"># 接收客户端信息，同时获得客户端地址</span></span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;receive: &quot;</span> + <span class="built_in">str</span>(message) + <span class="string">&quot; [from&quot;</span> + <span class="built_in">str</span>(clientAddress) + <span class="string">&quot;]&quot;</span>)</span><br><span class="line">    retMessage = message.upper() <span class="comment"># 将客户端发来的字符串变为大写</span></span><br><span class="line">    serverSocket.sendto(retMessage, clientAddress)  <span class="comment"># 通过已经获得的客户端地址，将修改后的字符串发回客户端</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>TCP 客户端：</li>
+</ul>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> socket <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line">serverName = <span class="string">&#x27;47.110.32.215&#x27;</span>    <span class="comment"># 服务端地址</span></span><br><span class="line">serverPort = <span class="number">8082</span>          <span class="comment"># 服务端端口</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 创建客户端套接字。AF_INET: 使用IPv4协议， SOCK_STREAM: 使用TCP协议</span></span><br><span class="line">clientSocket = socket(AF_INET, SOCK_STREAM)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 向服务端发起连接</span></span><br><span class="line">clientSocket.connect((serverName, serverPort))</span><br><span class="line"></span><br><span class="line">message = <span class="built_in">input</span>(<span class="string">&#x27;Input lowercase sentence: &#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 将信息发送到服务器</span></span><br><span class="line">clientSocket.send(message.encode())</span><br><span class="line"></span><br><span class="line"><span class="comment"># 从服务器接收信息</span></span><br><span class="line">recvMessage = clientSocket.recv(<span class="number">1024</span>)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&#x27;From Server:&#x27;</span>, recvMessage.decode())</span><br><span class="line"></span><br><span class="line"><span class="comment"># 关闭套接字</span></span><br><span class="line">clientSocket.close()</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>TCP 服务端：</li>
+</ul>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> socket <span class="keyword">import</span> *</span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"></span><br><span class="line">serverName = <span class="string">&#x27;localhost&#x27;</span>    <span class="comment"># 服务端地址</span></span><br><span class="line">serverPort = <span class="number">12000</span>          <span class="comment"># 服务端端口</span></span><br><span class="line"></span><br><span class="line">serverSocket = socket(AF_INET, SOCK_STREAM)</span><br><span class="line">serverSocket.bind((serverName, serverPort))</span><br><span class="line">serverSocket.listen(<span class="number">1</span>)</span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(<span class="string">&#x27;The server is ready to receive&#x27;</span>)</span><br><span class="line"><span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">    <span class="comment"># 服务端接收到客户端连接请求后，为新客户创建一个特定的套接字。单线程只支持单个用户</span></span><br><span class="line">    connSocket, clientAddress = serverSocket.accept()</span><br><span class="line">    message = connSocket.recv(<span class="number">1024</span>).decode()</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;receive: &quot;</span> + <span class="built_in">str</span>(message) + <span class="string">&quot; [from&quot;</span> + <span class="built_in">str</span>(clientAddress) + <span class="string">&quot;]&quot;</span>)</span><br><span class="line">    retMessage = message.upper()</span><br><span class="line">    connSocket.send(retMessage.encode())</span><br><span class="line">    connSocket.close()</span><br><span class="line"></span><br><span class="line">    time.sleep(<span class="number">20</span>)</span><br><span class="line">    <span class="keyword">if</span> <span class="built_in">input</span>(<span class="string">&#x27;press q to quit or other to continue:&#x27;</span>) == <span class="string">&#x27;q&#x27;</span>:</span><br><span class="line">        <span class="keyword">break</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="7-补充"><a href="#7-补充" class="headerlink" title="7. 补充"></a>7. 补充</h2><h3 id="7-1-IP-分片-与-TCP-分段"><a href="#7-1-IP-分片-与-TCP-分段" class="headerlink" title="7.1. IP 分片 与 TCP 分段"></a>7.1. IP 分片 与 TCP 分段</h3><p>由于受链路层 <strong>MTU（Maximum Transmission Unit，最大传输单元）</strong> 的影响，网络层IP会将数据报分片传输，而这对运输层是透明的，当这些数据报的片到达目的端时有可能会失序，但是在IP首部中有足够的信息让接收端能正确组装这些数据报片。</p>
+<p>尽管IP分片过程看起来透明的，但有一点让人不想使用它：即使只丢失一片数据也要重新传整个数据报。因为<strong>TCP报文段，对应于一份IP数据报（而不是一个分片）</strong>，TCP没有办法只重传数据报中的一个数据分片。</p>
+<p>因此，TCP试图避免IP分片。TCP是如何避免IP分片的呢？一旦TCP数据过大，超过了MSS（MSS &#x3D; MTU - TCP&#x2F;IP首部），则<strong>在运输层就会对TCP数据进行分段</strong>，这样到了IP层的数据报，自然不会超过MTU，也就不用分片了。</p>
+<p>而使用UDP很容易导致IP分片。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Network/" rel="tag"><i class="fa fa-tag"></i> 计算机网络</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/%E5%90%B4%E6%81%A9%E8%BE%BE%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E7%AC%AC%E4%B8%80%E8%AF%BE%E7%AC%94%E8%AE%B0-%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E4%B8%8E%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0.html" rel="prev" title="吴恩达深度学习第一课笔记 - 神经网络与深度学习">
+                  <i class="fa fa-chevron-left"></i> 吴恩达深度学习第一课笔记 - 神经网络与深度学习
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/C-C-%E9%87%8D%E9%9A%BE%E7%82%B9.html" rel="next" title="C/C++重难点">
+                  C/C++重难点 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments gitalk-container"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">dounine</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/mist/" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+<script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.0/search.js" integrity="sha256-vXZMYLEqsROAXkEw93GGIvaB2ab+QW6w3+1ahD9nXXA=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.0/es5/tex-mml-chtml.js","integrity":"sha256-r+3itOMtGGjap0x+10hu6jW/gZCzxHsoKrOd7gyRSGY="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/gitalk/1.7.2/gitalk.css" integrity="sha256-AJnUHL7dBv6PGaeyPQJcgQPDjt/Hn/PvYZde1iqfp8U=" crossorigin="anonymous">
+
+<script class="next-config" data-name="gitalk" type="application/json">{"enable":true,"github_id":"99MyCql","repo":"99MyCql.github.io","client_id":"7c69ea063e9c78a72075","client_secret":"f222b18af36b2dffda7884ce5fd77bbb9172de54","admin_user":"99MyCql","distraction_free_mode":false,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token","language":"zh-CN","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/gitalk/1.7.2/gitalk.min.js","integrity":"sha256-Pmj85ojLaPOWwRtlMJwmezB/Qg8BzvJp5eTzvXaYAfA="},"path_md5":"caff38697eaab190e679fda364896a1a"}</script>
+<script src="/js/third-party/comments/gitalk.js"></script>
+
+</body>
+</html>

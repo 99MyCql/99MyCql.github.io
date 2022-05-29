@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.2.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/golang32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/golang16.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="baidu-site-verification" content="code-RpvRDWfflk">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" integrity="sha256-DfWjNxDkM94fVBWx1H5BMMp0Zq7luBlV8QRcSES7s+0=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"blog.dounine.live","root":"/","images":"/images","scheme":"Mist","darkmode":false,"version":"8.11.1","exturl":false,"sidebar":{"position":"right","display":"always","padding":18,"offset":12},"copycode":{"enable":true,"style":"flat"},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":"gitalk","storage":true,"lazyload":false,"nav":null,"activeClass":"gitalk"},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="0. 前言在用python实现正态分布等概率分布函数时，混淆了直方图和条形图，又由于概率论没学到位，导致实现中遇到了不小的困难。 因而，借此篇博客复习一下，高中所学的直方图和条形图。。。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="复习直方图与条形图">
+<meta property="og:url" content="https://blog.dounine.live/%E5%A4%8D%E4%B9%A0%E7%9B%B4%E6%96%B9%E5%9B%BE%E4%B8%8E%E6%9D%A1%E5%BD%A2%E5%9B%BE.html">
+<meta property="og:site_name" content="dounine&#39;s blog">
+<meta property="og:description" content="0. 前言在用python实现正态分布等概率分布函数时，混淆了直方图和条形图，又由于概率论没学到位，导致实现中遇到了不小的困难。 因而，借此篇博客复习一下，高中所学的直方图和条形图。。。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://blog.dounine.live/%E5%A4%8D%E4%B9%A0%E7%9B%B4%E6%96%B9%E5%9B%BE%E4%B8%8E%E6%9D%A1%E5%BD%A2%E5%9B%BE/2.png">
+<meta property="og:image" content="https://blog.dounine.live/%E5%A4%8D%E4%B9%A0%E7%9B%B4%E6%96%B9%E5%9B%BE%E4%B8%8E%E6%9D%A1%E5%BD%A2%E5%9B%BE/3.png">
+<meta property="og:image" content="https://blog.dounine.live/%E5%A4%8D%E4%B9%A0%E7%9B%B4%E6%96%B9%E5%9B%BE%E4%B8%8E%E6%9D%A1%E5%BD%A2%E5%9B%BE/1.png">
+<meta property="og:image" content="https://blog.dounine.live/%E5%A4%8D%E4%B9%A0%E7%9B%B4%E6%96%B9%E5%9B%BE%E4%B8%8E%E6%9D%A1%E5%BD%A2%E5%9B%BE/4.png">
+<meta property="article:published_time" content="2019-10-10T03:41:13.000Z">
+<meta property="article:modified_time" content="2019-10-10T03:41:13.000Z">
+<meta property="article:author" content="dounine">
+<meta property="article:tag" content="数学">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://blog.dounine.live/%E5%A4%8D%E4%B9%A0%E7%9B%B4%E6%96%B9%E5%9B%BE%E4%B8%8E%E6%9D%A1%E5%BD%A2%E5%9B%BE/2.png">
+
+
+<link rel="canonical" href="https://blog.dounine.live/%E5%A4%8D%E4%B9%A0%E7%9B%B4%E6%96%B9%E5%9B%BE%E4%B8%8E%E6%9D%A1%E5%BD%A2%E5%9B%BE.html">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://blog.dounine.live/%E5%A4%8D%E4%B9%A0%E7%9B%B4%E6%96%B9%E5%9B%BE%E4%B8%8E%E6%9D%A1%E5%BD%A2%E5%9B%BE.html","path":"复习直方图与条形图.html","title":"复习直方图与条形图"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>复习直方图与条形图 | dounine's blog</title>
+  
+
+  <script src="/js/third-party/analytics/baidu-analytics.js"></script>
+  <script async src="https://hm.baidu.com/hm.js?66c7065aa71681df47eb23eff557978b"></script>
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">dounine's blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">18</span></a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">48</span></a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">75</span></a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#0-%E5%89%8D%E8%A8%80"><span class="nav-text">0. 前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E7%9B%B4%E6%96%B9%E5%9B%BE"><span class="nav-text">1. 直方图</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-%E7%90%86%E8%A7%A3"><span class="nav-text">1.1. 理解</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-python%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0"><span class="nav-text">1.2. python代码实现</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E6%9D%A1%E5%BD%A2%E5%9B%BE"><span class="nav-text">2. 条形图</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-%E7%90%86%E8%A7%A3"><span class="nav-text">2.1. 理解</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-python%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0"><span class="nav-text">2.2. python代码实现</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="dounine"
+      src="https://avatars.githubusercontent.com/u/41814469?s=400&u=48bf60a3428a3cb86a84a110c8688930cf6ceb08&v=4">
+  <p class="site-author-name" itemprop="name">dounine</p>
+  <div class="site-description" itemprop="description">回首向来萧瑟处</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">75</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">18</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">48</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/99MyCql" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;99MyCql" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+
+  <div class="links-of-blogroll site-overview-item animated">
+    <div class="links-of-blogroll-title"><i class="fa fa-globe fa-fw"></i>
+      Links
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://bkfish.gitee.io/" title="https:&#x2F;&#x2F;bkfish.gitee.io&#x2F;" rel="noopener" target="_blank">Kitty萌新的卧室</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://hitworld.github.io/" title="https:&#x2F;&#x2F;hitworld.github.io&#x2F;" rel="noopener" target="_blank">hirworld</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://wyjoutstanding.github.io/" title="https:&#x2F;&#x2F;wyjoutstanding.github.io&#x2F;" rel="noopener" target="_blank">wyjoutstanding</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://iwtf.github.io/" title="https:&#x2F;&#x2F;iwtf.github.io&#x2F;" rel="noopener" target="_blank">IWTF</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://wood1314.github.io/" title="https:&#x2F;&#x2F;wood1314.github.io&#x2F;" rel="noopener" target="_blank">wood</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://desperadoccy.github.io/" title="https:&#x2F;&#x2F;desperadoccy.github.io&#x2F;" rel="noopener" target="_blank">desperadoccy</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://doudouqaq.github.io/" title="https:&#x2F;&#x2F;doudouqaq.github.io&#x2F;" rel="noopener" target="_blank">doudouqaq</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://kylinnnnn.github.io/" title="https:&#x2F;&#x2F;kylinnnnn.github.io&#x2F;" rel="noopener" target="_blank">kylinnnnn</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://miaotony.xyz/" title="https:&#x2F;&#x2F;miaotony.xyz" rel="noopener" target="_blank">miaotony</a>
+        </li>
+    </ul>
+  </div>
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://github.com/99MyCql" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.dounine.live/%E5%A4%8D%E4%B9%A0%E7%9B%B4%E6%96%B9%E5%9B%BE%E4%B8%8E%E6%9D%A1%E5%BD%A2%E5%9B%BE.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://avatars.githubusercontent.com/u/41814469?s=400&u=48bf60a3428a3cb86a84a110c8688930cf6ceb08&v=4">
+      <meta itemprop="name" content="dounine">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dounine's blog">
+      <meta itemprop="description" content="回首向来萧瑟处">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="复习直方图与条形图 | dounine's blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          复习直方图与条形图
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2019-10-10 11:41:13" itemprop="dateCreated datePublished" datetime="2019-10-10T11:41:13+08:00">2019-10-10</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Base/" itemprop="url" rel="index"><span itemprop="name">九层之台，起于累土</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Base/Math/" itemprop="url" rel="index"><span itemprop="name">数学</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h2 id="0-前言"><a href="#0-前言" class="headerlink" title="0. 前言"></a>0. 前言</h2><p>在用python实现正态分布等概率分布函数时，混淆了直方图和条形图，又由于概率论没学到位，导致实现中遇到了不小的困难。</p>
+<p>因而，借此篇博客复习一下，高中所学的直方图和条形图。。。</p>
+<span id="more"></span>
+
+<h2 id="1-直方图"><a href="#1-直方图" class="headerlink" title="1. 直方图"></a>1. 直方图</h2><h3 id="1-1-理解"><a href="#1-1-理解" class="headerlink" title="1.1. 理解"></a>1.1. 理解</h3><p>首先，举一个直方图的例子：</p>
+<p><img src="/%E5%A4%8D%E4%B9%A0%E7%9B%B4%E6%96%B9%E5%9B%BE%E4%B8%8E%E6%9D%A1%E5%BD%A2%E5%9B%BE/2.png" alt="2"></p>
+<p>显然，直方图就是有很多根柱子的图。</p>
+<p>假设，数据集合<code>X</code>是分布在实数集上的随机数集合，<code>|X|=100</code>。</p>
+<p>对于直方图中的每个柱子：</p>
+<ul>
+<li><p>其<strong>宽</strong>对应<strong>横轴上的一个区间</strong>；</p>
+</li>
+<li><p>其<strong>高</strong>对应<strong>集合<code>X</code>中属于该区间的数的个数</strong>。</p>
+</li>
+</ul>
+<p><strong>频数分布直方图 (归一化直方图)</strong> 是直方图中的一种，它的特殊在于：</p>
+<ul>
+<li>其<strong>高</strong>对应该区间的计数除以集合<code>X</code>中的总数，即代表该区间的频数。</li>
+</ul>
+<p>上述例子便是一张频数分布直方图。</p>
+<h3 id="1-2-python代码实现"><a href="#1-2-python代码实现" class="headerlink" title="1.2. python代码实现"></a>1.2. python代码实现</h3><figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"><span class="keyword">from</span> matplotlib <span class="keyword">import</span> pyplot <span class="keyword">as</span> plt</span><br><span class="line"></span><br><span class="line">x = np.random.normal(<span class="number">1</span>,<span class="number">2</span>,<span class="number">100</span>) <span class="comment"># 生成100个服从 N(1,2^2) 的正态分布的随机数</span></span><br><span class="line"></span><br><span class="line">value, bins, count = plt.hist(x, bins=<span class="number">30</span>, normed=<span class="literal">True</span>) <span class="comment"># 根据x中的数据，画有30个连续区间的频数直方图</span></span><br><span class="line">plt.show()</span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(<span class="string">&#x27;value:&#x27;</span>, value, <span class="built_in">len</span>(value))</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&#x27;bins:&#x27;</span>, bins, <span class="built_in">len</span>(bins))</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&#x27;count:&#x27;</span>, count)</span><br></pre></td></tr></table></figure>
+
+<p>输出：</p>
+<p><img src="/%E5%A4%8D%E4%B9%A0%E7%9B%B4%E6%96%B9%E5%9B%BE%E4%B8%8E%E6%9D%A1%E5%BD%A2%E5%9B%BE/3.png" alt="3"></p>
+<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">value: [0.03220688 0.03220688 0.         0.09662064 0.03220688 0.06441376</span><br><span class="line"> 0.03220688 0.03220688 0.22544816 0.12882752 0.19324128 0.12882752</span><br><span class="line"> 0.3220688  0.22544816 0.25765504 0.06441376 0.12882752 0.22544816</span><br><span class="line"> 0.1610344  0.1610344  0.1610344  0.09662064 0.09662064 0.06441376</span><br><span class="line"> 0.         0.06441376 0.09662064 0.         0.         0.09662064] 30</span><br><span class="line">bins: [-3.97482069 -3.66432802 -3.35383536 -3.04334269 -2.73285002 -2.42235735</span><br><span class="line"> -2.11186468 -1.80137201 -1.49087934 -1.18038668 -0.86989401 -0.55940134</span><br><span class="line"> -0.24890867  0.061584    0.37207667  0.68256934  0.993062    1.30355467</span><br><span class="line">  1.61404734  1.92454001  2.23503268  2.54552535  2.85601801  3.16651068</span><br><span class="line">  3.47700335  3.78749602  4.09798869  4.40848136  4.71897403  5.02946669</span><br><span class="line">  5.33995936] 31</span><br><span class="line">count: &lt;a list of 30 Patch objects&gt;</span><br></pre></td></tr></table></figure>
+
+<p>对于<code>plt.hist()</code>函数：</p>
+<ul>
+<li><p><code>params</code>参数：</p>
+<ul>
+<li><p><code>x</code>: <code>x</code>轴上的数据集</p>
+</li>
+<li><p><code>bins</code>: 表示划分区间的个数，即柱子的个数</p>
+</li>
+<li><p><code>normed</code>: 表示是否归一化，若为<code>True</code>，则显示频数直方图</p>
+</li>
+<li><p>……</p>
+</li>
+</ul>
+</li>
+<li><p><code>return</code>返回值：</p>
+<ul>
+<li><p><code>value</code>: 每个区间对应的<code>y</code>值</p>
+</li>
+<li><p><code>bins</code>: 每个区间上下限的<code>x</code>值，如果有30个区间，则<code>len(bins)</code>为31</p>
+</li>
+<li><p><code>count</code>: 区间的个数</p>
+</li>
+</ul>
+</li>
+</ul>
+<p>其详情见<a target="_blank" rel="noopener" href="https://matplotlib.org/3.1.1/api/_as_gen/matplotlib.pyplot.hist.html">官网</a></p>
+<h2 id="2-条形图"><a href="#2-条形图" class="headerlink" title="2. 条形图"></a>2. 条形图</h2><h3 id="2-1-理解"><a href="#2-1-理解" class="headerlink" title="2.1. 理解"></a>2.1. 理解</h3><p>举个栗子：</p>
+<p><img src="/%E5%A4%8D%E4%B9%A0%E7%9B%B4%E6%96%B9%E5%9B%BE%E4%B8%8E%E6%9D%A1%E5%BD%A2%E5%9B%BE/1.png" alt="1"></p>
+<p>条形图似乎也是一个很多柱子的图。这便是条形图与直方图容易混淆的原因了。但，条形图的柱子似乎<strong>细很多</strong>呢。</p>
+<p>其实，条形图相对直方图，更好理解。</p>
+<p>条形图中，横坐标代表<code>x</code>值，纵坐标代表<code>y=f(x)</code>值。所以，条形图的边界就是对应函数<code>f(x)</code>图像的一部分了。</p>
+<h3 id="2-2-python代码实现"><a href="#2-2-python代码实现" class="headerlink" title="2.2. python代码实现"></a>2.2. python代码实现</h3><figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"><span class="keyword">from</span> matplotlib <span class="keyword">import</span> pyplot <span class="keyword">as</span> plt</span><br><span class="line"></span><br><span class="line"><span class="string">&#x27;&#x27;&#x27;正态分布公式&#x27;&#x27;&#x27;</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">normal_distribution</span>(<span class="params">mean, standard, x</span>):</span><br><span class="line">    <span class="keyword">return</span> (<span class="number">1</span> / (standard * np.sqrt(<span class="number">2</span>*np.pi)) * np.exp(-(x-mean)**<span class="number">2</span> / (<span class="number">2</span> * standard**<span class="number">2</span>)))</span><br><span class="line"></span><br><span class="line">x = np.random.normal(<span class="number">1</span>,<span class="number">2</span>,<span class="number">100</span>) <span class="comment"># 生成100个服从 N(1,2^2) 的正态分布的随机数</span></span><br><span class="line"><span class="built_in">print</span>(<span class="string">&#x27;x:&#x27;</span>, x)</span><br><span class="line"></span><br><span class="line">y = normal_distribution(<span class="number">1</span>,<span class="number">2</span>,x)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&#x27;y:&#x27;</span>, y)</span><br><span class="line">plt.bar(x, y) <span class="comment"># 画条形图。横轴为x，纵轴为y。</span></span><br><span class="line">plt.show()</span><br></pre></td></tr></table></figure>
+
+<p>输出：</p>
+<p><img src="/%E5%A4%8D%E4%B9%A0%E7%9B%B4%E6%96%B9%E5%9B%BE%E4%B8%8E%E6%9D%A1%E5%BD%A2%E5%9B%BE/4.png" alt="4"></p>
+<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line">x: [ 1.76932332  0.36522094  5.1450445   0.05004145  1.7720948   2.72576013</span><br><span class="line"> -0.10808016  1.89746125  3.63410412  2.91262325  4.10054093 -0.89758685</span><br><span class="line">  1.11546737  4.27508464  0.76085493  1.47257128  4.5245259   2.34713613</span><br><span class="line"> -0.05875876  8.75851437 -0.86486252 -0.34872341  0.07018679  0.88436324</span><br><span class="line">  0.48392354  0.1297039  -0.59002276  3.10785551  1.3165206   2.71668659</span><br><span class="line">  2.11486526 -0.84586926 -0.3576636   2.09204617  0.53542808  4.48640303</span><br><span class="line"> -0.52501128 -2.04203587 -1.57609217  0.92228732 -2.28138689  1.92260707</span><br><span class="line">  1.94208858  3.98329461 -4.28621987  0.0471915  -4.21319167  0.80202259</span><br><span class="line">  3.875302    2.73255094 -1.40581636  1.17265753 -2.22711288  1.1008017</span><br><span class="line">  1.87824436  3.10236217  1.43048658  1.00748939  4.80039664  0.8898163</span><br><span class="line">  2.82500036  1.7141756  -1.2301184   1.16866276  1.66890047  0.6901983</span><br><span class="line">  1.42811743  1.22482293 -0.25517217  1.78918545 -2.82314372 -1.79081425</span><br><span class="line"> -0.48748191  2.9755605  -2.07325393  1.17953198  3.76772486  0.41385189</span><br><span class="line">  0.83417547  1.15602977 -3.80374808 -1.63877772  2.14545695  3.10734999</span><br><span class="line"> -3.17789913  1.86693313  0.41279216  2.02547252  1.60170928  1.83176309</span><br><span class="line">  4.23187971 -0.3603266  -0.73596668  1.21855677 -2.12121712 -0.20157449</span><br><span class="line">  0.06652799  2.84224194  2.15910299  3.5127497 ]</span><br><span class="line">y: [1.85246481e-01 1.89672995e-01 2.32893302e-02 1.78192943e-01</span><br><span class="line"> 1.85147586e-01 1.37467642e-01 1.71089936e-01 1.80366335e-01</span><br><span class="line"> 8.37935889e-02 1.26267617e-01 5.99793484e-02 1.27175126e-01</span><br><span class="line"> 1.99138981e-01 5.21903254e-02 1.98050247e-01 1.93979816e-01</span><br><span class="line"> 4.22195850e-02 1.58987025e-01 1.73390851e-01 1.07673843e-04</span><br><span class="line"> 1.29147548e-01 1.58902008e-01 1.79038432e-01 1.99138006e-01</span><br><span class="line"> 1.92939699e-01 1.81452272e-01 1.45423186e-01 1.14467130e-01</span><br><span class="line"> 1.96988707e-01 1.38005420e-01 1.70767673e-01 1.30290347e-01</span><br><span class="line"> 1.58422143e-01 1.71846040e-01 1.94161674e-01 4.36539516e-02</span><br><span class="line"> 1.49151436e-01 6.27351432e-02 8.70200197e-02 1.99320615e-01</span><br><span class="line"> 5.19214540e-02 1.79337425e-01 1.78524921e-01 6.55729800e-02</span><br><span class="line"> 6.06572758e-03 1.78072195e-01 6.67586408e-03 1.98496245e-01</span><br><span class="line"> 7.09694403e-02 1.37064685e-01 9.67543721e-02 1.98729228e-01</span><br><span class="line"> 5.42654299e-02 1.99217948e-01 1.81137321e-01 1.14798536e-01</span><br><span class="line"> 1.94903532e-01 1.99469742e-01 3.27955468e-02 1.99168661e-01</span><br><span class="line"> 1.31543984e-01 1.87150614e-01 1.07124430e-01 1.98763102e-01</span><br><span class="line"> 1.88621259e-01 1.97092356e-01 1.94953096e-01 1.98214821e-01</span><br><span class="line"> 1.63814947e-01 1.84531071e-01 3.20922985e-02 7.53458647e-02</span><br><span class="line"> 1.51274227e-01 1.22463700e-01 6.12557886e-02 1.98669094e-01</span><br><span class="line"> 7.65643798e-02 1.91085957e-01 1.98786691e-01 1.98865040e-01</span><br><span class="line"> 1.11469968e-02 8.35358669e-02 1.69298023e-01 1.14497623e-01</span><br><span class="line"> 2.25067310e-02 1.81584831e-01 1.91056259e-01 1.74901040e-01</span><br><span class="line"> 1.90644952e-01 1.82945965e-01 5.40569843e-02 1.58278875e-01</span><br><span class="line"> 1.36861850e-01 1.98283670e-01 5.90225768e-02 1.66533569e-01</span><br><span class="line"> 1.78885926e-01 1.30508407e-01 1.68633817e-01 9.05978680e-02]</span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Math/" rel="tag"><i class="fa fa-tag"></i> 数学</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/junit%E5%85%A5%E9%97%A8.html" rel="prev" title="junit入门">
+                  <i class="fa fa-chevron-left"></i> junit入门
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/numpy%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0.html" rel="next" title="numpy学习笔记">
+                  numpy学习笔记 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments gitalk-container"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">dounine</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/mist/" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+<script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.0/search.js" integrity="sha256-vXZMYLEqsROAXkEw93GGIvaB2ab+QW6w3+1ahD9nXXA=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">false</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.0/es5/tex-mml-chtml.js","integrity":"sha256-r+3itOMtGGjap0x+10hu6jW/gZCzxHsoKrOd7gyRSGY="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/gitalk/1.7.2/gitalk.css" integrity="sha256-AJnUHL7dBv6PGaeyPQJcgQPDjt/Hn/PvYZde1iqfp8U=" crossorigin="anonymous">
+
+<script class="next-config" data-name="gitalk" type="application/json">{"enable":true,"github_id":"99MyCql","repo":"99MyCql.github.io","client_id":"7c69ea063e9c78a72075","client_secret":"f222b18af36b2dffda7884ce5fd77bbb9172de54","admin_user":"99MyCql","distraction_free_mode":false,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token","language":"zh-CN","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/gitalk/1.7.2/gitalk.min.js","integrity":"sha256-Pmj85ojLaPOWwRtlMJwmezB/Qg8BzvJp5eTzvXaYAfA="},"path_md5":"943652c394cf011e73eb2a127a3b2f37"}</script>
+<script src="/js/third-party/comments/gitalk.js"></script>
+
+</body>
+</html>

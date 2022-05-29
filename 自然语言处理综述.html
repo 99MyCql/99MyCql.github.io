@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.2.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/golang32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/golang16.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="baidu-site-verification" content="code-RpvRDWfflk">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" integrity="sha256-DfWjNxDkM94fVBWx1H5BMMp0Zq7luBlV8QRcSES7s+0=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"blog.dounine.live","root":"/","images":"/images","scheme":"Mist","darkmode":false,"version":"8.11.1","exturl":false,"sidebar":{"position":"right","display":"always","padding":18,"offset":12},"copycode":{"enable":true,"style":"flat"},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":"gitalk","storage":true,"lazyload":false,"nav":null,"activeClass":"gitalk"},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="1. 引言自然语言是指人类日常使用的语言，比如：中文、英语、日语等。自然语言灵活多变，是人类社会的重要组成部分，但它却不能被计算机很好地理解。为了实现用自然语言在人与计算机之间进行沟通，自然语言处理诞生了。自然语言处理(Natural Language Processing, NLP)是一个融合了语言学、计算机科学、数学等学科的领域，它不仅研究语言学，更研究如何让计算机处理这些语言。它主要分为两大">
+<meta property="og:type" content="article">
+<meta property="og:title" content="自然语言处理综述">
+<meta property="og:url" content="https://blog.dounine.live/%E8%87%AA%E7%84%B6%E8%AF%AD%E8%A8%80%E5%A4%84%E7%90%86%E7%BB%BC%E8%BF%B0.html">
+<meta property="og:site_name" content="dounine&#39;s blog">
+<meta property="og:description" content="1. 引言自然语言是指人类日常使用的语言，比如：中文、英语、日语等。自然语言灵活多变，是人类社会的重要组成部分，但它却不能被计算机很好地理解。为了实现用自然语言在人与计算机之间进行沟通，自然语言处理诞生了。自然语言处理(Natural Language Processing, NLP)是一个融合了语言学、计算机科学、数学等学科的领域，它不仅研究语言学，更研究如何让计算机处理这些语言。它主要分为两大">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://blog.dounine.live/%E8%87%AA%E7%84%B6%E8%AF%AD%E8%A8%80%E5%A4%84%E7%90%86%E7%BB%BC%E8%BF%B0/image.png">
+<meta property="og:image" content="https://blog.dounine.live/%E8%87%AA%E7%84%B6%E8%AF%AD%E8%A8%80%E5%A4%84%E7%90%86%E7%BB%BC%E8%BF%B0/image_1.png">
+<meta property="og:image" content="https://blog.dounine.live/%E8%87%AA%E7%84%B6%E8%AF%AD%E8%A8%80%E5%A4%84%E7%90%86%E7%BB%BC%E8%BF%B0/image_2.png">
+<meta property="og:image" content="https://blog.dounine.live/%E8%87%AA%E7%84%B6%E8%AF%AD%E8%A8%80%E5%A4%84%E7%90%86%E7%BB%BC%E8%BF%B0/image_3.png">
+<meta property="og:image" content="https://blog.dounine.live/%E8%87%AA%E7%84%B6%E8%AF%AD%E8%A8%80%E5%A4%84%E7%90%86%E7%BB%BC%E8%BF%B0/image_4.png">
+<meta property="article:published_time" content="2021-11-18T03:03:11.000Z">
+<meta property="article:modified_time" content="2021-11-18T03:03:11.000Z">
+<meta property="article:author" content="dounine">
+<meta property="article:tag" content="深度学习">
+<meta property="article:tag" content="自然语言处理">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://blog.dounine.live/%E8%87%AA%E7%84%B6%E8%AF%AD%E8%A8%80%E5%A4%84%E7%90%86%E7%BB%BC%E8%BF%B0/image.png">
+
+
+<link rel="canonical" href="https://blog.dounine.live/%E8%87%AA%E7%84%B6%E8%AF%AD%E8%A8%80%E5%A4%84%E7%90%86%E7%BB%BC%E8%BF%B0.html">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://blog.dounine.live/%E8%87%AA%E7%84%B6%E8%AF%AD%E8%A8%80%E5%A4%84%E7%90%86%E7%BB%BC%E8%BF%B0.html","path":"自然语言处理综述.html","title":"自然语言处理综述"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>自然语言处理综述 | dounine's blog</title>
+  
+
+  <script src="/js/third-party/analytics/baidu-analytics.js"></script>
+  <script async src="https://hm.baidu.com/hm.js?66c7065aa71681df47eb23eff557978b"></script>
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">dounine's blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">18</span></a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">48</span></a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">75</span></a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E5%BC%95%E8%A8%80"><span class="nav-text">1. 引言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E5%8E%86%E5%8F%B2%E4%B8%8E%E5%8F%91%E5%B1%95"><span class="nav-text">2. 历史与发展</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E7%9B%B8%E5%85%B3%E8%BF%9B%E5%B1%95"><span class="nav-text">3. 相关进展</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-word2vec"><span class="nav-text">3.1. word2vec</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#3-1-1-CBOW"><span class="nav-text">3.1.1. CBOW</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-1-2-Skip-gram"><span class="nav-text">3.1.2. Skip-gram</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-Transformer"><span class="nav-text">3.2. Transformer</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#3-2-1-Self-Attention"><span class="nav-text">3.2.1. Self-Attention</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-2-2-Transformer"><span class="nav-text">3.2.2. Transformer</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-3-%E9%A2%84%E8%AE%AD%E7%BB%83%E6%A8%A1%E5%9E%8B"><span class="nav-text">3.3. 预训练模型</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-%E7%BB%93%E6%9D%9F%E8%AF%AD"><span class="nav-text">4. 结束语</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-%E5%8F%82%E8%80%83%E6%96%87%E7%8C%AE"><span class="nav-text">5. 参考文献</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="dounine"
+      src="https://avatars.githubusercontent.com/u/41814469?s=400&u=48bf60a3428a3cb86a84a110c8688930cf6ceb08&v=4">
+  <p class="site-author-name" itemprop="name">dounine</p>
+  <div class="site-description" itemprop="description">回首向来萧瑟处</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">75</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">18</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">48</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/99MyCql" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;99MyCql" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+
+  <div class="links-of-blogroll site-overview-item animated">
+    <div class="links-of-blogroll-title"><i class="fa fa-globe fa-fw"></i>
+      Links
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://bkfish.gitee.io/" title="https:&#x2F;&#x2F;bkfish.gitee.io&#x2F;" rel="noopener" target="_blank">Kitty萌新的卧室</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://hitworld.github.io/" title="https:&#x2F;&#x2F;hitworld.github.io&#x2F;" rel="noopener" target="_blank">hirworld</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://wyjoutstanding.github.io/" title="https:&#x2F;&#x2F;wyjoutstanding.github.io&#x2F;" rel="noopener" target="_blank">wyjoutstanding</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://iwtf.github.io/" title="https:&#x2F;&#x2F;iwtf.github.io&#x2F;" rel="noopener" target="_blank">IWTF</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://wood1314.github.io/" title="https:&#x2F;&#x2F;wood1314.github.io&#x2F;" rel="noopener" target="_blank">wood</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://desperadoccy.github.io/" title="https:&#x2F;&#x2F;desperadoccy.github.io&#x2F;" rel="noopener" target="_blank">desperadoccy</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://doudouqaq.github.io/" title="https:&#x2F;&#x2F;doudouqaq.github.io&#x2F;" rel="noopener" target="_blank">doudouqaq</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://kylinnnnn.github.io/" title="https:&#x2F;&#x2F;kylinnnnn.github.io&#x2F;" rel="noopener" target="_blank">kylinnnnn</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://miaotony.xyz/" title="https:&#x2F;&#x2F;miaotony.xyz" rel="noopener" target="_blank">miaotony</a>
+        </li>
+    </ul>
+  </div>
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://github.com/99MyCql" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.dounine.live/%E8%87%AA%E7%84%B6%E8%AF%AD%E8%A8%80%E5%A4%84%E7%90%86%E7%BB%BC%E8%BF%B0.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://avatars.githubusercontent.com/u/41814469?s=400&u=48bf60a3428a3cb86a84a110c8688930cf6ceb08&v=4">
+      <meta itemprop="name" content="dounine">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dounine's blog">
+      <meta itemprop="description" content="回首向来萧瑟处">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="自然语言处理综述 | dounine's blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          自然语言处理综述
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-11-18 11:03:11" itemprop="dateCreated datePublished" datetime="2021-11-18T11:03:11+08:00">2021-11-18</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Pro/" itemprop="url" rel="index"><span itemprop="name">欲穷千里目，更上一层楼</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Pro/AI/" itemprop="url" rel="index"><span itemprop="name">人工智能</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h2 id="1-引言"><a href="#1-引言" class="headerlink" title="1. 引言"></a>1. 引言</h2><p>自然语言是指人类日常使用的语言，比如：中文、英语、日语等。自然语言灵活多变，是人类社会的重要组成部分，但它却不能被计算机很好地理解。为了实现用自然语言在人与计算机之间进行沟通，自然语言处理诞生了。自然语言处理(Natural Language Processing, NLP)是一个融合了语言学、计算机科学、数学等学科的领域，它不仅研究语言学，更研究如何让计算机处理这些语言。它主要分为两大方向：自然语言理解(Natural language Understanding, NLU)和自然语言生成(Natural language Generation, NLG)，前者是听读，后者是说写。</p>
+<p>本文将从自然语言处理的历史与发展讲起，进而分析目前深度学习在自然语言处理领域的研究进展，最后讨论自然语言处理的未来发展方向。</p>
+<span id="more"></span>
+
+<h2 id="2-历史与发展"><a href="#2-历史与发展" class="headerlink" title="2. 历史与发展"></a>2. 历史与发展</h2><p>1950年，计算机科学之父图灵提出了“图灵测试”，标志着人工智能领域的开端。而此时，正值苏美冷战，美国政府为了更方便地破译苏联相关文件，大力投入机器翻译的研究，自然语言处理从此兴起。从这之后的一段时期内，自然语言处理主要采用基于规则的方法，这种方法依赖于语言学，它通过分析词法、语法等信息，总结这些信息之间的规则，从而达到翻译的效果。这种类似于专家系统的方法，泛化性差、不便于优化，最终进展缓慢，未能达到预期效果。</p>
+<p>到了20世纪80、90年代，互联网飞速发展，计算机硬件也有了显著提升。同时，自然语言处理引入了统计机器学习算法，基于规则的方法逐渐被基于统计的方法所取代。在这一阶段，自然语言处理取得了实质性突破，并走向了实际应用。</p>
+<p>而从2008年左右开始，随着深度学习神经网络在图像处理、语音识别等领域取得了显著的成果，它也开始被应用到自然语言处理领域。从最开始的词嵌入、word2vec，到RNN、GRU、LSTM等神经网络模型，再到最近的注意力机制、预训练语言模型等等。伴随着深度学习的加持，自然语言处理也迎来了突飞猛进。</p>
+<h2 id="3-相关进展"><a href="#3-相关进展" class="headerlink" title="3. 相关进展"></a>3. 相关进展</h2><p>接下来，我将介绍自然语言处理与深度学习结合后的相关进展。</p>
+<h3 id="3-1-word2vec"><a href="#3-1-word2vec" class="headerlink" title="3.1. word2vec"></a>3.1. word2vec</h3><p>在自然语言中，词是最基本的单元。为了让计算机理解并处理自然语言，我们首先就要对词进行编码。由于自然语言中词的数量是有限的，那就可以对每个词指定一个唯一序号，比如：英文单词word的序号可以是1156。而为了方便计算，通常会将序号转换成统一的向量。简单做法是对单词序号进行one-hot编码，每个单词都对应一个长度为N（单词总数）的向量（一维数组），向量中只有该单词序号对应位置的元素值为1，其它都为0。</p>
+<p>虽然使用one-hot编码构造词向量十分容易，但并不是一个较好的方法。主要原因是无法很好地表示词的语义，比如苹果和橘子是相似单词（都是水果），但one-hot向量就无法体现这种相似关系。</p>
+<p>为了解决上述问题，Google的Mikolov等人于2013年发表了两篇与word2vec相关的原始论文[1][2]。word2vec将词表示成一个定长的向量，并通过上下文学习词的语义信息，使得这些向量能表达词特征、词之间关系等语义信息。word2vec包含两个模型：跳字模型（Skip-gram）[1] 和连续词袋模型（continuous bag of words，CBOW）[2]，它们的作用分别是：通过某个中心词预测上下文、通过上下文预测某个中心词。比如，有一句话”I drink apple juice”，Skip-gram模型是用apple预测其它词，CBOW模型则是用其它词预测出apple。</p>
+<h4 id="3-1-1-CBOW"><a href="#3-1-1-CBOW" class="headerlink" title="3.1.1. CBOW"></a>3.1.1. CBOW</h4><p><img src="/%E8%87%AA%E7%84%B6%E8%AF%AD%E8%A8%80%E5%A4%84%E7%90%86%E7%BB%BC%E8%BF%B0/image.png" alt="1"></p>
+<p>首先介绍CBOW模型，它是一个三层神经网络，通过上下文预测中心词。以某个训练数据”I drink apple juice”为例，可以把apple作为标签值先剔除，将”I drink juice”作为输入，apple作为待预测的中心词。</p>
+<ul>
+<li><p>输入层： $x_i$ 是上下文中第i个单词的one-hot向量，长度为 $V$ 。比如在训练数据<code>I drink _ juice</code>中，$x_2$就是词”drink”的one-hot向量。V是词库中词的总数，C是上下文中词的个数，k是训练集的大小。</p>
+</li>
+<li><p>隐藏层：输入层$x_i$乘上$W_{V \times N}$求和即得到隐藏层，公式为$\sum_{i&#x3D;1}^C x_i \times W_{V \times N}$。其中，$W_{V \times N}$是一个二维矩阵，V是词的总数，N代表着词的特征向量，长度可自定义。这个矩阵的每一行即可看作每个词对应的特征向量，而$x_i \times W_{V \times N}$就相当于取第i个词对应的特征向量。隐藏层没有激活函数，最后输出是一个$1 \times N$的向量。</p>
+</li>
+<li><p>输出层：输出层是中心词的预测值，一个$1 \times V$的向量。它由隐藏层输出乘上 $W_{N \times V}’$ ，并通过softmax激活函数得到，向量中每个位置的值相当于对应词的概率。中心词预测值会与实际值比较，并通过损失函数计算出损失值，再求出梯度值反向传播，最终更新 $W_{V \times N}$ 和 $W_{N \times V}’$ 的值。</p>
+</li>
+</ul>
+<h4 id="3-1-2-Skip-gram"><a href="#3-1-2-Skip-gram" class="headerlink" title="3.1.2. Skip-gram"></a>3.1.2. Skip-gram</h4><p><img src="/%E8%87%AA%E7%84%B6%E8%AF%AD%E8%A8%80%E5%A4%84%E7%90%86%E7%BB%BC%E8%BF%B0/image_1.png" alt="1"></p>
+<p>Skip-gram模型与CBOW类似，也是一个三层神经网络模型。不同在于，它是通过中心词预测上下文，即通过”apple”预测出”I drink juice”。接下来简单介绍Skip-gram模型中各层：</p>
+<ul>
+<li><p>输入层：中心词的one-hot向量，$1 \times V$。</p>
+</li>
+<li><p>隐藏层：一个$1 \times N$ 的向量，输入层直接乘上$W_{V \times N}$即可得到。</p>
+</li>
+<li><p>输出层：由隐藏层乘上$W_{N \times V}’$并通过softmax激活函数得到，是一个$1 \times V$的向量。在这个向量中，与上下文相关的词所对应位置上的概率值较高。</p>
+</li>
+</ul>
+<p>两种模型训练结束后，会取 $W_{V \times N}$ 作为词向量矩阵，第i行就代表词库中第i个词的词向量。词向量可用来计算词之间的相似度（词向量点乘）。比如，输入<code>I drink _ juice</code>上下文，预测出中心词为apple、orange的概率可能都很高，原因就是在$W_{V \times N}$中apple和orange对应的词向量十分相似，即相似度高。词向量还可以用于机器翻译、命名实体识别、关系抽取等等。</p>
+<p>其实这两种模型的原型在2003年就已出现[3]，而Mikolov在13年的论文中主要是简化了模型，且提出了负采样与层序softmax方法，使得训练更加高效。</p>
+<h3 id="3-2-Transformer"><a href="#3-2-Transformer" class="headerlink" title="3.2. Transformer"></a>3.2. Transformer</h3><p>词向量提出的同时，深度学习RNN框架也被应用到NLP中，并结合词向量取得了巨大成效。但是，RNN网络也存在一些问题，比如：难以并行化、难以建立长距离和层级化的依赖关系。而这些问题都在2017年发表的论文《Attention Is All You Need》[4]中得到有效解决。正是在这篇论文中，提出了Transformer模型。Transformer中抛弃了传统的复杂的CNN和RNN，整个网络结构完全由注意力机制组成。</p>
+<h4 id="3-2-1-Self-Attention"><a href="#3-2-1-Self-Attention" class="headerlink" title="3.2.1. Self-Attention"></a>3.2.1. Self-Attention</h4><p>Transformer最核心的内容是自注意力机制(Self-Attention)，它是注意力机制(Attention)的变体。注意力的作用是从大量信息中筛选出少量重要信息，并聚焦在这些信息上，比如：人在看一幅图像时，会重点关注较为吸引的部分，而忽略其它信息，这就是注意力的体现。但注意力机制会关注全局信息，即关注输入数据与输出数据以及中间产物的相关性。而自注意力机制则减少了对外部其它数据的关注，只关注输入数据本身，更擅长捕捉数据内部的相关性。</p>
+<p>自注意力机制的算法过程如下：</p>
+<ol>
+<li><p>将输入中one-hot编码的单词乘上word2vec中得出的词向量矩阵，得到单词的词向量。</p>
+</li>
+<li><p>将每个词的词向量分别乘上三个不同的矩阵，得到q、k、v三个向量。q是query，用来与k做匹配；k是key，代表着v的key；v是value，代表待提取信息的值。</p>
+</li>
+<li><p>依次将各个词的q与每个词的k点乘，再除于$\sqrt{d}$（d是q和k的维度）。比如，第1个单词对应的结果$a_{1,j} &#x3D; q_1 \cdot k_j \div \sqrt{d}$，j从1到n，组成一个向量。</p>
+</li>
+<li><p>将上一步每个词的结果进行softmax。</p>
+</li>
+<li><p>最后，每个词的输出为$b_i &#x3D; \sum_j(a_{i,j}v_i)$。</p>
+</li>
+</ol>
+<p><img src="/%E8%87%AA%E7%84%B6%E8%AF%AD%E8%A8%80%E5%A4%84%E7%90%86%E7%BB%BC%E8%BF%B0/image_2.png" alt="1"></p>
+<p>自注意力机制不仅建立了输入数据中词与词之间的关系，还能并行地高效地计算出每个词的输出。</p>
+<h4 id="3-2-2-Transformer"><a href="#3-2-2-Transformer" class="headerlink" title="3.2.2. Transformer"></a>3.2.2. Transformer</h4><p>Transformer的总体架构如下：</p>
+<p><img src="/%E8%87%AA%E7%84%B6%E8%AF%AD%E8%A8%80%E5%A4%84%E7%90%86%E7%BB%BC%E8%BF%B0/image_3.png" alt="1"></p>
+<p>它分为两部分：编码器（Encoder）和解码器（Decoder）。</p>
+<p>编码器的输入是词向量加上位置编码（表明这个词是在哪个位置），再通过多头自注意力操作（Multi-Head Attention）、全连接网络（Feed Forward）两部分得到输出。其中，多头自注意力就是输入的每个词对应多组q、k、v，每组之间互不影响，最终每个词产生多个输出b值，组成一个向量。编码器是transformer的核心，它通常会有多层，前一层的输出会作为下一层的输入，最后一层的输出会作为解码器的一部分输入。</p>
+<p>解码器包含两个不同的多头自注意力操作（Masked Multi-Head Attention和Multi-Head Attention）、全连接网络（Feed Forward）三部分。解码器会运行多次，每次只输出一个单词，直到输出完整的目标文本。已输出的部分会组合起来，作为下一次解码器的输入。其中，Masked Multi-Head Attention是将输入中未得到的部分遮掩起来，再进行多头自注意力操作。比如原有5个输入，但某次只有2个输入，那么q1和q2只会与k1、k2相乘，。</p>
+<h3 id="3-3-预训练模型"><a href="#3-3-预训练模型" class="headerlink" title="3.3. 预训练模型"></a>3.3. 预训练模型</h3><p>如果深度学习的应用，让NLP有了第一次飞跃。那预训练模型的出现，让NLP有了第二次的飞跃。预训练通过自监督学习（不需要标注）从大规模语料数据中学习出一个强大的语言模型，再通过微调迁移到具体任务，最终达成显著效果。</p>
+<p>预训练模型的优势如下：</p>
+<ul>
+<li><p>由于不需要标注数据，预训练模型可以从无限的文本中（比如互联网上大量的文本数据）学习通用的语法语义知识。</p>
+</li>
+<li><p>具有良好的复用性，通过微调可应用到具体任务，减少重复性劳动、节约资源。</p>
+</li>
+<li><p>预训练模型几乎在所有NLP任务中都取得显著成效。</p>
+</li>
+</ul>
+<p>预训练模型的关键技术有三个：</p>
+<ol>
+<li><p>transformer。</p>
+</li>
+<li><p>自监督学习，它不同于监督学习，需要对目标数据进行标注，它是取输入中的一部分作为目标数据。常见的方法有：预测下一个词，输入一个句子的前一部分预测下一个词，预训练模型ELMo[5]和著名的GPT[6]等就是采用这种方法；遮盖输入，将句子中的某个词遮盖，通过模型来预测这个词，预训练模型Bert[7]则采用这种方法。</p>
+</li>
+<li><p>微调，是将预训练模型迁移到具体的任务上。具体方法是：在预训练模型上再叠加一层特定任务层，训练并进行调参时，可以固定预训练模型的参数，也可以调整预训练模型的参数，通常采用后者。由于目前的预训练模型都非常庞大，为了让预训练模型调参更加高效，又提出了Adaptor[8]。它插入在预训练模型中一起训练，但迁移调参时只需要Adaptor中的参数。</p>
+</li>
+</ol>
+<p>关于预训练模型的架构，以Bert为例：输入是词的one-hot编码向量，乘上词向量矩阵后，再经过多层transformer中的Encoder模块，最终得到输出。</p>
+<p><img src="/%E8%87%AA%E7%84%B6%E8%AF%AD%E8%A8%80%E5%A4%84%E7%90%86%E7%BB%BC%E8%BF%B0/image_4.png" alt="1"></p>
+<h2 id="4-结束语"><a href="#4-结束语" class="headerlink" title="4. 结束语"></a>4. 结束语</h2><p>本文介绍了NLP领域的流行研究进展，其中transformer和预训练模型的出现，具有划时代的意义。但随着预训练模型越来越庞大，也将触及硬件瓶颈。另外，NLP在一些阅读理解、文本推理等任务上的表示，也差强人意。总而言之，NLP领域依旧存在着巨大的前景与挑战，仍然需要大家的长期努力。</p>
+<h2 id="5-参考文献"><a href="#5-参考文献" class="headerlink" title="5. 参考文献"></a>5. 参考文献</h2><p>[1]Mikolov, T., Sutskever, I., Chen, K., Corrado, G. S., &amp; Dean, J. (2013). Distributed representations of words and phrases and their compositionality. In Advances in neural information processing systems (pp. 3111-3119).</p>
+<p>[2]Mikolov, T., Chen, K., Corrado, G., &amp; Dean, J. (2013). Efficient estimation of word representations in vector space. arXiv preprint arXiv:1301.3781.</p>
+<p>[3]Yoshua Bengio, R´ejean Ducharme, Pascal Vincent, and Christian Janvin. A neural probabilistic language model. The Journal of Machine Learning Research, 3:1137–1155, 2003.</p>
+<p>[4]Vaswani A, Shazeer N, Parmar N, et al. Attention is all you need[C]&#x2F;&#x2F;Advances in neural information processing systems. 2017: 5998-6008.</p>
+<p>[5]Peters M E, Neumann M, Iyyer M, et al. Deep contextualized word representations[J]. arXiv preprint arXiv:1802.05365, 2018.</p>
+<p>[6]Radford A, Narasimhan K, Salimans T, et al. Improving language understanding by generative pre-training[J]. 2018.</p>
+<p>[7]Devlin J, Chang M W, Lee K, et al. Bert: Pre-training of deep bidirectional transformers for language understanding[J]. arXiv preprint arXiv:1810.04805, 2018.</p>
+<p>[8]Houlsby N, Giurgiu A, Jastrzebski S, et al. Parameter-efficient transfer learning for NLP[C]&#x2F;&#x2F;International Conference on Machine Learning. PMLR, 2019: 2790-2799.</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/DeepLearning/" rel="tag"><i class="fa fa-tag"></i> 深度学习</a>
+              <a href="/tags/NLP/" rel="tag"><i class="fa fa-tag"></i> 自然语言处理</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/%E5%8C%BA%E5%9D%97%E9%93%BE%E4%B9%8B%E5%85%B1%E8%AF%86%E2%80%94%E2%80%94%E8%A7%A3%E8%AF%BB%E3%80%8A%E5%8C%BA%E5%9D%97%E9%93%BE%E5%85%B1%E8%AF%86%E5%8D%8F%E8%AE%AE%E7%BB%BC%E8%BF%B0%E3%80%8B.html" rel="prev" title="区块链之共识——解读《区块链共识协议综述》">
+                  <i class="fa fa-chevron-left"></i> 区块链之共识——解读《区块链共识协议综述》
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95%E5%B0%8F%E6%B1%87%E6%80%BB.html" rel="next" title="数据结构与算法小汇总">
+                  数据结构与算法小汇总 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments gitalk-container"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">dounine</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/mist/" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+<script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.0/search.js" integrity="sha256-vXZMYLEqsROAXkEw93GGIvaB2ab+QW6w3+1ahD9nXXA=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.0/es5/tex-mml-chtml.js","integrity":"sha256-r+3itOMtGGjap0x+10hu6jW/gZCzxHsoKrOd7gyRSGY="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/gitalk/1.7.2/gitalk.css" integrity="sha256-AJnUHL7dBv6PGaeyPQJcgQPDjt/Hn/PvYZde1iqfp8U=" crossorigin="anonymous">
+
+<script class="next-config" data-name="gitalk" type="application/json">{"enable":true,"github_id":"99MyCql","repo":"99MyCql.github.io","client_id":"7c69ea063e9c78a72075","client_secret":"f222b18af36b2dffda7884ce5fd77bbb9172de54","admin_user":"99MyCql","distraction_free_mode":false,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token","language":"zh-CN","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/gitalk/1.7.2/gitalk.min.js","integrity":"sha256-Pmj85ojLaPOWwRtlMJwmezB/Qg8BzvJp5eTzvXaYAfA="},"path_md5":"c369e0f6a46512fedd0ed943f61fca90"}</script>
+<script src="/js/third-party/comments/gitalk.js"></script>
+
+</body>
+</html>

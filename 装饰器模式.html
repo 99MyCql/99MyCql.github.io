@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.2.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/golang32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/golang16.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="baidu-site-verification" content="code-RpvRDWfflk">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" integrity="sha256-DfWjNxDkM94fVBWx1H5BMMp0Zq7luBlV8QRcSES7s+0=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"blog.dounine.live","root":"/","images":"/images","scheme":"Mist","darkmode":false,"version":"8.11.1","exturl":false,"sidebar":{"position":"right","display":"always","padding":18,"offset":12},"copycode":{"enable":true,"style":"flat"},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":"gitalk","storage":true,"lazyload":false,"nav":null,"activeClass":"gitalk"},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="前言装饰器模式是一种结构型设计模式，它可以向现有对象动态地添加任意功能，而不改变其原本结构 。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="装饰器模式">
+<meta property="og:url" content="https://blog.dounine.live/%E8%A3%85%E9%A5%B0%E5%99%A8%E6%A8%A1%E5%BC%8F.html">
+<meta property="og:site_name" content="dounine&#39;s blog">
+<meta property="og:description" content="前言装饰器模式是一种结构型设计模式，它可以向现有对象动态地添加任意功能，而不改变其原本结构 。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://blog.dounine.live/%E8%A3%85%E9%A5%B0%E5%99%A8%E6%A8%A1%E5%BC%8F/1.png">
+<meta property="article:published_time" content="2021-11-05T05:58:21.000Z">
+<meta property="article:modified_time" content="2021-11-05T05:58:21.000Z">
+<meta property="article:author" content="dounine">
+<meta property="article:tag" content="设计模式">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://blog.dounine.live/%E8%A3%85%E9%A5%B0%E5%99%A8%E6%A8%A1%E5%BC%8F/1.png">
+
+
+<link rel="canonical" href="https://blog.dounine.live/%E8%A3%85%E9%A5%B0%E5%99%A8%E6%A8%A1%E5%BC%8F.html">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://blog.dounine.live/%E8%A3%85%E9%A5%B0%E5%99%A8%E6%A8%A1%E5%BC%8F.html","path":"装饰器模式.html","title":"装饰器模式"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>装饰器模式 | dounine's blog</title>
+  
+
+  <script src="/js/third-party/analytics/baidu-analytics.js"></script>
+  <script async src="https://hm.baidu.com/hm.js?66c7065aa71681df47eb23eff557978b"></script>
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">dounine's blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">18</span></a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">48</span></a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">75</span></a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1%E4%B8%AD%E7%9A%84%E8%A3%85%E9%A5%B0%E5%99%A8"><span class="nav-text">面向对象中的装饰器</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%BE%E4%BE%8B"><span class="nav-text">举例</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%87%AA%E9%97%AE%E8%87%AA%E7%AD%94"><span class="nav-text">自问自答</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%9D%A2%E5%90%91%E8%BF%87%E7%A8%8B%E4%B8%AD%E7%9A%84%E8%A3%85%E9%A5%B0%E5%99%A8"><span class="nav-text">面向过程中的装饰器</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Python%E4%B8%AD%E7%9A%84%E8%A3%85%E9%A5%B0%E5%99%A8"><span class="nav-text">Python中的装饰器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Go%E4%B8%AD%E7%9A%84%E8%A3%85%E9%A5%B0%E5%99%A8"><span class="nav-text">Go中的装饰器</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-text">总结</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="dounine"
+      src="https://avatars.githubusercontent.com/u/41814469?s=400&u=48bf60a3428a3cb86a84a110c8688930cf6ceb08&v=4">
+  <p class="site-author-name" itemprop="name">dounine</p>
+  <div class="site-description" itemprop="description">回首向来萧瑟处</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">75</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">18</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">48</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/99MyCql" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;99MyCql" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+
+  <div class="links-of-blogroll site-overview-item animated">
+    <div class="links-of-blogroll-title"><i class="fa fa-globe fa-fw"></i>
+      Links
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://bkfish.gitee.io/" title="https:&#x2F;&#x2F;bkfish.gitee.io&#x2F;" rel="noopener" target="_blank">Kitty萌新的卧室</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://hitworld.github.io/" title="https:&#x2F;&#x2F;hitworld.github.io&#x2F;" rel="noopener" target="_blank">hirworld</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://wyjoutstanding.github.io/" title="https:&#x2F;&#x2F;wyjoutstanding.github.io&#x2F;" rel="noopener" target="_blank">wyjoutstanding</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://iwtf.github.io/" title="https:&#x2F;&#x2F;iwtf.github.io&#x2F;" rel="noopener" target="_blank">IWTF</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://wood1314.github.io/" title="https:&#x2F;&#x2F;wood1314.github.io&#x2F;" rel="noopener" target="_blank">wood</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://desperadoccy.github.io/" title="https:&#x2F;&#x2F;desperadoccy.github.io&#x2F;" rel="noopener" target="_blank">desperadoccy</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://doudouqaq.github.io/" title="https:&#x2F;&#x2F;doudouqaq.github.io&#x2F;" rel="noopener" target="_blank">doudouqaq</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://kylinnnnn.github.io/" title="https:&#x2F;&#x2F;kylinnnnn.github.io&#x2F;" rel="noopener" target="_blank">kylinnnnn</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://miaotony.xyz/" title="https:&#x2F;&#x2F;miaotony.xyz" rel="noopener" target="_blank">miaotony</a>
+        </li>
+    </ul>
+  </div>
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://github.com/99MyCql" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.dounine.live/%E8%A3%85%E9%A5%B0%E5%99%A8%E6%A8%A1%E5%BC%8F.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://avatars.githubusercontent.com/u/41814469?s=400&u=48bf60a3428a3cb86a84a110c8688930cf6ceb08&v=4">
+      <meta itemprop="name" content="dounine">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dounine's blog">
+      <meta itemprop="description" content="回首向来萧瑟处">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="装饰器模式 | dounine's blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          装饰器模式
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-11-05 13:58:21" itemprop="dateCreated datePublished" datetime="2021-11-05T13:58:21+08:00">2021-11-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Base/" itemprop="url" rel="index"><span itemprop="name">九层之台，起于累土</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Base/SoftwareEngineering/" itemprop="url" rel="index"><span itemprop="name">软件工程</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>装饰器模式是一种结构型设计模式，它可以<strong>向现有对象动态地添加任意功能，而不改变其原本结构</strong> 。</p>
+<span id="more"></span>
+
+<h2 id="面向对象中的装饰器"><a href="#面向对象中的装饰器" class="headerlink" title="面向对象中的装饰器"></a>面向对象中的装饰器</h2><p><img src="/%E8%A3%85%E9%A5%B0%E5%99%A8%E6%A8%A1%E5%BC%8F/1.png" alt="1"></p>
+<p>由图可知，具体装饰器类Concrete Decorators继承Component接口类，与具体部件类Concrete Component一样拥有execute方法。但不同在于，Concrete Decorators的execute方法，是在被装饰对象wrappee的execute方法的基础上添加额外功能。而这个被装饰对象wrappee，既可以是具体部件类，也可以是装饰器类。</p>
+<p>使用时，用户可用多层装饰器来包裹部件，整体呈一个链式关系：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">c = <span class="keyword">new</span> <span class="built_in">ConcreteDecoratorA</span>(<span class="keyword">new</span> <span class="built_in">ConcreteDecoratorB</span>(<span class="keyword">new</span> <span class="built_in">ConcreteComponent</span>()))</span><br><span class="line">c.<span class="built_in">execute</span>()</span><br></pre></td></tr></table></figure>
+
+<p>最终调用execute方法时，会依次调用<code>ConcreteDecoratorA.execute() → ConcreteDecoratorB.execute() → ConcreteComponent.execute()</code>。</p>
+<h3 id="举例"><a href="#举例" class="headerlink" title="举例"></a>举例</h3><p>有一家奶茶店，提供多种类型的奶茶：奶青、乌龙奶茶、椰奶奶茶等等。当然，奶茶也可以加料，配料有椰果、珍珠、仙草等等。刚开始售卖奶茶时，奶茶店将奶茶与配料捆绑在一起，就会出现一份椰果的乌龙奶茶、一份珍珠的椰奶奶茶、一份椰果与一份珍珠的椰奶奶茶等，这样不仅使奶茶种类变得臃肿，还丧失了灵活性。顾客体验很差，生意自然就不好。</p>
+<p>但好巧不巧，老板无意中学习到了装饰器模式，幡然醒悟，将奶茶与配料拆开，让顾客先选择奶茶，再添加任意配料。如此，顾客就有非常自由且丰富的选择。顾客高兴了，生意自然就好起来了，奶茶店也有了好盼头。</p>
+<p>在这个例子中，奶茶就是Component接口类，配料就是Base Decorator类。一杯奶茶Concrete Component被生产出来后，可以向其中添加任意类型和数量的配料Concrete Decorators。</p>
+<h3 id="自问自答"><a href="#自问自答" class="headerlink" title="自问自答"></a>自问自答</h3><p>为什么不把Decorators作为Component类的一个数组属性？然后在execute时依次调用Decorators中 的方法呢？</p>
+<p>首先，这样需要修改Component类的结构和内容。而在实际中，往往是先有Component再有Decorator，甚至Component是不允许修改的。</p>
+<p>其次，缺乏灵活性。不同Decorator可能有不同的行为，有些Decorator想在execute方法被调用之前做处理，有些则想在之后做处理。</p>
+<p>而装饰器模式既不用修改被装饰对象，又保证了灵活性。</p>
+<h2 id="面向过程中的装饰器"><a href="#面向过程中的装饰器" class="headerlink" title="面向过程中的装饰器"></a>面向过程中的装饰器</h2><p>面向对象通常离我们较远，而真正让我领会到装饰器模式厉害之处的，是在面向过程的编程中。</p>
+<h3 id="Python中的装饰器"><a href="#Python中的装饰器" class="headerlink" title="Python中的装饰器"></a>Python中的装饰器</h3><p>编写函数时我总有一个习惯，在函数的开头打印函数开始与函数参数，并在函数结尾打印函数结束与函数返回值。如此，打印输出的逻辑顺序较为清晰，就可以较为轻松地进行调试。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">funcA</span>(<span class="params">s</span>):</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;++++++ funA begin ++++++&quot;</span>)</span><br><span class="line">    <span class="built_in">print</span>(s)</span><br><span class="line"></span><br><span class="line">    ...</span><br><span class="line"></span><br><span class="line">    <span class="built_in">print</span>(ret)</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;------ funA end ------&quot;</span>)</span><br><span class="line">    <span class="keyword">return</span> ret</span><br><span class="line"></span><br><span class="line">funcA(<span class="number">1</span>)</span><br></pre></td></tr></table></figure>
+
+<p>但是，如果每个函数都添加这些步骤，重复性又太高，代码将充满坏味道。有一种方法是定义专门的函数如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># args 参数数组，kwargs 参数字典</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">func_log</span>(<span class="params">func, *args, **kwargs</span>):</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">f&quot;++++++ <span class="subst">&#123;func.__name__&#125;</span> begin ++++++&quot;</span>)</span><br><span class="line">    <span class="built_in">print</span>(*args, **kwargs)</span><br><span class="line">    ret = func(*args, **kwargs)</span><br><span class="line">    <span class="built_in">print</span>(ret)</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">f&quot;------ <span class="subst">&#123;func.__name__&#125;</span> end ------&quot;</span>)</span><br><span class="line">    <span class="keyword">return</span> ret</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">funcA</span>(<span class="params">s</span>):</span><br><span class="line">    ...</span><br><span class="line"></span><br><span class="line"><span class="comment"># old: funcA(1)</span></span><br><span class="line">func_log(funcA, <span class="number">1</span>)</span><br></pre></td></tr></table></figure>
+
+<p>这样虽然能复用，但原来通过<code>funcA(1)</code>，现在要通过<code>func_log(funcA, 1)</code>的形式调用。<strong>改变了代码的原本结构</strong> ，这是我们不想看到的。</p>
+<p>于是，装饰器模式登场了。装饰器模式的本质在于：<strong>传入一种类型的变量或对象，在不改变其原有结构的基础上进行装饰加工，最终返回相同类型的变量或对象。</strong></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">log_decorator</span>(<span class="params">func</span>):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">wrapper</span>(<span class="params">*args, **kwargs</span>):</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">f&quot;++++++ <span class="subst">&#123;func.__name__&#125;</span> begin ++++++&quot;</span>)</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">f&quot;===&gt; args:<span class="subst">&#123;args&#125;</span>, kwargs:<span class="subst">&#123;kwargs&#125;</span>&quot;</span>)</span><br><span class="line">        ret = func(*args, **kwargs)</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">f&quot;&lt;=== return:<span class="subst">&#123;ret&#125;</span>&quot;</span>)</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">f&quot;------ <span class="subst">&#123;func.__name__&#125;</span> end ------&quot;</span>)</span><br><span class="line">        <span class="keyword">return</span> ret</span><br><span class="line">    <span class="keyword">return</span> wrapper</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">funcA</span>(<span class="params">s</span>):</span><br><span class="line">    ...</span><br><span class="line"></span><br><span class="line">funcA = log_decorator(funcA) <span class="comment"># 使用装饰器装饰</span></span><br><span class="line">...</span><br><span class="line">funcA(<span class="number">1</span>)</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>使用装饰器后，既能在函数的调用前后添加额外功能，又不会改变函数的内容和调用方式。这已经非常完美了，但还能更完美。在python中，还提供了装饰器语法糖<code>@</code>，使装饰器的使用更加方便：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">log_decorator</span>(<span class="params">func</span>):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">wrapper</span>(<span class="params">*args, **kwargs</span>):</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">f&quot;++++++ <span class="subst">&#123;func.__name__&#125;</span> begin ++++++&quot;</span>)</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">f&quot;===&gt; args:<span class="subst">&#123;args&#125;</span>, kwargs:<span class="subst">&#123;kwargs&#125;</span>&quot;</span>)</span><br><span class="line">        ret = func(*args, **kwargs)</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">f&quot;&lt;=== return:<span class="subst">&#123;ret&#125;</span>&quot;</span>)</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">f&quot;------ <span class="subst">&#123;func.__name__&#125;</span> end ------&quot;</span>)</span><br><span class="line">        <span class="keyword">return</span> ret</span><br><span class="line">    <span class="keyword">return</span> wrapper</span><br><span class="line"></span><br><span class="line"><span class="meta">@log_decorator </span><span class="comment"># 使用装饰器装饰</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">funcA</span>(<span class="params">s</span>):</span><br><span class="line">    ...</span><br><span class="line"></span><br><span class="line">funcA(<span class="number">1</span>)</span><br></pre></td></tr></table></figure>
+
+<h3 id="Go中的装饰器"><a href="#Go中的装饰器" class="headerlink" title="Go中的装饰器"></a>Go中的装饰器</h3><p>只要在一门语言中函数是一等公民，那这门语言就可以使用过程式的装饰器。因而，Go语言也可以编写过程式的装饰器。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">  <span class="string">&quot;log&quot;</span></span><br><span class="line">  <span class="string">&quot;runtime&quot;</span></span><br><span class="line">  <span class="string">&quot;reflect&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> Func <span class="function"><span class="keyword">func</span><span class="params">(s <span class="type">string</span>)</span></span> <span class="type">string</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">getFuncName</span><span class="params">(i <span class="keyword">interface</span>&#123;&#125;)</span></span> <span class="type">string</span> &#123;</span><br><span class="line">  <span class="keyword">return</span> runtime.FuncForPC(reflect.ValueOf(i).Pointer()).Name()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">logDecorator</span><span class="params">(fn Func)</span></span> Func &#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="function"><span class="keyword">func</span><span class="params">(s <span class="type">string</span>)</span></span> <span class="type">string</span> &#123;</span><br><span class="line">    funcName := getFuncName(fn)</span><br><span class="line">    log.Printf(<span class="string">&quot;===&gt; %s arg: %v\n&quot;</span>, funcName, s)</span><br><span class="line">    ret := fn(s)</span><br><span class="line">    log.Printf(<span class="string">&quot;&lt;=== %s ret: %v\n&quot;</span>, funcName, ret)</span><br><span class="line">    <span class="keyword">return</span> ret</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">funcA</span><span class="params">(s <span class="type">string</span>)</span></span> <span class="type">string</span> &#123;</span><br><span class="line">  s = <span class="string">&quot;hello &quot;</span> + s</span><br><span class="line">  <span class="keyword">return</span> s</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">  fn := logDecorator(funcA)</span><br><span class="line">  fn(<span class="string">&quot;decorator&quot;</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>但是，Go语言是一门强类型语言，它无法做到python那样将一个装饰器应用到任意函数上。在Go语言中，只能对同一类型的函数（参数与返回值都相同）编写专门的装饰器，这与面向对象的装饰器相似。同时，它也暂不支持装饰器语法糖。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>装饰器模式，尤其是面向过程的装饰器，可以将许多小功能（如打印日志、计算运行时间、参数预处理等）作为装饰器，灵活地组合在一起，大大提高代码的复用性。</p>
+<p>其实，装饰器模式这种“<strong>只提供最基础本体，而将附加功能作为装饰器</strong> ”的思想，不仅适用于代码编写，还适用于方方面面。比如，当今后端框架越来越趋于小而轻，而不是大而重，框架只需提供最基础的功能，而附加功能可通过插件的形式进行补充，这样就能使得用户的选择更加灵活多样。再比如，奶茶中的配料、烹饪时的佐料等等，都是装饰器模式思想的体现。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/DesignPatterns/" rel="tag"><i class="fa fa-tag"></i> 设计模式</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95%E5%B0%8F%E6%B1%87%E6%80%BB.html" rel="prev" title="数据结构与算法小汇总">
+                  <i class="fa fa-chevron-left"></i> 数据结构与算法小汇总
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/%E6%AF%94%E7%89%B9%E5%B8%81%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E2%80%94%E2%80%94%E5%85%B1%E8%AF%86%E6%A8%A1%E5%9D%97.html" rel="next" title="比特币源码分析——共识模块">
+                  比特币源码分析——共识模块 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments gitalk-container"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">dounine</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/mist/" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+<script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.0/search.js" integrity="sha256-vXZMYLEqsROAXkEw93GGIvaB2ab+QW6w3+1ahD9nXXA=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">false</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.0/es5/tex-mml-chtml.js","integrity":"sha256-r+3itOMtGGjap0x+10hu6jW/gZCzxHsoKrOd7gyRSGY="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/gitalk/1.7.2/gitalk.css" integrity="sha256-AJnUHL7dBv6PGaeyPQJcgQPDjt/Hn/PvYZde1iqfp8U=" crossorigin="anonymous">
+
+<script class="next-config" data-name="gitalk" type="application/json">{"enable":true,"github_id":"99MyCql","repo":"99MyCql.github.io","client_id":"7c69ea063e9c78a72075","client_secret":"f222b18af36b2dffda7884ce5fd77bbb9172de54","admin_user":"99MyCql","distraction_free_mode":false,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token","language":"zh-CN","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/gitalk/1.7.2/gitalk.min.js","integrity":"sha256-Pmj85ojLaPOWwRtlMJwmezB/Qg8BzvJp5eTzvXaYAfA="},"path_md5":"e2948a77cc85ed83f338fa61dc35d27d"}</script>
+<script src="/js/third-party/comments/gitalk.js"></script>
+
+</body>
+</html>

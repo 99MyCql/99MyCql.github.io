@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.2.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/golang32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/golang16.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="baidu-site-verification" content="code-RpvRDWfflk">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" integrity="sha256-DfWjNxDkM94fVBWx1H5BMMp0Zq7luBlV8QRcSES7s+0=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"blog.dounine.live","root":"/","images":"/images","scheme":"Mist","darkmode":false,"version":"8.11.1","exturl":false,"sidebar":{"position":"right","display":"always","padding":18,"offset":12},"copycode":{"enable":true,"style":"flat"},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":"gitalk","storage":true,"lazyload":false,"nav":null,"activeClass":"gitalk"},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="[TOC] 0. 前言结合之前卓越班《软件开发环境与工具》课程所教的junit，以及此次的软件测试大赛，决定入门学习一下junit。 此处使用IDEA作为开发工具。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="junit入门">
+<meta property="og:url" content="https://blog.dounine.live/junit%E5%85%A5%E9%97%A8.html">
+<meta property="og:site_name" content="dounine&#39;s blog">
+<meta property="og:description" content="[TOC] 0. 前言结合之前卓越班《软件开发环境与工具》课程所教的junit，以及此次的软件测试大赛，决定入门学习一下junit。 此处使用IDEA作为开发工具。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://blog.dounine.live/junit%E5%85%A5%E9%97%A8/demo1.png">
+<meta property="og:image" content="https://blog.dounine.live/junit%E5%85%A5%E9%97%A8/demo2.png">
+<meta property="og:image" content="https://blog.dounine.live/junit%E5%85%A5%E9%97%A8/demo3.png">
+<meta property="og:image" content="https://blog.dounine.live/junit%E5%85%A5%E9%97%A8/demo4.png">
+<meta property="og:image" content="https://blog.dounine.live/junit%E5%85%A5%E9%97%A8/demo5.png">
+<meta property="og:image" content="https://blog.dounine.live/junit%E5%85%A5%E9%97%A8/demo6.png">
+<meta property="og:image" content="https://blog.dounine.live/junit%E5%85%A5%E9%97%A8/demo7.png">
+<meta property="og:image" content="https://blog.dounine.live/junit%E5%85%A5%E9%97%A8/demo8.png">
+<meta property="og:image" content="https://blog.dounine.live/junit%E5%85%A5%E9%97%A8/demo9.png">
+<meta property="og:image" content="https://blog.dounine.live/junit%E5%85%A5%E9%97%A8/demo10.png">
+<meta property="og:image" content="https://blog.dounine.live/junit%E5%85%A5%E9%97%A8/demo11.png">
+<meta property="og:image" content="https://blog.dounine.live/junit%E5%85%A5%E9%97%A8/demo12.png">
+<meta property="article:published_time" content="2019-10-17T06:12:36.000Z">
+<meta property="article:modified_time" content="2019-10-17T06:12:36.000Z">
+<meta property="article:author" content="dounine">
+<meta property="article:tag" content="Java">
+<meta property="article:tag" content="Junit">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://blog.dounine.live/junit%E5%85%A5%E9%97%A8/demo1.png">
+
+
+<link rel="canonical" href="https://blog.dounine.live/junit%E5%85%A5%E9%97%A8.html">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://blog.dounine.live/junit%E5%85%A5%E9%97%A8.html","path":"junit入门.html","title":"junit入门"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>junit入门 | dounine's blog</title>
+  
+
+  <script src="/js/third-party/analytics/baidu-analytics.js"></script>
+  <script async src="https://hm.baidu.com/hm.js?66c7065aa71681df47eb23eff557978b"></script>
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">dounine's blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">18</span></a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">48</span></a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">75</span></a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#0-%E5%89%8D%E8%A8%80"><span class="nav-text">0. 前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E7%8E%AF%E5%A2%83%E5%87%86%E5%A4%87"><span class="nav-text">1. 环境准备</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E5%BC%80%E5%A7%8B"><span class="nav-text">2. 开始</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-%E7%BC%96%E5%86%99%E8%AE%A1%E7%AE%97%E5%99%A8%E7%B1%BB%EF%BC%8C%E5%8C%85%E5%90%AB%E5%8A%A0%E5%87%8F%E4%B9%98%E9%99%A4%E5%9B%9B%E4%B8%AA%E5%87%BD%E6%95%B0"><span class="nav-text">2.1. 编写计算器类，包含加减乘除四个函数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-%E7%BC%96%E5%86%99%E6%B5%8B%E8%AF%95%E7%B1%BB%EF%BC%8C%E4%BD%BF%E7%94%A8%E6%96%AD%E8%A8%80"><span class="nav-text">2.2. 编写测试类，使用断言</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-%E7%BC%96%E5%86%99%E5%87%BA%E7%8E%B0Error%E5%92%8CFailure%E7%9A%84%E6%B5%8B%E8%AF%95%E7%94%A8%E4%BE%8B%EF%BC%8C%E5%B9%B6%E5%88%86%E6%9E%90%E5%8C%BA%E5%88%AB"><span class="nav-text">2.3. 编写出现Error和Failure的测试用例，并分析区别</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-4-junit%E6%89%A7%E8%A1%8C%E8%BF%87%E7%A8%8B"><span class="nav-text">2.4. junit执行过程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-5-%E5%BC%82%E5%B8%B8%E6%B5%8B%E8%AF%95%E3%80%81%E8%B6%85%E6%97%B6%E6%B5%8B%E8%AF%95%E3%80%81%E5%BF%BD%E7%95%A5%E6%B5%8B%E8%AF%95"><span class="nav-text">2.5. 异常测试、超时测试、忽略测试</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-6-%E5%8F%82%E6%95%B0%E5%8C%96%E6%B5%8B%E8%AF%95"><span class="nav-text">2.6. 参数化测试</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-7-%E5%90%8C%E6%97%B6%E8%BF%90%E8%A1%8C%E5%A4%9A%E4%B8%AA%E6%B5%8B%E8%AF%95%E7%B1%BB"><span class="nav-text">2.7. 同时运行多个测试类</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E5%8F%82%E8%80%83"><span class="nav-text">3. 参考</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="dounine"
+      src="https://avatars.githubusercontent.com/u/41814469?s=400&u=48bf60a3428a3cb86a84a110c8688930cf6ceb08&v=4">
+  <p class="site-author-name" itemprop="name">dounine</p>
+  <div class="site-description" itemprop="description">回首向来萧瑟处</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">75</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">18</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">48</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/99MyCql" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;99MyCql" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+
+  <div class="links-of-blogroll site-overview-item animated">
+    <div class="links-of-blogroll-title"><i class="fa fa-globe fa-fw"></i>
+      Links
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://bkfish.gitee.io/" title="https:&#x2F;&#x2F;bkfish.gitee.io&#x2F;" rel="noopener" target="_blank">Kitty萌新的卧室</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://hitworld.github.io/" title="https:&#x2F;&#x2F;hitworld.github.io&#x2F;" rel="noopener" target="_blank">hirworld</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://wyjoutstanding.github.io/" title="https:&#x2F;&#x2F;wyjoutstanding.github.io&#x2F;" rel="noopener" target="_blank">wyjoutstanding</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://iwtf.github.io/" title="https:&#x2F;&#x2F;iwtf.github.io&#x2F;" rel="noopener" target="_blank">IWTF</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://wood1314.github.io/" title="https:&#x2F;&#x2F;wood1314.github.io&#x2F;" rel="noopener" target="_blank">wood</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://desperadoccy.github.io/" title="https:&#x2F;&#x2F;desperadoccy.github.io&#x2F;" rel="noopener" target="_blank">desperadoccy</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://doudouqaq.github.io/" title="https:&#x2F;&#x2F;doudouqaq.github.io&#x2F;" rel="noopener" target="_blank">doudouqaq</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://kylinnnnn.github.io/" title="https:&#x2F;&#x2F;kylinnnnn.github.io&#x2F;" rel="noopener" target="_blank">kylinnnnn</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://miaotony.xyz/" title="https:&#x2F;&#x2F;miaotony.xyz" rel="noopener" target="_blank">miaotony</a>
+        </li>
+    </ul>
+  </div>
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://github.com/99MyCql" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.dounine.live/junit%E5%85%A5%E9%97%A8.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://avatars.githubusercontent.com/u/41814469?s=400&u=48bf60a3428a3cb86a84a110c8688930cf6ceb08&v=4">
+      <meta itemprop="name" content="dounine">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dounine's blog">
+      <meta itemprop="description" content="回首向来萧瑟处">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="junit入门 | dounine's blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          junit入门
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2019-10-17 14:12:36" itemprop="dateCreated datePublished" datetime="2019-10-17T14:12:36+08:00">2019-10-17</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Others/" itemprop="url" rel="index"><span itemprop="name">不知道怎么分类的分类</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p>[TOC]</p>
+<h2 id="0-前言"><a href="#0-前言" class="headerlink" title="0. 前言"></a>0. 前言</h2><p>结合之前卓越班《软件开发环境与工具》课程所教的junit，以及此次的软件测试大赛，决定入门学习一下<code>junit</code>。</p>
+<p>此处使用<code>IDEA</code>作为开发工具。</p>
+<span id="more"></span>
+
+<h2 id="1-环境准备"><a href="#1-环境准备" class="headerlink" title="1. 环境准备"></a>1. 环境准备</h2><ol>
+<li><p><code>IDEA</code>新建一个java空项目，即新建项目页面什么都不选，直接next：</p>
+<p> <img src="/junit%E5%85%A5%E9%97%A8/demo1.png" alt="demo"></p>
+</li>
+<li><p>新建项目成功后，需要导入项目的依赖包(即junit包)。</p>
+</li>
+</ol>
+<ul>
+<li><p>右键项目根目录 - 选择<code>Open Module Settings</code> - 点击项目<code>Dependencies</code>(依赖配置) - 点击窗口右侧的绿色<code>+</code>按键 - 选择第1项<code>JARs or directories...</code>；</p>
+<p>  <img src="/junit%E5%85%A5%E9%97%A8/demo2.png" alt="demo"></p>
+</li>
+<li><p>找到<code>IDEA安装目录/lib/</code>目录，在该目录中找到<code>junit-4.12.jar</code>包，点击<code>OK</code>；</p>
+<p>  <img src="/junit%E5%85%A5%E9%97%A8/demo3.png" alt="demo"></p>
+</li>
+<li><p>用同样的方式，导入<code>hamcrest-core-1.3.jar</code>包(也在<code>IDEA安装目录/lib/</code>目录下)。<code>junit4.12</code>依赖于该包，若不导入该包，<code>junit4</code>运行则会报错。最终项目依赖列表如下：</p>
+<p>  <img src="/junit%E5%85%A5%E9%97%A8/demo4.png" alt="demo"></p>
+</li>
+<li><p>在项目<code>src/</code>目录下新建<code>main</code>和<code>test</code>包(即目录)，也可以不新建，个人喜好。最终项目结构和外部依赖如下：</p>
+<p>  <img src="/junit%E5%85%A5%E9%97%A8/demo5.png" alt="demo"></p>
+</li>
+</ul>
+<h2 id="2-开始"><a href="#2-开始" class="headerlink" title="2. 开始"></a>2. 开始</h2><h3 id="2-1-编写计算器类，包含加减乘除四个函数"><a href="#2-1-编写计算器类，包含加减乘除四个函数" class="headerlink" title="2.1. 编写计算器类，包含加减乘除四个函数"></a>2.1. 编写计算器类，包含加减乘除四个函数</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Calculator</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="type">int</span> <span class="title function_">add</span><span class="params">(<span class="type">int</span> a, <span class="type">int</span> b)</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> a + b;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="type">int</span> <span class="title function_">sub</span><span class="params">(<span class="type">int</span> a, <span class="type">int</span> b)</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> a - b;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="type">int</span> <span class="title function_">mul</span><span class="params">(<span class="type">int</span> a, <span class="type">int</span> b)</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> a * b;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="type">int</span> <span class="title function_">div</span><span class="params">(<span class="type">int</span> a, <span class="type">int</span> b)</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> a / b;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-2-编写测试类，使用断言"><a href="#2-2-编写测试类，使用断言" class="headerlink" title="2.2. 编写测试类，使用断言"></a>2.2. 编写测试类，使用断言</h3><p>在<code>test</code>目录下，新建<code>CalculatorTest</code>测试类，内容如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> test;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> main.Calculator;</span><br><span class="line"><span class="keyword">import</span> org.junit.Assert;</span><br><span class="line"><span class="keyword">import</span> org.junit.Test;</span><br><span class="line"></span><br><span class="line"><span class="comment">/***</span></span><br><span class="line"><span class="comment">* <span class="doctag">@project</span> junitDemo</span></span><br><span class="line"><span class="comment">* <span class="doctag">@class</span> CalculatorTest</span></span><br><span class="line"><span class="comment">* <span class="doctag">@author</span> douNine</span></span><br><span class="line"><span class="comment">* <span class="doctag">@date</span> 2019/6/23 11:40</span></span><br><span class="line"><span class="comment">* <span class="doctag">@description</span> TODO</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">CalculatorTest</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">addTest</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="type">Calculator</span> <span class="variable">c</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Calculator</span>();</span><br><span class="line">        <span class="type">int</span> <span class="variable">result</span> <span class="operator">=</span> c.add(<span class="number">1</span>, <span class="number">2</span>);</span><br><span class="line">        Assert.assertEquals(<span class="string">&quot;add error&quot;</span>, result, <span class="number">3</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">subTest</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="type">Calculator</span> <span class="variable">c</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Calculator</span>();</span><br><span class="line">        <span class="type">int</span> <span class="variable">result</span> <span class="operator">=</span> c.sub(<span class="number">3</span>, <span class="number">2</span>);</span><br><span class="line">        Assert.assertEquals(<span class="string">&quot;sub error&quot;</span>, result, <span class="number">1</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">mulTest</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="type">Calculator</span> <span class="variable">c</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Calculator</span>();</span><br><span class="line">        <span class="type">int</span> <span class="variable">result</span> <span class="operator">=</span> c.mul(<span class="number">1</span>, <span class="number">2</span>);</span><br><span class="line">        Assert.assertEquals(<span class="string">&quot;mul error&quot;</span>, result, <span class="number">2</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">divTest</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="type">Calculator</span> <span class="variable">c</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Calculator</span>();</span><br><span class="line">        <span class="type">int</span> <span class="variable">result</span> <span class="operator">=</span> c.div(<span class="number">2</span>, <span class="number">1</span>);</span><br><span class="line">        Assert.assertEquals(<span class="string">&quot;div error&quot;</span>, result, <span class="number">2</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>junit</code>中的断言：</p>
+<ul>
+<li><code>assertEquals()</code>: 如果比较的两个对象是相等的，此方法将正常返回；否则失败显示在JUnit的窗口测试将中止。</li>
+<li><code>assertSame()</code> 和 <code>assertNotSame()</code>: 方法测试两个对象引用指向完全相同的对象。</li>
+<li><code>assertNull()</code> 和 <code>assertNotNull()</code>: 方法测试一个变量是否为空或不为空(null)。</li>
+<li><code>assertTrue()</code> 和 <code>assertFalse()</code>: 方法测试if条件或变量是true还是false。</li>
+<li><code>assertArrayEquals()</code>: 将比较两个数组，如果它们相等，则该方法将继续进行不会发出错误。否则失败将显示在JUnit窗口和中止测试。</li>
+</ul>
+<h3 id="2-3-编写出现Error和Failure的测试用例，并分析区别"><a href="#2-3-编写出现Error和Failure的测试用例，并分析区别" class="headerlink" title="2.3. 编写出现Error和Failure的测试用例，并分析区别"></a>2.3. 编写出现Error和Failure的测试用例，并分析区别</h3><ul>
+<li><p>正常测试<br>  点击<code>CalculatorTest</code>测试类旁的绿色三角箭头，运行正确测试类，结果如下：</p>
+<p>  <img src="/junit%E5%85%A5%E9%97%A8/demo6.png" alt="demo"></p>
+</li>
+<li><p>编写出现<code>Failure</code>的测试用例</p>
+<p>  修改<code>Calculator</code>类的<code>add()</code>函数为：</p>
+  <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="type">int</span> <span class="title function_">add</span><span class="params">(<span class="type">int</span> a, <span class="type">int</span> b)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> a - b;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>  再次运行<code>CalculatorTest</code>测试类，<code>addTest()</code>函数报错<code>fail</code>：</p>
+<p>  <img src="/junit%E5%85%A5%E9%97%A8/demo7.png" alt="demo"></p>
+</li>
+<li><p>编写出现<code>Error</code>的测试用例</p>
+<p>  修改<code>CalculatorTest</code>测试类的<code>divTest()</code>函数为：</p>
+  <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">divTest</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="type">Calculator</span> <span class="variable">c</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Calculator</span>();</span><br><span class="line">    <span class="type">int</span> <span class="variable">result</span> <span class="operator">=</span> c.div(<span class="number">2</span>, <span class="number">0</span>);</span><br><span class="line">    Assert.assertEquals(<span class="string">&quot;div error&quot;</span>, result, <span class="number">2</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>  再次运行，出现<code>error</code>错误。原因是<strong>测试数据</strong>中存在<strong>除0</strong>，导致<strong>被测试函数</strong>抛出异常：</p>
+<p>  <img src="/junit%E5%85%A5%E9%97%A8/demo8.png" alt="demo"></p>
+</li>
+<li><p>Error和Failure的区别</p>
+<p>  <code>Error</code>的出现是因为<strong>测试代码</strong>编写的问题，比如以上用例：未接受被测试程序“正常”抛出的异常。</p>
+<p>  <code>Failure</code>的出现则说明<strong>被测试程序</strong>有问题，比如以上用例：<code>add()</code>函数错误地返回两数相减的结果。</p>
+</li>
+</ul>
+<h3 id="2-4-junit执行过程"><a href="#2-4-junit执行过程" class="headerlink" title="2.4. junit执行过程"></a>2.4. junit执行过程</h3><p>在<code>CalculatorTest</code>测试类中添加如下函数，并导入相应的包：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@BeforeClass</span></span><br><span class="line"><span class="keyword">static</span> <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">setUpClass</span><span class="params">()</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">    System.out.println(<span class="string">&quot;BeforeClass&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@AfterClass</span></span><br><span class="line"><span class="keyword">static</span> <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">tearDownClass</span><span class="params">()</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">    System.out.println(<span class="string">&quot;AfterClass&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Before</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">setUp</span><span class="params">()</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">    System.out.println(<span class="string">&quot;Before&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@After</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">tearDown</span><span class="params">()</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">    System.out.println(<span class="string">&quot;After&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>上述注解含义：</p>
+<p><code>@BeforeClass</code>表示该函数在<strong>所有测试函数</strong>运行之前运行；</p>
+<p><code>@AfterClass</code>表示该函数在<strong>所有测试函数</strong>运行之后运行；</p>
+<p><code>@Before</code>表示该函数在<strong>每个测试函数</strong>运行之前运行一次；</p>
+<p><code>@After</code>表示该函数在<strong>每个测试函数</strong>运行之后运行一次；</p>
+<p>在每个测试函数中加一句输出，运行测试类结果如下：</p>
+<p><img src="/junit%E5%85%A5%E9%97%A8/demo9.png" alt="demo"></p>
+<h3 id="2-5-异常测试、超时测试、忽略测试"><a href="#2-5-异常测试、超时测试、忽略测试" class="headerlink" title="2.5. 异常测试、超时测试、忽略测试"></a>2.5. 异常测试、超时测试、忽略测试</h3><ul>
+<li><p>异常测试</p>
+<p>  通过<code>@Test(expected = ArithmeticException.class)</code>实现异常检测。</p>
+<p>  对于上述<code>divTest()</code>除0抛出异常的情况，进行异常接受测试，修改<code>divTest()</code>函数如下：</p>
+  <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Test(expected = ArithmeticException.class)</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">divTest</span><span class="params">()</span> &#123;</span><br><span class="line">    System.out.println(<span class="string">&quot;divTest&quot;</span>);</span><br><span class="line">    <span class="type">Calculator</span> <span class="variable">c</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Calculator</span>();</span><br><span class="line">    <span class="type">int</span> <span class="variable">result</span> <span class="operator">=</span> c.div(<span class="number">2</span>, <span class="number">0</span>);</span><br><span class="line">    Assert.assertEquals(<span class="string">&quot;div error&quot;</span>, result, <span class="number">0</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>  运行结果如下，未出现<code>Error</code></p>
+<p>  <img src="/junit%E5%85%A5%E9%97%A8/demo10.png" alt="demo"></p>
+</li>
+<li><p>超时测试</p>
+<p>  通过<code>@Test(timeout = 2000)</code>实现。</p>
+<p>  在<code>CalculatorTest</code>测试类中添加超时测试函数：</p>
+  <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Test(timeout = 2000)</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">printTest</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="keyword">while</span> (<span class="literal">true</span>) &#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;hello&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>  该测试函数运行超过2000ms，则会报错<code>Error</code>：</p>
+<p>  <img src="/junit%E5%85%A5%E9%97%A8/demo11.png" alt="demo"></p>
+</li>
+<li><p>忽略测试</p>
+<p>  在<code>printTest()</code>函数上添加<code>@Ignore</code>注解。运行则会忽略该函数：</p>
+<p>  <img src="/junit%E5%85%A5%E9%97%A8/demo12.png" alt="demo"></p>
+</li>
+</ul>
+<h3 id="2-6-参数化测试"><a href="#2-6-参数化测试" class="headerlink" title="2.6. 参数化测试"></a>2.6. 参数化测试</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> test;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> main.Calculator;</span><br><span class="line"><span class="keyword">import</span> org.junit.Assert;</span><br><span class="line"><span class="keyword">import</span> org.junit.Test;</span><br><span class="line"><span class="keyword">import</span> org.junit.runner.RunWith;</span><br><span class="line"><span class="keyword">import</span> org.junit.runners.Parameterized;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.Arrays;</span><br><span class="line"><span class="keyword">import</span> java.util.Collection;</span><br><span class="line"></span><br><span class="line"><span class="comment">/***</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@project</span> junitDemo</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@class</span> ParameterTest</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> douNine</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@date</span> 2019/6/23 14:10</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@description</span> 参数化设置测试</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">@RunWith(Parameterized.class)</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">ParameterTest</span> &#123;</span><br><span class="line">    <span class="type">int</span> <span class="variable">expected</span> <span class="operator">=</span> <span class="number">0</span>;</span><br><span class="line">    <span class="type">int</span> <span class="variable">a</span> <span class="operator">=</span> <span class="number">0</span>;</span><br><span class="line">    <span class="type">int</span> <span class="variable">b</span> <span class="operator">=</span> <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">ParameterTest</span><span class="params">(<span class="type">int</span> expected, <span class="type">int</span> a, <span class="type">int</span> b)</span> &#123;</span><br><span class="line">        <span class="built_in">this</span>.expected = expected;</span><br><span class="line">        <span class="built_in">this</span>.a = a;</span><br><span class="line">        <span class="built_in">this</span>.b = b;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 设定多组数据，给测试方法用</span></span><br><span class="line">    <span class="meta">@Parameterized</span>.Parameters</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> Collection&lt;Object[]&gt; date() &#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;data&quot;</span>);</span><br><span class="line">        <span class="comment">// 返回多组参数数据，如：&#123;3,2,1&#125; 赋给了 expected, a, b</span></span><br><span class="line">        <span class="keyword">return</span> Arrays.asList(<span class="keyword">new</span> <span class="title class_">Object</span>[][]&#123;&#123;<span class="number">3</span>,<span class="number">2</span>,<span class="number">1</span>&#125;, &#123;<span class="number">1</span>,<span class="number">22</span>,<span class="number">3</span>&#125;&#125;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 设置了多少个参数则运行多少次。每次都会实例化测试类，并设置测试参数值。</span></span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">addTest</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="type">Calculator</span> <span class="variable">calutor</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Calculator</span>();</span><br><span class="line">        Assert.assertEquals(<span class="built_in">this</span>.expected, calutor.add(<span class="built_in">this</span>.a, <span class="built_in">this</span>.b));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>参数化测试说明：</p>
+<ul>
+<li>测试类需要使用<code>@RunWith(Parameterized.class)</code>注解进行修饰。</li>
+<li>测试类需要声明分别用于<strong>存放期望值和测试数据</strong>的变量。</li>
+<li>测试类需要声明一个<strong>带有参数的公共构造函数</strong>，并在其中为第二个环节中声明的几个变量赋值。</li>
+<li>测试类需要声明一个公共静态方法，使用<code>@Parameterized.Parameters</code>进行修饰，并返回<code>java.util.Collection</code>类，并在此方法中<strong>初始化所有需要测试的参数对</strong>。</li>
+<li>编写测试方法，使用类变量作为参数进行测试。</li>
+</ul>
+<h3 id="2-7-同时运行多个测试类"><a href="#2-7-同时运行多个测试类" class="headerlink" title="2.7. 同时运行多个测试类"></a>2.7. 同时运行多个测试类</h3><p>同时运行<code>CalculatorTest</code>和<code>ParameterTest</code>测试类，例如：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> test;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.junit.runner.RunWith;</span><br><span class="line"><span class="keyword">import</span> org.junit.runners.Suite;</span><br><span class="line"></span><br><span class="line"><span class="comment">/***</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@project</span> junitDemo</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@class</span> CommTest</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> douNine</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@date</span> 2019/6/23 14:11</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@description</span> 同时运行多个测试类</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">@RunWith(Suite.class)</span></span><br><span class="line"><span class="meta">@Suite</span>.SuiteClasses(&#123;</span><br><span class="line">        CalculatorTest.class,</span><br><span class="line">        ParameterTest.class</span><br><span class="line">&#125;)</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">CommTest</span> &#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="3-参考"><a href="#3-参考" class="headerlink" title="3. 参考"></a>3. 参考</h2><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_34264849/article/details/88243278">https://blog.csdn.net/qq_34264849&#x2F;article&#x2F;details&#x2F;88243278</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Java/" rel="tag"><i class="fa fa-tag"></i> Java</a>
+              <a href="/tags/Junit/" rel="tag"><i class="fa fa-tag"></i> Junit</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/python%E5%AE%9E%E7%8E%B0BP%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C.html" rel="prev" title="python实现BP神经网络">
+                  <i class="fa fa-chevron-left"></i> python实现BP神经网络
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/%E5%A4%8D%E4%B9%A0%E7%9B%B4%E6%96%B9%E5%9B%BE%E4%B8%8E%E6%9D%A1%E5%BD%A2%E5%9B%BE.html" rel="next" title="复习直方图与条形图">
+                  复习直方图与条形图 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments gitalk-container"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">dounine</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/mist/" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+<script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.0/search.js" integrity="sha256-vXZMYLEqsROAXkEw93GGIvaB2ab+QW6w3+1ahD9nXXA=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">false</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.0/es5/tex-mml-chtml.js","integrity":"sha256-r+3itOMtGGjap0x+10hu6jW/gZCzxHsoKrOd7gyRSGY="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/gitalk/1.7.2/gitalk.css" integrity="sha256-AJnUHL7dBv6PGaeyPQJcgQPDjt/Hn/PvYZde1iqfp8U=" crossorigin="anonymous">
+
+<script class="next-config" data-name="gitalk" type="application/json">{"enable":true,"github_id":"99MyCql","repo":"99MyCql.github.io","client_id":"7c69ea063e9c78a72075","client_secret":"f222b18af36b2dffda7884ce5fd77bbb9172de54","admin_user":"99MyCql","distraction_free_mode":false,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token","language":"zh-CN","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/gitalk/1.7.2/gitalk.min.js","integrity":"sha256-Pmj85ojLaPOWwRtlMJwmezB/Qg8BzvJp5eTzvXaYAfA="},"path_md5":"71ce533c6ebba785e167d3a31cd464e9"}</script>
+<script src="/js/third-party/comments/gitalk.js"></script>
+
+</body>
+</html>

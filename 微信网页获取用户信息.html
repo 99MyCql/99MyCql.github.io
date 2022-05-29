@@ -19,31 +19,31 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" integrity="sha256-DfWjNxDkM94fVBWx1H5BMMp0Zq7luBlV8QRcSES7s+0=" crossorigin="anonymous">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
 
-<script class="next-config" data-name="main" type="application/json">{"hostname":"blog.dounine.live","root":"/","images":"/images","scheme":"Mist","darkmode":false,"version":"8.11.1","exturl":false,"sidebar":{"position":"right","display":"always","padding":18,"offset":12},"copycode":{"enable":true,"style":"flat"},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":"gitalk","storage":true,"lazyload":false,"nav":null,"activeClass":"gitalk"},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+<script class="next-config" data-name="main" type="application/json">{"hostname":"99mycql.github.io","root":"/","images":"/images","scheme":"Mist","darkmode":false,"version":"8.11.1","exturl":false,"sidebar":{"position":"right","display":"always","padding":18,"offset":12},"copycode":{"enable":true,"style":"flat"},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":"gitalk","storage":true,"lazyload":false,"nav":null,"activeClass":"gitalk"},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
 
     <meta name="description" content="0. 前言准备：  微信认证公众号(要求企业才能认证)，或微信测试号(推荐)  PHP需要准备Apach服务器，python则准备Flask即可  调式工具：微信开发者工具(微信推出的IDE)  大致阅读微信公众平台文档中的微信网页授权   在本文中，笔者将简述微信网页获取用户信息的三个主要步骤，并附上后端PHP&#x2F;python代码。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="微信网页获取用户信息(PHP、python实现)">
-<meta property="og:url" content="https://blog.dounine.live/%E5%BE%AE%E4%BF%A1%E7%BD%91%E9%A1%B5%E8%8E%B7%E5%8F%96%E7%94%A8%E6%88%B7%E4%BF%A1%E6%81%AF.html">
+<meta property="og:url" content="https://99mycql.github.io/%E5%BE%AE%E4%BF%A1%E7%BD%91%E9%A1%B5%E8%8E%B7%E5%8F%96%E7%94%A8%E6%88%B7%E4%BF%A1%E6%81%AF.html">
 <meta property="og:site_name" content="dounine&#39;s blog">
 <meta property="og:description" content="0. 前言准备：  微信认证公众号(要求企业才能认证)，或微信测试号(推荐)  PHP需要准备Apach服务器，python则准备Flask即可  调式工具：微信开发者工具(微信推出的IDE)  大致阅读微信公众平台文档中的微信网页授权   在本文中，笔者将简述微信网页获取用户信息的三个主要步骤，并附上后端PHP&#x2F;python代码。">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://blog.dounine.live/%E5%BE%AE%E4%BF%A1%E7%BD%91%E9%A1%B5%E8%8E%B7%E5%8F%96%E7%94%A8%E6%88%B7%E4%BF%A1%E6%81%AF/1.png">
-<meta property="og:image" content="https://blog.dounine.live/%E5%BE%AE%E4%BF%A1%E7%BD%91%E9%A1%B5%E8%8E%B7%E5%8F%96%E7%94%A8%E6%88%B7%E4%BF%A1%E6%81%AF/2.png">
+<meta property="og:image" content="https://99mycql.github.io/%E5%BE%AE%E4%BF%A1%E7%BD%91%E9%A1%B5%E8%8E%B7%E5%8F%96%E7%94%A8%E6%88%B7%E4%BF%A1%E6%81%AF/1.png">
+<meta property="og:image" content="https://99mycql.github.io/%E5%BE%AE%E4%BF%A1%E7%BD%91%E9%A1%B5%E8%8E%B7%E5%8F%96%E7%94%A8%E6%88%B7%E4%BF%A1%E6%81%AF/2.png">
 <meta property="article:published_time" content="2018-11-14T12:31:44.000Z">
 <meta property="article:modified_time" content="2018-11-14T12:31:44.000Z">
 <meta property="article:author" content="dounine">
 <meta property="article:tag" content="后端">
 <meta property="article:tag" content="Python">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://blog.dounine.live/%E5%BE%AE%E4%BF%A1%E7%BD%91%E9%A1%B5%E8%8E%B7%E5%8F%96%E7%94%A8%E6%88%B7%E4%BF%A1%E6%81%AF/1.png">
+<meta name="twitter:image" content="https://99mycql.github.io/%E5%BE%AE%E4%BF%A1%E7%BD%91%E9%A1%B5%E8%8E%B7%E5%8F%96%E7%94%A8%E6%88%B7%E4%BF%A1%E6%81%AF/1.png">
 
 
-<link rel="canonical" href="https://blog.dounine.live/%E5%BE%AE%E4%BF%A1%E7%BD%91%E9%A1%B5%E8%8E%B7%E5%8F%96%E7%94%A8%E6%88%B7%E4%BF%A1%E6%81%AF.html">
+<link rel="canonical" href="https://99mycql.github.io/%E5%BE%AE%E4%BF%A1%E7%BD%91%E9%A1%B5%E8%8E%B7%E5%8F%96%E7%94%A8%E6%88%B7%E4%BF%A1%E6%81%AF.html">
 
 
 
-<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://blog.dounine.live/%E5%BE%AE%E4%BF%A1%E7%BD%91%E9%A1%B5%E8%8E%B7%E5%8F%96%E7%94%A8%E6%88%B7%E4%BF%A1%E6%81%AF.html","path":"微信网页获取用户信息.html","title":"微信网页获取用户信息(PHP、python实现)"}</script>
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://99mycql.github.io/%E5%BE%AE%E4%BF%A1%E7%BD%91%E9%A1%B5%E8%8E%B7%E5%8F%96%E7%94%A8%E6%88%B7%E4%BF%A1%E6%81%AF.html","path":"微信网页获取用户信息.html","title":"微信网页获取用户信息(PHP、python实现)"}</script>
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
 <title>微信网页获取用户信息(PHP、python实现) | dounine's blog</title>
@@ -257,7 +257,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://blog.dounine.live/%E5%BE%AE%E4%BF%A1%E7%BD%91%E9%A1%B5%E8%8E%B7%E5%8F%96%E7%94%A8%E6%88%B7%E4%BF%A1%E6%81%AF.html">
+    <link itemprop="mainEntityOfPage" href="https://99mycql.github.io/%E5%BE%AE%E4%BF%A1%E7%BD%91%E9%A1%B5%E8%8E%B7%E5%8F%96%E7%94%A8%E6%88%B7%E4%BF%A1%E6%81%AF.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="https://avatars.githubusercontent.com/u/41814469?s=400&u=48bf60a3428a3cb86a84a110c8688930cf6ceb08&v=4">

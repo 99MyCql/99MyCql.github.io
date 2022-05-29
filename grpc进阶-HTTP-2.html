@@ -19,19 +19,19 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" integrity="sha256-DfWjNxDkM94fVBWx1H5BMMp0Zq7luBlV8QRcSES7s+0=" crossorigin="anonymous">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
 
-<script class="next-config" data-name="main" type="application/json">{"hostname":"blog.dounine.live","root":"/","images":"/images","scheme":"Mist","darkmode":false,"version":"8.11.1","exturl":false,"sidebar":{"position":"right","display":"always","padding":18,"offset":12},"copycode":{"enable":true,"style":"flat"},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":"gitalk","storage":true,"lazyload":false,"nav":null,"activeClass":"gitalk"},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+<script class="next-config" data-name="main" type="application/json">{"hostname":"99mycql.github.io","root":"/","images":"/images","scheme":"Mist","darkmode":false,"version":"8.11.1","exturl":false,"sidebar":{"position":"right","display":"always","padding":18,"offset":12},"copycode":{"enable":true,"style":"flat"},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":"gitalk","storage":true,"lazyload":false,"nav":null,"activeClass":"gitalk"},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
 
     <meta name="description" content="0. 前言面试的时候，面试官问我 gRPC 所使用的 HTTP&#x2F;2 协议有何优势，我支支吾吾没答好。 面试结束后，深刻意识到自身的问题：学习新技术框架，常常不求甚解，缺乏刨根问底的精神。 因此，抽空好好学习一下 HTTP&#x2F;2 。 也借此勉励各位，千万不能只会 Hello world 。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="grpc进阶-HTTP&#x2F;2">
-<meta property="og:url" content="https://blog.dounine.live/grpc%E8%BF%9B%E9%98%B6-HTTP-2.html">
+<meta property="og:url" content="https://99mycql.github.io/grpc%E8%BF%9B%E9%98%B6-HTTP-2.html">
 <meta property="og:site_name" content="dounine&#39;s blog">
 <meta property="og:description" content="0. 前言面试的时候，面试官问我 gRPC 所使用的 HTTP&#x2F;2 协议有何优势，我支支吾吾没答好。 面试结束后，深刻意识到自身的问题：学习新技术框架，常常不求甚解，缺乏刨根问底的精神。 因此，抽空好好学习一下 HTTP&#x2F;2 。 也借此勉励各位，千万不能只会 Hello world 。">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://blog.dounine.live/grpc%E8%BF%9B%E9%98%B6-HTTP-2%5C2.png">
-<meta property="og:image" content="https://blog.dounine.live/grpc%E8%BF%9B%E9%98%B6-HTTP-2%5C1.png">
-<meta property="og:image" content="https://blog.dounine.live/grpc%E8%BF%9B%E9%98%B6-HTTP-2%5C3.png">
-<meta property="og:image" content="https://blog.dounine.live/grpc%E8%BF%9B%E9%98%B6-HTTP-2%5C4.png">
+<meta property="og:image" content="https://99mycql.github.io/grpc%E8%BF%9B%E9%98%B6-HTTP-2%5C2.png">
+<meta property="og:image" content="https://99mycql.github.io/grpc%E8%BF%9B%E9%98%B6-HTTP-2%5C1.png">
+<meta property="og:image" content="https://99mycql.github.io/grpc%E8%BF%9B%E9%98%B6-HTTP-2%5C3.png">
+<meta property="og:image" content="https://99mycql.github.io/grpc%E8%BF%9B%E9%98%B6-HTTP-2%5C4.png">
 <meta property="article:published_time" content="2020-08-22T06:39:55.000Z">
 <meta property="article:modified_time" content="2020-08-22T06:39:55.000Z">
 <meta property="article:author" content="dounine">
@@ -39,14 +39,14 @@
 <meta property="article:tag" content="grpc">
 <meta property="article:tag" content="计算机网络">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://blog.dounine.live/grpc%E8%BF%9B%E9%98%B6-HTTP-2%5C2.png">
+<meta name="twitter:image" content="https://99mycql.github.io/grpc%E8%BF%9B%E9%98%B6-HTTP-2%5C2.png">
 
 
-<link rel="canonical" href="https://blog.dounine.live/grpc%E8%BF%9B%E9%98%B6-HTTP-2.html">
+<link rel="canonical" href="https://99mycql.github.io/grpc%E8%BF%9B%E9%98%B6-HTTP-2.html">
 
 
 
-<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://blog.dounine.live/grpc%E8%BF%9B%E9%98%B6-HTTP-2.html","path":"grpc进阶-HTTP-2.html","title":"grpc进阶-HTTP/2"}</script>
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://99mycql.github.io/grpc%E8%BF%9B%E9%98%B6-HTTP-2.html","path":"grpc进阶-HTTP-2.html","title":"grpc进阶-HTTP/2"}</script>
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
 <title>grpc进阶-HTTP/2 | dounine's blog</title>
@@ -260,7 +260,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://blog.dounine.live/grpc%E8%BF%9B%E9%98%B6-HTTP-2.html">
+    <link itemprop="mainEntityOfPage" href="https://99mycql.github.io/grpc%E8%BF%9B%E9%98%B6-HTTP-2.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="https://avatars.githubusercontent.com/u/41814469?s=400&u=48bf60a3428a3cb86a84a110c8688930cf6ceb08&v=4">

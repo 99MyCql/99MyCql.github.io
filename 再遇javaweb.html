@@ -19,34 +19,34 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" integrity="sha256-DfWjNxDkM94fVBWx1H5BMMp0Zq7luBlV8QRcSES7s+0=" crossorigin="anonymous">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
 
-<script class="next-config" data-name="main" type="application/json">{"hostname":"blog.dounine.live","root":"/","images":"/images","scheme":"Mist","darkmode":false,"version":"8.11.1","exturl":false,"sidebar":{"position":"right","display":"always","padding":18,"offset":12},"copycode":{"enable":true,"style":"flat"},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":"gitalk","storage":true,"lazyload":false,"nav":null,"activeClass":"gitalk"},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+<script class="next-config" data-name="main" type="application/json">{"hostname":"99mycql.github.io","root":"/","images":"/images","scheme":"Mist","darkmode":false,"version":"8.11.1","exturl":false,"sidebar":{"position":"right","display":"always","padding":18,"offset":12},"copycode":{"enable":true,"style":"flat"},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":"gitalk","storage":true,"lazyload":false,"nav":null,"activeClass":"gitalk"},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
 
     <meta name="description" content="0. 前言从最初的servlet、Tomcat，到笨重的ofbiz框架，再跳至spring boot，现在又邂逅了jfinal(国内框架，迫于项目要求)。 javaweb的开发之路上，遇见了诸多框架，虽然都有些浅尝辄止，但也想对javaweb中的项目结构进行自我的总结归纳。 其缘由呢，是因为此次碰见的jfinal框架，它支持 热加载(内置服务器) 和 依托Tomcat 两种运行方式。同时，我们可以">
 <meta property="og:type" content="article">
 <meta property="og:title" content="再遇javaweb">
-<meta property="og:url" content="https://blog.dounine.live/%E5%86%8D%E9%81%87javaweb.html">
+<meta property="og:url" content="https://99mycql.github.io/%E5%86%8D%E9%81%87javaweb.html">
 <meta property="og:site_name" content="dounine&#39;s blog">
 <meta property="og:description" content="0. 前言从最初的servlet、Tomcat，到笨重的ofbiz框架，再跳至spring boot，现在又邂逅了jfinal(国内框架，迫于项目要求)。 javaweb的开发之路上，遇见了诸多框架，虽然都有些浅尝辄止，但也想对javaweb中的项目结构进行自我的总结归纳。 其缘由呢，是因为此次碰见的jfinal框架，它支持 热加载(内置服务器) 和 依托Tomcat 两种运行方式。同时，我们可以">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://blog.dounine.live/%E5%86%8D%E9%81%87javaweb/2.png">
-<meta property="og:image" content="https://blog.dounine.live/%E5%86%8D%E9%81%87javaweb/5.png">
-<meta property="og:image" content="https://blog.dounine.live/%E5%86%8D%E9%81%87javaweb/4.png">
-<meta property="og:image" content="https://blog.dounine.live/%E5%86%8D%E9%81%87javaweb/1.png">
-<meta property="og:image" content="https://blog.dounine.live/%E5%86%8D%E9%81%87javaweb/3.png">
+<meta property="og:image" content="https://99mycql.github.io/%E5%86%8D%E9%81%87javaweb/2.png">
+<meta property="og:image" content="https://99mycql.github.io/%E5%86%8D%E9%81%87javaweb/5.png">
+<meta property="og:image" content="https://99mycql.github.io/%E5%86%8D%E9%81%87javaweb/4.png">
+<meta property="og:image" content="https://99mycql.github.io/%E5%86%8D%E9%81%87javaweb/1.png">
+<meta property="og:image" content="https://99mycql.github.io/%E5%86%8D%E9%81%87javaweb/3.png">
 <meta property="article:published_time" content="2019-08-05T02:30:05.000Z">
 <meta property="article:modified_time" content="2019-08-05T02:30:05.000Z">
 <meta property="article:author" content="dounine">
 <meta property="article:tag" content="Java">
 <meta property="article:tag" content="后端">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://blog.dounine.live/%E5%86%8D%E9%81%87javaweb/2.png">
+<meta name="twitter:image" content="https://99mycql.github.io/%E5%86%8D%E9%81%87javaweb/2.png">
 
 
-<link rel="canonical" href="https://blog.dounine.live/%E5%86%8D%E9%81%87javaweb.html">
+<link rel="canonical" href="https://99mycql.github.io/%E5%86%8D%E9%81%87javaweb.html">
 
 
 
-<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://blog.dounine.live/%E5%86%8D%E9%81%87javaweb.html","path":"再遇javaweb.html","title":"再遇javaweb"}</script>
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://99mycql.github.io/%E5%86%8D%E9%81%87javaweb.html","path":"再遇javaweb.html","title":"再遇javaweb"}</script>
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
 <title>再遇javaweb | dounine's blog</title>
@@ -260,7 +260,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://blog.dounine.live/%E5%86%8D%E9%81%87javaweb.html">
+    <link itemprop="mainEntityOfPage" href="https://99mycql.github.io/%E5%86%8D%E9%81%87javaweb.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="https://avatars.githubusercontent.com/u/41814469?s=400&u=48bf60a3428a3cb86a84a110c8688930cf6ceb08&v=4">

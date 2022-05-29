@@ -19,39 +19,39 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" integrity="sha256-DfWjNxDkM94fVBWx1H5BMMp0Zq7luBlV8QRcSES7s+0=" crossorigin="anonymous">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
 
-<script class="next-config" data-name="main" type="application/json">{"hostname":"blog.dounine.live","root":"/","images":"/images","scheme":"Mist","darkmode":false,"version":"8.11.1","exturl":false,"sidebar":{"position":"right","display":"always","padding":18,"offset":12},"copycode":{"enable":true,"style":"flat"},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":"gitalk","storage":true,"lazyload":false,"nav":null,"activeClass":"gitalk"},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+<script class="next-config" data-name="main" type="application/json">{"hostname":"99mycql.github.io","root":"/","images":"/images","scheme":"Mist","darkmode":false,"version":"8.11.1","exturl":false,"sidebar":{"position":"right","display":"always","padding":18,"offset":12},"copycode":{"enable":true,"style":"flat"},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":"gitalk","storage":true,"lazyload":false,"nav":null,"activeClass":"gitalk"},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
 
     <meta name="description" content="0. 前言有幸，在软件可靠性课程的实验中，被要求实现BP神经网络模型。虽然，我觉得这门课程搭配这样的实验很无厘头，但正好趁这个机会，重新学习一下神经网络知识。学校的课程设计总归是不太令人满意的，但只要能学到有益的知识，就是赚到了。至于学分、绩点多少，就无关紧要了。 BP神经网络模型简介： BP神经网络模型是1986年由Rumelhart和McClelland为首的科学家提出的概念，是一种按照误差逆">
 <meta property="og:type" content="article">
 <meta property="og:title" content="python实现BP神经网络">
-<meta property="og:url" content="https://blog.dounine.live/python%E5%AE%9E%E7%8E%B0BP%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C.html">
+<meta property="og:url" content="https://99mycql.github.io/python%E5%AE%9E%E7%8E%B0BP%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C.html">
 <meta property="og:site_name" content="dounine&#39;s blog">
 <meta property="og:description" content="0. 前言有幸，在软件可靠性课程的实验中，被要求实现BP神经网络模型。虽然，我觉得这门课程搭配这样的实验很无厘头，但正好趁这个机会，重新学习一下神经网络知识。学校的课程设计总归是不太令人满意的，但只要能学到有益的知识，就是赚到了。至于学分、绩点多少，就无关紧要了。 BP神经网络模型简介： BP神经网络模型是1986年由Rumelhart和McClelland为首的科学家提出的概念，是一种按照误差逆">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://blog.dounine.live/python%E5%AE%9E%E7%8E%B0BP%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/13.png">
-<meta property="og:image" content="https://blog.dounine.live/python%E5%AE%9E%E7%8E%B0BP%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/9.png">
-<meta property="og:image" content="https://blog.dounine.live/python%E5%AE%9E%E7%8E%B0BP%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/14.png">
-<meta property="og:image" content="https://blog.dounine.live/python%E5%AE%9E%E7%8E%B0BP%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/16.png">
-<meta property="og:image" content="https://blog.dounine.live/python%E5%AE%9E%E7%8E%B0BP%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/17.png">
-<meta property="og:image" content="https://blog.dounine.live/python%E5%AE%9E%E7%8E%B0BP%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/18.png">
-<meta property="og:image" content="https://blog.dounine.live/python%E5%AE%9E%E7%8E%B0BP%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/1.png">
-<meta property="og:image" content="https://blog.dounine.live/python%E5%AE%9E%E7%8E%B0BP%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/2.png">
-<meta property="og:image" content="https://blog.dounine.live/python%E5%AE%9E%E7%8E%B0BP%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/3.png">
-<meta property="og:image" content="https://blog.dounine.live/python%E5%AE%9E%E7%8E%B0BP%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/4.png">
+<meta property="og:image" content="https://99mycql.github.io/python%E5%AE%9E%E7%8E%B0BP%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/13.png">
+<meta property="og:image" content="https://99mycql.github.io/python%E5%AE%9E%E7%8E%B0BP%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/9.png">
+<meta property="og:image" content="https://99mycql.github.io/python%E5%AE%9E%E7%8E%B0BP%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/14.png">
+<meta property="og:image" content="https://99mycql.github.io/python%E5%AE%9E%E7%8E%B0BP%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/16.png">
+<meta property="og:image" content="https://99mycql.github.io/python%E5%AE%9E%E7%8E%B0BP%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/17.png">
+<meta property="og:image" content="https://99mycql.github.io/python%E5%AE%9E%E7%8E%B0BP%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/18.png">
+<meta property="og:image" content="https://99mycql.github.io/python%E5%AE%9E%E7%8E%B0BP%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/1.png">
+<meta property="og:image" content="https://99mycql.github.io/python%E5%AE%9E%E7%8E%B0BP%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/2.png">
+<meta property="og:image" content="https://99mycql.github.io/python%E5%AE%9E%E7%8E%B0BP%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/3.png">
+<meta property="og:image" content="https://99mycql.github.io/python%E5%AE%9E%E7%8E%B0BP%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/4.png">
 <meta property="article:published_time" content="2019-10-29T13:54:21.000Z">
 <meta property="article:modified_time" content="2019-10-29T13:54:21.000Z">
 <meta property="article:author" content="dounine">
 <meta property="article:tag" content="Python">
 <meta property="article:tag" content="深度学习">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://blog.dounine.live/python%E5%AE%9E%E7%8E%B0BP%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/13.png">
+<meta name="twitter:image" content="https://99mycql.github.io/python%E5%AE%9E%E7%8E%B0BP%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/13.png">
 
 
-<link rel="canonical" href="https://blog.dounine.live/python%E5%AE%9E%E7%8E%B0BP%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C.html">
+<link rel="canonical" href="https://99mycql.github.io/python%E5%AE%9E%E7%8E%B0BP%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C.html">
 
 
 
-<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://blog.dounine.live/python%E5%AE%9E%E7%8E%B0BP%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C.html","path":"python实现BP神经网络.html","title":"python实现BP神经网络"}</script>
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://99mycql.github.io/python%E5%AE%9E%E7%8E%B0BP%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C.html","path":"python实现BP神经网络.html","title":"python实现BP神经网络"}</script>
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
 <title>python实现BP神经网络 | dounine's blog</title>
@@ -265,7 +265,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://blog.dounine.live/python%E5%AE%9E%E7%8E%B0BP%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C.html">
+    <link itemprop="mainEntityOfPage" href="https://99mycql.github.io/python%E5%AE%9E%E7%8E%B0BP%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="https://avatars.githubusercontent.com/u/41814469?s=400&u=48bf60a3428a3cb86a84a110c8688930cf6ceb08&v=4">

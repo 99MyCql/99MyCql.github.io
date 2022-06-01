@@ -28,26 +28,26 @@
 <meta property="og:site_name" content="dounine&#39;s blog">
 <meta property="og:description" content="前言当下，分布式是一大热门，常用场景比如分布式数据库等。在错综复杂的分布式网络环境中，不同节点间的数据（也被称为状态）很可能不一致，原因比如：传输时数据丢失、节点崩溃等等。分布式中所要解决的一大问题，就是节点间如何达成共识，也就是如何保证各节点数据的一致性。最容易想到的方法是，选择一个主节点，其它节点与主节点状态保持一致。但致命的问题在于，主节点崩溃了怎么办？如何选取新的主节点？如何保证新主节点的">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://blog.dounine.live/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BRaft%E2%80%94%E2%80%94%E8%A7%A3%E8%AF%BB%E3%80%8ARaft%E3%80%8B/image.png">
-<meta property="og:image" content="https://blog.dounine.live/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BRaft%E2%80%94%E2%80%94%E8%A7%A3%E8%AF%BB%E3%80%8ARaft%E3%80%8B/image_1.png">
-<meta property="og:image" content="https://blog.dounine.live/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BRaft%E2%80%94%E2%80%94%E8%A7%A3%E8%AF%BB%E3%80%8ARaft%E3%80%8B/image_2.png">
-<meta property="og:image" content="https://blog.dounine.live/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BRaft%E2%80%94%E2%80%94%E8%A7%A3%E8%AF%BB%E3%80%8ARaft%E3%80%8B/image_3.png">
-<meta property="og:image" content="https://blog.dounine.live/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BRaft%E2%80%94%E2%80%94%E8%A7%A3%E8%AF%BB%E3%80%8ARaft%E3%80%8B/image_4.png">
-<meta property="og:image" content="https://blog.dounine.live/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BRaft%E2%80%94%E2%80%94%E8%A7%A3%E8%AF%BB%E3%80%8ARaft%E3%80%8B/image_5.png">
-<meta property="og:image" content="https://blog.dounine.live/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BRaft%E2%80%94%E2%80%94%E8%A7%A3%E8%AF%BB%E3%80%8ARaft%E3%80%8B/image_6.png">
-<meta property="og:image" content="https://blog.dounine.live/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BRaft%E2%80%94%E2%80%94%E8%A7%A3%E8%AF%BB%E3%80%8ARaft%E3%80%8B/image_7.png">
-<meta property="og:image" content="https://blog.dounine.live/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BRaft%E2%80%94%E2%80%94%E8%A7%A3%E8%AF%BB%E3%80%8ARaft%E3%80%8B/image_8.png">
-<meta property="og:image" content="https://blog.dounine.live/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BRaft%E2%80%94%E2%80%94%E8%A7%A3%E8%AF%BB%E3%80%8ARaft%E3%80%8B/image_9.png">
-<meta property="og:image" content="https://blog.dounine.live/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BRaft%E2%80%94%E2%80%94%E8%A7%A3%E8%AF%BB%E3%80%8ARaft%E3%80%8B/image_10.png">
-<meta property="og:image" content="https://blog.dounine.live/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BRaft%E2%80%94%E2%80%94%E8%A7%A3%E8%AF%BB%E3%80%8ARaft%E3%80%8B/image_11.png">
-<meta property="og:image" content="https://blog.dounine.live/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BRaft%E2%80%94%E2%80%94%E8%A7%A3%E8%AF%BB%E3%80%8ARaft%E3%80%8B/image_12.png">
+<meta property="og:image" content="https://blog.dounine.live/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BRaft/image.png">
+<meta property="og:image" content="https://blog.dounine.live/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BRaft/image_1.png">
+<meta property="og:image" content="https://blog.dounine.live/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BRaft/image_2.png">
+<meta property="og:image" content="https://blog.dounine.live/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BRaft/image_3.png">
+<meta property="og:image" content="https://blog.dounine.live/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BRaft/image_4.png">
+<meta property="og:image" content="https://blog.dounine.live/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BRaft/image_5.png">
+<meta property="og:image" content="https://blog.dounine.live/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BRaft/image_6.png">
+<meta property="og:image" content="https://blog.dounine.live/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BRaft/image_7.png">
+<meta property="og:image" content="https://blog.dounine.live/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BRaft/image_8.png">
+<meta property="og:image" content="https://blog.dounine.live/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BRaft/image_9.png">
+<meta property="og:image" content="https://blog.dounine.live/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BRaft/image_10.png">
+<meta property="og:image" content="https://blog.dounine.live/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BRaft/image_11.png">
+<meta property="og:image" content="https://blog.dounine.live/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BRaft/image_12.png">
 <meta property="article:published_time" content="2022-01-29T08:18:07.000Z">
 <meta property="article:modified_time" content="2022-01-29T08:18:07.000Z">
 <meta property="article:author" content="dounine">
 <meta property="article:tag" content="分布式">
 <meta property="article:tag" content="MapReduce">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://blog.dounine.live/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BRaft%E2%80%94%E2%80%94%E8%A7%A3%E8%AF%BB%E3%80%8ARaft%E3%80%8B/image.png">
+<meta name="twitter:image" content="https://blog.dounine.live/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BRaft/image.png">
 
 
 <link rel="canonical" href="https://blog.dounine.live/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BRaft.html">
@@ -373,7 +373,7 @@
 <p>第2节介绍复制状态机的问题（replicated state machine problem）；第3节讨论Paxos的优缺点；第4节描述实现易理解性的大体方法；第5-8节讲解Raft算法；第9节测评Raft算法；第10节讨论最近的相关工作。</p>
 <h3 id="2-Replicated-state-machines"><a href="#2-Replicated-state-machines" class="headerlink" title="2 Replicated state machines"></a>2 Replicated state machines</h3><p>在分布式系统中，常用复制状态机(replicated state machine)解决容错问题。比如，在只有一个leader的大型系统中，通常会使用独立的复制状态机，去管理leader的选举与配置信息的存储（防止leader崩溃）。</p>
 <p>复制状态机通过日志实现，每个服务器上的日志保存着一系列命令，服务器上的状态机(state machine)会顺序执行这些命令。每个日志中的命令序列都是相同的，因此每个状态机都执行相同顺序的命令，并得到相同的状态和输出。</p>
-<p><img src="/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BRaft%E2%80%94%E2%80%94%E8%A7%A3%E8%AF%BB%E3%80%8ARaft%E3%80%8B/image.png" alt="1"></p>
+<p><img src="/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BRaft/image.png" alt="1"></p>
 <p>复制状态机中，共识算法是为了保证日志的一致性。当服务器上的共识模块(consensus module)收到客户的命令后，会将命令添加到它的日志中，并与其它服务器上的共识模块通信，以保证每个日志中命令序列都是相同的。一旦日志被正确地复制，每台服务器上的状态机就会执行日志中的命令，并将结果返回给客户端。</p>
 <p>在实际系统中，共识算法通常有以下特性：</p>
 <ul>
@@ -404,9 +404,9 @@
 <li>减少状态数</li>
 </ol>
 <h3 id="5-The-Raft-consensus-algorithm"><a href="#5-The-Raft-consensus-algorithm" class="headerlink" title="5 The Raft consensus algorithm"></a>5 The Raft consensus algorithm</h3><p>Raft是一种用于管理第2节中可复制日志（replicated log）的共识算法。图2是算法的压缩总结，以供参考。图3列举了算法的关键属性。</p>
-<p><img src="/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BRaft%E2%80%94%E2%80%94%E8%A7%A3%E8%AF%BB%E3%80%8ARaft%E3%80%8B/image_1.png" alt="1"></p>
-<p><img src="/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BRaft%E2%80%94%E2%80%94%E8%A7%A3%E8%AF%BB%E3%80%8ARaft%E3%80%8B/image_2.png" alt="1"></p>
-<p><img src="/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BRaft%E2%80%94%E2%80%94%E8%A7%A3%E8%AF%BB%E3%80%8ARaft%E3%80%8B/image_3.png" alt="1"></p>
+<p><img src="/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BRaft/image_1.png" alt="1"></p>
+<p><img src="/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BRaft/image_2.png" alt="1"></p>
+<p><img src="/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BRaft/image_3.png" alt="1"></p>
 <p>Raft首先会选举一个独立的leader，让leader全权负责日志复制。leader从客户端获取命令（日志记录 log entries），然后将其复制给其它服务器，并告诉其它服务器什么时候执行才是安全的。当leader失效时，会选举出新的leader。</p>
 <p>通过leader机制，Raft将共识问题分解为三个子问题：</p>
 <ul>
@@ -417,10 +417,10 @@
 <p>在介绍了共识算法之后，本节将讨论可用性和定时(timing)在系统中的作用。</p>
 <h4 id="5-1-Raft-basics"><a href="#5-1-Raft-basics" class="headerlink" title="5.1 Raft basics"></a>5.1 Raft basics</h4><p>Raft集群包含多个节点，通常有5个节点就能容忍2个节点出错。</p>
 <p>任意时刻，集群中节点只有三种状态：leader、follower、candidate。在正常情况下，有一个leader，其它都是follower。follower节点不发出请求，只响应leader或candidate的请求。leader节点处理所有客户端请求，如果follower收到客户端，会转交给leader。candidate状态则用于leader选举。各状态间的相互转换如下图：</p>
-<p><img src="/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BRaft%E2%80%94%E2%80%94%E8%A7%A3%E8%AF%BB%E3%80%8ARaft%E3%80%8B/image_4.png" alt="1"></p>
+<p><img src="/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BRaft/image_4.png" alt="1"></p>
 <p>如下图，Raft将时间分为不同长度的任期(terms)，terms的序号是连续的。每个term都开始于一次选举election，选举中一或多个candidate竞争一个leader，如果某个candidate赢得选举，将在当前term的剩余时间内担任leader。</p>
 <p>在某些情况下，可能会出现相等的票数（比如A和B都得到3票），那么当前term就会以无leader的情况(<strong>no leader</strong>)结束，一个新的term很快就会开始。Raft会保证一个term最多只有一个leader。</p>
-<p><img src="/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BRaft%E2%80%94%E2%80%94%E8%A7%A3%E8%AF%BB%E3%80%8ARaft%E3%80%8B/image_5.png" alt="1"></p>
+<p><img src="/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BRaft/image_5.png" alt="1"></p>
 <p>不同节点可能在不同时间察觉到term的变动，在某些情况下，节点甚至察觉不到某次选举或整个term。</p>
 <p>在Raft中，terms扮演了逻辑时钟的角色，可以让节点发现一些过期的信息，比如已失效的leader。</p>
 <p>每个节点都保存着一个<strong>当前term序号(current term number)<strong>，并随着时间递增。</strong>当节点进行通信时，会交换当前term的序号，如果节点发现它的term序号较小时，它会将其更新成那个较大的值</strong>。当leader或candidate发现它的term已过期时，它会立即变为follower状态。如果节点收到一个携带已过期term序号的请求，它会拒绝这个请求。</p>
@@ -442,7 +442,7 @@
 <p>Raft使用<strong>随机化</strong>的选举等待时间来解决上述**投票分裂(split votes)<strong>问题：每个candidate节点开始竞选时，会从某个区间（比如150-300ms）内随机选择</strong>选举等待时间(election timeout)**。这将导致在大多情况下，只有一个节点率先超时进入下一次选举，并在其它节点超时之前赢得选举。</p>
 <h4 id="5-3-Log-replication"><a href="#5-3-Log-replication" class="headerlink" title="5.3 Log replication"></a>5.3 Log replication</h4><p>一旦某个leader被选举出来，它将处理客户端请求。每个客户端请求包含一条可被复制状态机执行的命令。leader会将这条命令追加到它的日志中，然后并行地发送AppendEntries RPCs请求，复制这条命令给其它节点。当这条命令被安全地复制，leader将让它的状态机执行这条命令，并返回结果给客户端。如果followers崩溃或网络堵塞，leader将会重复地发送请求，直到所有follower都保存了这条命令。</p>
 <p>日志如下图所示，类似于有序数组，日志中每条记录都包含一条命令和对应的term序号。</p>
-<p><img src="/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BRaft%E2%80%94%E2%80%94%E8%A7%A3%E8%AF%BB%E3%80%8ARaft%E3%80%8B/image_6.png" alt="1"></p>
+<p><img src="/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BRaft/image_6.png" alt="1"></p>
 <p>如果某条日志记录可以安全地执行，那leader会标记这条记录为<strong>已提交的(committed)<strong>。</strong>Raft会保证已提交的记录是持久的（不会被删除或覆盖），且最终被所有节点执行</strong>。当记录<strong>被复制到大多数节点</strong>时，它就可以被标记为已提交的，比如上图中的第7条记录。leader会保存日志中<strong>已提交记录的最大索引</strong>，比如上图中最大已提交索引为7。它会在AppendEntries RPCs请求中包含这个值，以便让其它节点知晓。<strong>一旦某个follower节点得知某条记录已提交，它便会执行记录中的命令</strong>（按日志中记录的顺序）。</p>
 <p>Raft会维持如下特性，这些特性构成了图3种的**日志匹配属性(Log Matching Property)**：</p>
 <ul>
@@ -451,7 +451,7 @@
 </ul>
 <p>一个任期号至多对应一个leader，且leader在任期号内的一个索引处只能创建一条记录，这保证第一条特性。第二条特性由AppendEntries RPCs请求时<strong>一致性检查</strong>保证：当leader发送AppendEntries RPCs请求时，会将新日志记录的<strong>上一条记录的索引和term号（其实就是已提交记录的最大索引和其term号）</strong>包含在内。如果follower在它日志中没有找到<strong>相同的索引和term号</strong>，它就会拒绝请求（保证一致性）。</p>
 <p>在某些情况下，旧leader发生崩溃，那么新的leader与follower日志可能不同：新leader中的日志记录可能比某些follower多，也可能比某些follower少。</p>
-<p><img src="/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BRaft%E2%80%94%E2%80%94%E8%A7%A3%E8%AF%BB%E3%80%8ARaft%E3%80%8B/image_7.png" alt="1"></p>
+<p><img src="/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BRaft/image_7.png" alt="1"></p>
 <p>Raft中，leader通过强制follower的日志保持与自己一致，来解决不一致问题（5.4节将解释，当附加了一个至多个限制时，这是安全的）。</p>
 <p>leader为了让follower的日志与自己一致，<strong>会找到两者日志中一致且索引最大的记录，然后删除follower日志中的剩余记录，再将leader日志中剩余记录追加到follower日志中</strong>。</p>
 <p>leader为每个follower都维护了一个**下一个索引值(nextIndex)**，用于标识下一个将发送给follower的日志记录。当leader首次启动时，它会初始所有nextIndex为它日志中最后一条记录的下一个索引。如果follower的日志与leader的不一致，AppendEntries RPC请求将会失败。当leader收到拒绝响应时，它会将follower对应的nextIndex减1，然后再重试。最终，nextIndex会达到leader和follower中日志相一致的索引处。此时，AppendEntries RPC请求将成功响应，follower会删除冲突的部分，并将leader发来的记录追加到它的日志中。</p>
@@ -464,7 +464,7 @@
 <p>这个投票限制通过RequestVote RPC请求实现：RPC请求会包含candidate的日志信息，<strong>如果投票者的日志比candidate的新，它就会拒绝投票。</strong></p>
 <p>Raft通过比较两个日志中最后一条记录来判断谁更新：<strong>term序号大的更新；term序号相等但日志更长的更新</strong>。</p>
 <h5 id="5-4-2-Committing-entries-from-previous-terms"><a href="#5-4-2-Committing-entries-from-previous-terms" class="headerlink" title="5.4.2 Committing entries from previous terms"></a>5.4.2 Committing entries from previous terms</h5><p>由上文可知，leader只有得知大多数节点保存了当前日志记录后，才会提交该记录。如果leader在提交该记录前崩溃了，那么新leader会尝试继续完成该记录的复制。然而，如果前一条记录被复制到大多数节点，leader也无法判断该记录是否已提交。下图展示了在旧leader下被复制到大多数节点的记录，可能被新leader覆盖。</p>
-<p><img src="/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BRaft%E2%80%94%E2%80%94%E8%A7%A3%E8%AF%BB%E3%80%8ARaft%E3%80%8B/image_8.png" alt="1"></p>
+<p><img src="/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BRaft/image_8.png" alt="1"></p>
 <p>图8描述了一种情况：(a)中，S1被选为leader(term 2)，复制2索引处的记录到S1、S2。(b)中，S1崩溃，S5被选为leader(term 3)，投票来自S3、S4、S5，它在2索引处获得新记录。(c)中，S5崩溃，S1重新被选为leader(term 4)，为了保证日志一致，它会继续复制索引2处term 2内的记录到其它节点，如果得到超过半数的复制成功响应，它就会提交该记录（也意味着会执行该记录）。但在(d)中，S1崩溃，S5重新选为leader，它也会继续复制索引2处term 3内的记录到其它节点，此时，就会覆盖索引2处term 2的已提交记录（S1执行过的命令被覆盖，违背持久性）。如果，回到(c)中，S1复制索引2处term 2内的记录到其它节点，得到大多数成功响应，但并不标记这个记录为已提交，而是等到自己term内的记录复制到大多数，才标记自己term内的记录已提交，那就会避免这个问题，既能提交旧term内的记录，也能保证一致。</p>
 <p>为了解决这个问题，Raft不会通过统计是否复制到大多数节点，来提交之前任期(term)内的日志记录。<strong>只有当前term内的日志记录，才会通过统计是否复制到大多数节点来提交</strong>。因为，一旦当前term内的记录被提交，所有此前的记录都会被提交（参考5.3节）。</p>
 <h5 id="5-4-3-Safety-argument"><a href="#5-4-3-Safety-argument" class="headerlink" title="5.4.3 Safety argument"></a>5.4.3 Safety argument</h5><p>此节讨论Raft的安全性，主要通过反证法进行论证。假设任期T内的leaderT在任期内提交了一个日志记录，但是该日志记录没有被存储到未来某个任期U的 leaderU 中，然后反证这种情况不可能发生。</p>
@@ -479,7 +479,7 @@
 <p>广播时间和MTBF由具体情况而定，但选举超时时间可自定义。通常，广播时间大约是0.5ms-20ms，因此选举超时时间可定义为10ms-500ms。</p>
 <h3 id="6-Cluster-membership-changes"><a href="#6-Cluster-membership-changes" class="headerlink" title="6 Cluster membership changes"></a>6 Cluster membership changes</h3><p>实际中，某些时刻需要更新系统的配置（系统节点信息），即集群变更，比如某些节点永久失效需要被替换时。一个方法是将所有节点下线，更新完成后再手动重启，但这样会导致系统某段时间不可用。此外，通过手动操作也会产生意料之外的错误。于是，Raft针对集群变更设计自动化机制。</p>
 <p>当然，在集群变更过程中，会产生一些问题：由于一次性改变所有节点配置是不可能的，那么在某个时刻，旧配置节点与新配置节点共存，可能出现两个leader。如下图，1、2在旧配置（只有3个节点）中，3、4、5在新配置（有5个节点）中，1获得了2的投票，它就会认为得到大多数投票，成为leader；而5获得3、4的投票，它也会成为leader。这样同一时刻就有两个leader。</p>
-<p><img src="/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BRaft%E2%80%94%E2%80%94%E8%A7%A3%E8%AF%BB%E3%80%8ARaft%E3%80%8B/image_9.png" alt="1"></p>
+<p><img src="/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BRaft/image_9.png" alt="1"></p>
 <p>为了保证集群变更时的安全性，需使用<strong>两阶段(two-phase)方法</strong>。这种方法有许多实现方式，比如：一些系统，在第一阶段先停止旧配置节点，让其不能接收请求；然后在第二个阶段启动新配置节点。</p>
 <p>在Raft中，集群首先切换到一个中间状态，称为<strong>联合一致(joint consensus)<strong>。一旦joint consensus被提交，系统就可以过渡到新配置。在joint consensus状态中，系统同时包含旧配置和新配置，并遵循以下机制（相当于</strong>旧新配置的并集</strong>）：</p>
 <ul>
@@ -488,7 +488,7 @@
 <li>选举和日志提交，<strong>既需要得到旧配置中大多数节点的同意，也需要得到新配置中大多数节点的同意</strong>。这能保证新旧配置leader不会同时出现，比如上图10中，5想要成为leader，就需要同时得到旧配置（1、2、3）下的大多数投票，和新配置（1、2、3、4、5）下的大多数投票。</li>
 </ul>
 <p>集群配置作为<strong>特殊的日志记录</strong>进行存储。下图展示了配置变更过程。当leader收到配置变更的请求($C_{old}$→$C_{new}$)时，它会将中间态配置$C_{old,new}$（相当于新旧配置的并集）存储为一个日志记录，然后按照如上机制复制到系统其它节点。（一旦节点添加了新的配置记录到日志中，它将会使用该配置进行未来的全部决策。且节点总是使用日志中最新的配置记录，无论该记录是否提交）。leader会使用$C_{old,new}$配置来判断$C_{old,new}$记录是否已提交，如果leader宕机，一个<strong>新的leader会从$C_{old}$或$C_{old,new}$配置的机器中选出</strong>。在任何情况中，$C_{new}$的配置都不会产生任何决策。</p>
-<p><img src="/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BRaft%E2%80%94%E2%80%94%E8%A7%A3%E8%AF%BB%E3%80%8ARaft%E3%80%8B/image_10.png" alt="1"></p>
+<p><img src="/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BRaft/image_10.png" alt="1"></p>
 <p>一旦$C_{old,new}$配置已提交，不管$C_{old}$或$C_{new}$配置的节点都不能单独决策（因为按照中间态的机制，决策既要得到旧配置中大多数节点的同意，也需要得到新配置中大多数节点的同意）。且$C_{old,new}$配置已提交能保证它被复制到大多数节点，即只有$C_{old,new}$配置的节点才能选为leader。此时，leader可以安全地创建$C_{new}$配置的日志记录，并复制到集群。当$C_{new}$配置被提交，不在新配置下的节点将被关闭。</p>
 <p>关于配置变更还有3个问题：</p>
 <ol>
@@ -500,10 +500,10 @@
 <h3 id="7-Log-compaction"><a href="#7-Log-compaction" class="headerlink" title="7 Log compaction"></a>7 Log compaction</h3><p>Raft中，日志会越来越长，这会导致日志占用空间越来越大，重新执行日志花费的时间也会更长。为了防止日志无限增长，Raft需要压缩日志。</p>
 <p>快照是最简单的压缩方法。系统会将当前状态以快照方式持久化存储，而该时间点前的日志全部丢弃。</p>
 <p>Raft中的快照机制如下图。每个节点独立地生成快照，具体工作是将状态机的当前状态存储到快照中，因此只有已提交的日志记录才会被快照替代（已提交才会被状态机执行）。Raft也会在快照中保存相关元数据：last included index是被快照替代的日志序列中最后一个记录的索引，last included term是被快照替代的日志序列中最后一个记录的term号，它们主要用于支持AppendEntries RPC请求时的一致性检查。为了支持集群成员变更，还会包含被快照替代的日志序列中最后一条配置信息。一旦快照成功保存，节点会删除包括last included index在内的之前所有日志记录。</p>
-<p><img src="/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BRaft%E2%80%94%E2%80%94%E8%A7%A3%E8%AF%BB%E3%80%8ARaft%E3%80%8B/image_11.png" alt="1"></p>
+<p><img src="/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BRaft/image_11.png" alt="1"></p>
 <p>当leader需要发送已被快照替代的日志记录给某些follower时，它应该发送快照给对方，这种情况发生在某些follower较慢或刚加入集群时。</p>
 <p>leader使用InstallSnapshot RPC请求（如下图）发送快照给一些落后的follower。当follower收到InstallSnapshot RPC请求时，它会丢弃快照之内的日志记录，只保留不在快照中的剩余记录，若已提交索引小于快照最后索引，还会更新自己的已提交索引，最后将快照应用到状态机中。</p>
-<p><img src="/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BRaft%E2%80%94%E2%80%94%E8%A7%A3%E8%AF%BB%E3%80%8ARaft%E3%80%8B/image_12.png" alt="1"></p>
+<p><img src="/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BRaft/image_12.png" alt="1"></p>
 <h3 id="8-Client-interaction"><a href="#8-Client-interaction" class="headerlink" title="8 Client interaction"></a>8 Client interaction</h3><p>当一个客户端初次启动时，它会随机连接到一个节点。若节点并非leader，它会返回当前leader节点的信息给客户端。如果leader宕机了，客户端会请求超时，然后再尝试连接一个随机节点。</p>
 <p>Raft需实现线性语义化(linearizable semantics)，即一条指令只执行一次。实际情况中，一条指令可能执行多次，比如leader执行完某条指令，但在响应客户端时宕机了，客户端会重试连接，并重新发送这条指令，那么这条指令就会被执行两次。解决方法是对每条指令附加一个唯一标识，当状态机收到一条标识重复的指令时，它会直接返回而不执行。</p>
 <p><strong>只读操作</strong>不需要写入到日志中，但是系统可能会返回过期的数据，比如：响应只读请求的leader可能不知道新leader已经出现了，因为不产生日志则不需要发送日志复制请求。Raft采取两个额外措施来解决这个问题：</p>

@@ -23,8 +23,8 @@
 
     <meta name="description" content="前言当下，分布式是一大热门，常用场景比如分布式数据库等。在错综复杂的分布式网络环境中，不同节点间的数据（也被称为状态）很可能不一致，原因比如：传输时数据丢失、节点崩溃等等。分布式中所要解决的一大问题，就是节点间如何达成共识，也就是如何保证各节点数据的一致性。最容易想到的方法是，选择一个主节点，其它节点与主节点状态保持一致。但致命的问题在于，主节点崩溃了怎么办？如何选取新的主节点？如何保证新主节点的">
 <meta property="og:type" content="article">
-<meta property="og:title" content="分布式之Raft——解读《Raft》">
-<meta property="og:url" content="https://blog.dounine.live/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BRaft%E2%80%94%E2%80%94%E8%A7%A3%E8%AF%BB%E3%80%8ARaft%E3%80%8B.html">
+<meta property="og:title" content="分布式之Raft">
+<meta property="og:url" content="https://blog.dounine.live/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BRaft.html">
 <meta property="og:site_name" content="dounine&#39;s blog">
 <meta property="og:description" content="前言当下，分布式是一大热门，常用场景比如分布式数据库等。在错综复杂的分布式网络环境中，不同节点间的数据（也被称为状态）很可能不一致，原因比如：传输时数据丢失、节点崩溃等等。分布式中所要解决的一大问题，就是节点间如何达成共识，也就是如何保证各节点数据的一致性。最容易想到的方法是，选择一个主节点，其它节点与主节点状态保持一致。但致命的问题在于，主节点崩溃了怎么办？如何选取新的主节点？如何保证新主节点的">
 <meta property="og:locale" content="zh_CN">
@@ -50,14 +50,14 @@
 <meta name="twitter:image" content="https://blog.dounine.live/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BRaft%E2%80%94%E2%80%94%E8%A7%A3%E8%AF%BB%E3%80%8ARaft%E3%80%8B/image.png">
 
 
-<link rel="canonical" href="https://blog.dounine.live/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BRaft%E2%80%94%E2%80%94%E8%A7%A3%E8%AF%BB%E3%80%8ARaft%E3%80%8B.html">
+<link rel="canonical" href="https://blog.dounine.live/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BRaft.html">
 
 
 
-<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://blog.dounine.live/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BRaft%E2%80%94%E2%80%94%E8%A7%A3%E8%AF%BB%E3%80%8ARaft%E3%80%8B.html","path":"分布式之Raft——解读《Raft》.html","title":"分布式之Raft——解读《Raft》"}</script>
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://blog.dounine.live/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BRaft.html","path":"分布式之Raft.html","title":"分布式之Raft"}</script>
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
-<title>分布式之Raft——解读《Raft》 | dounine's blog</title>
+<title>分布式之Raft | dounine's blog</title>
   
 
   <script src="/js/third-party/analytics/baidu-analytics.js"></script>
@@ -205,10 +205,10 @@
     </div>
     <ul class="links-of-blogroll-list">
         <li class="links-of-blogroll-item">
-          <a href="https://bkfish.gitee.io/" title="https:&#x2F;&#x2F;bkfish.gitee.io&#x2F;" rel="noopener" target="_blank">Kitty萌新的卧室</a>
+          <a href="https://bkfish.gitee.io/" title="https:&#x2F;&#x2F;bkfish.gitee.io&#x2F;" rel="noopener" target="_blank">bkfish</a>
         </li>
         <li class="links-of-blogroll-item">
-          <a href="https://hitworld.github.io/" title="https:&#x2F;&#x2F;hitworld.github.io&#x2F;" rel="noopener" target="_blank">hirworld</a>
+          <a href="https://hitworld.github.io/" title="https:&#x2F;&#x2F;hitworld.github.io&#x2F;" rel="noopener" target="_blank">w4rd3n</a>
         </li>
         <li class="links-of-blogroll-item">
           <a href="https://wyjoutstanding.github.io/" title="https:&#x2F;&#x2F;wyjoutstanding.github.io&#x2F;" rel="noopener" target="_blank">wyjoutstanding</a>
@@ -220,7 +220,7 @@
           <a href="https://wood1314.github.io/" title="https:&#x2F;&#x2F;wood1314.github.io&#x2F;" rel="noopener" target="_blank">wood</a>
         </li>
         <li class="links-of-blogroll-item">
-          <a href="https://desperadoccy.github.io/" title="https:&#x2F;&#x2F;desperadoccy.github.io&#x2F;" rel="noopener" target="_blank">desperadoccy</a>
+          <a href="https://desperadoccy.xyz/" title="https:&#x2F;&#x2F;desperadoccy.xyz&#x2F;" rel="noopener" target="_blank">desperadoccy</a>
         </li>
         <li class="links-of-blogroll-item">
           <a href="https://doudouqaq.github.io/" title="https:&#x2F;&#x2F;doudouqaq.github.io&#x2F;" rel="noopener" target="_blank">doudouqaq</a>
@@ -275,7 +275,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://blog.dounine.live/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BRaft%E2%80%94%E2%80%94%E8%A7%A3%E8%AF%BB%E3%80%8ARaft%E3%80%8B.html">
+    <link itemprop="mainEntityOfPage" href="https://blog.dounine.live/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BRaft.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="https://avatars.githubusercontent.com/u/41814469?s=400&u=48bf60a3428a3cb86a84a110c8688930cf6ceb08&v=4">
@@ -288,12 +288,12 @@
     </span>
 
     <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="分布式之Raft——解读《Raft》 | dounine's blog">
+      <meta itemprop="name" content="分布式之Raft | dounine's blog">
       <meta itemprop="description" content="">
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          分布式之Raft——解读《Raft》
+          分布式之Raft
         </h1>
 
         <div class="post-meta-container">
@@ -537,8 +537,8 @@
                 </a>
             </div>
             <div class="post-nav-item">
-                <a href="/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BMapReduce%E2%80%94%E2%80%94%E8%A7%A3%E8%AF%BB%E3%80%8AMapReduce%E3%80%8B.html" rel="next" title="分布式之MapReduce——解读《MapReduce》">
-                  分布式之MapReduce——解读《MapReduce》 <i class="fa fa-chevron-right"></i>
+                <a href="/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BMapReduce.html" rel="next" title="分布式之MapReduce">
+                  分布式之MapReduce <i class="fa fa-chevron-right"></i>
                 </a>
             </div>
           </div>

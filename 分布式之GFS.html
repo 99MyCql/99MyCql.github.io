@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.2.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/golang32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/golang16.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="baidu-site-verification" content="code-RpvRDWfflk">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" integrity="sha256-DfWjNxDkM94fVBWx1H5BMMp0Zq7luBlV8QRcSES7s+0=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"blog.dounine.live","root":"/","images":"/images","scheme":"Mist","darkmode":false,"version":"8.11.1","exturl":false,"sidebar":{"position":"right","display":"always","padding":18,"offset":12},"copycode":{"enable":true,"style":"flat"},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":"utterances","storage":true,"lazyload":false,"nav":null,"activeClass":"utterances"},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="0. 前言2000年前后，随着互联网的飞速发展，单机的存储和计算能力早已达到瓶颈，急需通过增加机器数量来提高整体性能。但是，1+1并不大于2，机器数量的增加带来了许多新的问题：网络延迟、机器宕机、数据不一致等等。正是为了解决这些问题，Google在2003-2006年间先后发表了3篇论文《GFS》、《MapReduce》、《Bigtable》，分别解决了大规模数据的存储(非结构化)、计算、索引(结">
+<meta property="og:type" content="article">
+<meta property="og:title" content="分布式之GFS">
+<meta property="og:url" content="https://blog.dounine.live/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BGFS.html">
+<meta property="og:site_name" content="dounine&#39;s blog">
+<meta property="og:description" content="0. 前言2000年前后，随着互联网的飞速发展，单机的存储和计算能力早已达到瓶颈，急需通过增加机器数量来提高整体性能。但是，1+1并不大于2，机器数量的增加带来了许多新的问题：网络延迟、机器宕机、数据不一致等等。正是为了解决这些问题，Google在2003-2006年间先后发表了3篇论文《GFS》、《MapReduce》、《Bigtable》，分别解决了大规模数据的存储(非结构化)、计算、索引(结">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://blog.dounine.live/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BGFS/image_T24ae31M43.png">
+<meta property="og:image" content="https://blog.dounine.live/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BGFS/image_NS3NXlZMea.png">
+<meta property="og:image" content="https://blog.dounine.live/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BGFS/image_YQzsfqbceJ.png">
+<meta property="og:image" content="https://blog.dounine.live/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BGFS/image_bAUUBTRZXe.png">
+<meta property="article:published_time" content="2022-06-05T07:18:28.000Z">
+<meta property="article:modified_time" content="2022-06-05T07:18:28.000Z">
+<meta property="article:author" content="dounine">
+<meta property="article:tag" content="分布式">
+<meta property="article:tag" content="GFS">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://blog.dounine.live/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BGFS/image_T24ae31M43.png">
+
+
+<link rel="canonical" href="https://blog.dounine.live/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BGFS.html">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://blog.dounine.live/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BGFS.html","path":"分布式之GFS.html","title":"分布式之GFS"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>分布式之GFS | dounine's blog</title>
+  
+
+  <script src="/js/third-party/analytics/baidu-analytics.js"></script>
+  <script async src="https://hm.baidu.com/hm.js?66c7065aa71681df47eb23eff557978b"></script>
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">dounine's blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">18</span></a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">50</span></a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">76</span></a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#0-%E5%89%8D%E8%A8%80"><span class="nav-text">0. 前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E8%AE%BE%E8%AE%A1%E5%81%87%E8%AE%BE"><span class="nav-text">1. 设计假设</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E6%9E%B6%E6%9E%84"><span class="nav-text">2. 架构</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#master%E5%85%83%E6%95%B0%E6%8D%AE"><span class="nav-text">master元数据</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E7%B3%BB%E7%BB%9F%E4%BA%A4%E4%BA%92"><span class="nav-text">3. 系统交互</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AF%BB%E6%96%87%E4%BB%B6"><span class="nav-text">读文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%86%99%E6%96%87%E4%BB%B6"><span class="nav-text">写文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BF%AB%E7%85%A7"><span class="nav-text">快照</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-Master%E6%93%8D%E4%BD%9C"><span class="nav-text">5. Master操作</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#namespace%E7%AE%A1%E7%90%86"><span class="nav-text">namespace管理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%89%AF%E6%9C%AC%E6%94%BE%E7%BD%AE"><span class="nav-text">副本放置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%9B%E5%BB%BAchunk%E5%89%AF%E6%9C%AC"><span class="nav-text">创建chunk副本</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6"><span class="nav-text">垃圾回收</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BF%87%E6%9C%9F%E5%89%AF%E6%9C%AC%E6%A3%80%E6%B5%8B"><span class="nav-text">过期副本检测</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-%E5%AE%B9%E9%94%99%E5%92%8C%E8%AF%8A%E6%96%AD"><span class="nav-text">6. 容错和诊断</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%AB%98%E5%8F%AF%E7%94%A8"><span class="nav-text">高可用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E5%AE%8C%E6%95%B4%E6%80%A7"><span class="nav-text">数据完整性</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-%E4%B8%AA%E4%BA%BA%E6%80%BB%E7%BB%93"><span class="nav-text">7. 个人总结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83"><span class="nav-text">参考</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="dounine"
+      src="https://avatars.githubusercontent.com/u/41814469?s=400&u=48bf60a3428a3cb86a84a110c8688930cf6ceb08&v=4">
+  <p class="site-author-name" itemprop="name">dounine</p>
+  <div class="site-description" itemprop="description">回首向来萧瑟处</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">76</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">18</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">50</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/99MyCql" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;99MyCql" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+
+  <div class="links-of-blogroll site-overview-item animated">
+    <div class="links-of-blogroll-title"><i class="fa fa-globe fa-fw"></i>
+      Links
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://bkfish.gitee.io/" title="https:&#x2F;&#x2F;bkfish.gitee.io&#x2F;" rel="noopener" target="_blank">bkfish</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://hitworld.github.io/" title="https:&#x2F;&#x2F;hitworld.github.io&#x2F;" rel="noopener" target="_blank">w4rd3n</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://wyjoutstanding.github.io/" title="https:&#x2F;&#x2F;wyjoutstanding.github.io&#x2F;" rel="noopener" target="_blank">wyjoutstanding</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://iwtf.github.io/" title="https:&#x2F;&#x2F;iwtf.github.io&#x2F;" rel="noopener" target="_blank">IWTF</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://wood1314.github.io/" title="https:&#x2F;&#x2F;wood1314.github.io&#x2F;" rel="noopener" target="_blank">wood</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://desperadoccy.xyz/" title="https:&#x2F;&#x2F;desperadoccy.xyz&#x2F;" rel="noopener" target="_blank">desperadoccy</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://doudouqaq.github.io/" title="https:&#x2F;&#x2F;doudouqaq.github.io&#x2F;" rel="noopener" target="_blank">doudouqaq</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://kylinnnnn.github.io/" title="https:&#x2F;&#x2F;kylinnnnn.github.io&#x2F;" rel="noopener" target="_blank">kylinnnnn</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://miaotony.xyz/" title="https:&#x2F;&#x2F;miaotony.xyz" rel="noopener" target="_blank">miaotony</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://110.40.153.120:3030/" title="http:&#x2F;&#x2F;110.40.153.120:3030&#x2F;" rel="noopener" target="_blank">AZhou</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.csdn.net/weixin_40986490" title="https:&#x2F;&#x2F;blog.csdn.net&#x2F;weixin_40986490" rel="noopener" target="_blank">白速龙王的回眸</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.csdn.net/weixin_43116322" title="https:&#x2F;&#x2F;blog.csdn.net&#x2F;weixin_43116322" rel="noopener" target="_blank">Ethan</a>
+        </li>
+    </ul>
+  </div>
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.dounine.live/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BGFS.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://avatars.githubusercontent.com/u/41814469?s=400&u=48bf60a3428a3cb86a84a110c8688930cf6ceb08&v=4">
+      <meta itemprop="name" content="dounine">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dounine's blog">
+      <meta itemprop="description" content="回首向来萧瑟处">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="分布式之GFS | dounine's blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          分布式之GFS
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2022-06-05 15:18:28" itemprop="dateCreated datePublished" datetime="2022-06-05T15:18:28+08:00">2022-06-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Pro/" itemprop="url" rel="index"><span itemprop="name">欲穷千里目，更上一层楼</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Pro/Distributed/" itemprop="url" rel="index"><span itemprop="name">分布式</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>7k</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h2 id="0-前言"><a href="#0-前言" class="headerlink" title="0. 前言"></a>0. 前言</h2><p>2000年前后，随着互联网的飞速发展，单机的存储和计算能力早已达到瓶颈，急需通过增加机器数量来提高整体性能。但是，<strong>1+1并不大于2</strong>，机器数量的增加带来了许多新的问题：网络延迟、机器宕机、数据不一致等等。正是为了解决这些问题，Google在2003-2006年间先后发表了3篇论文《GFS》、《MapReduce》、《Bigtable》，分别解决了大规模数据的存储(非结构化)、计算、索引(结构化数据&#x2F;数据库)，这三篇也被称为Google三驾马车，鉴定了分布式大数据时代的基础。后来的开源项目Hadoop中，HDFS参考了《GFS》，MapReduce参考了《MapReduce》，HBase参考了《Bigtable》。</p>
+<p>GFS首先被提出，它在大规模分散的机器上，实现了类似Linux文件系统的分布式存储系统。单台机器读写数据的性能有限，对于数亿GB的海量，肯定不能存放在单台机器上，而应将数据分割存储到多台机器上。同时，还需考虑机器宕机、磁盘损坏的问题，对同一份数据应做多个备份。如此又会出现许多新问题：如何在多台机器中找到用户想要的数据？如何保证系统在部分机器失效的情况下仍能正常运行？如何保证多个备份数据的一致？如何保证较高的读写性能？这些问题都将GFS中得到解决。</p>
+<span id="more"></span>
+
+<h2 id="1-设计假设"><a href="#1-设计假设" class="headerlink" title="1. 设计假设"></a>1. 设计假设</h2><ul>
+<li><p>建立在大量廉价的机器上，机器经常会失效，因此需要不停地监控-容错-恢复。</p>
+</li>
+<li><p>适用于存储大文件（MB或GB）。</p>
+</li>
+<li><p>大的流式顺序读，小的随机读。顺序读取连续的大批量数据（MB），只在某个位置偏移几KB范围内的随机读取。</p>
+</li>
+<li><p>一旦写入，就很少被修改。</p>
+</li>
+<li><p>同一时刻，同一文件，可能被多个客户端并发地追加数据，因此需要保证最小同步操作（追加）的原子性(Atomicity with minimal synchronization overhead is essential)。</p>
+</li>
+<li><p>高持久的带宽（批量处理数据）比低延迟（单个读写操作的响应时间）更加重要。</p>
+</li>
+</ul>
+<h2 id="2-架构"><a href="#2-架构" class="headerlink" title="2. 架构"></a>2. 架构</h2><p><img src="/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BGFS/image_T24ae31M43.png" alt="1"></p>
+<ul>
+<li><p>GFS集群中包含<strong>1个master</strong>和<strong>多个chunkserver</strong>。</p>
+</li>
+<li><p>GFS中，<strong>每个文件被划分成固定大小的chunk</strong>（默认64MB），每个chunk都有一个<strong>全局唯一的64bit的标识（chunk handle, 句柄）</strong>，每个chunk被<strong>备份到多个chunkserver</strong>（默认3个）。</p>
+</li>
+<li><p><strong>master只保存元数据</strong>，比如：文件命名空间、文件对应每个chunk的chunk handle、每个chunk所在的chunkserver等等。<strong>master和chunkserver通过周期性的心跳进行通信</strong>。</p>
+</li>
+<li><p>chunkserver负责保存chunk数据，它会将chunk以<strong>Linux文件</strong>的形式存储在本地。客户端可通过chunk handle和字节范围（0~64MB）来获取chunk内数据。</p>
+</li>
+</ul>
+<h3 id="master元数据"><a href="#master元数据" class="headerlink" title="master元数据"></a>master元数据</h3><p>master主要存储3类元数据：</p>
+<ul>
+<li><p>文件命名空间(namespace)。</p>
+</li>
+<li><p>文件和chunk的映射关系：file name -&gt; array of chunk handles。每个文件都对应一个chunk handle数组，数组第i个元素是文件中第i个chunk的标识(handle)。</p>
+</li>
+<li><p>每个chunk对应的相关信息：chunk handle -&gt;</p>
+<ul>
+<li><p>存储位置list of chunkservers，1个chunk会被复制并存储到多个chunkserver上（备份，用于容错）。</p>
+</li>
+<li><p>版本号version，用于判断是否最新。</p>
+</li>
+<li><p>主副本primary，用于写操作。</p>
+</li>
+<li><p>租约lease，用于写操作。</p>
+</li>
+</ul>
+</li>
+</ul>
+<p>上述元数据都会存在于<strong>内存</strong>中，以此提高操作效率。</p>
+<p>前2个元数据的<strong>变更操作</strong>，会以<strong>日志</strong>的形式记录，并<strong>持久化</strong>保存到本地磁盘，同时备份到远程机器上（容错）。当master重启时，会重放日志来恢复关键信息。为了缩短恢复时间，master会在日志超过一定长度时，设置一个**检查点(checkpoints)**。恢复时，只需要最新的检查点和之后的日志。checkpoint是一个压缩的类B-Tree结构，可以被直接映射到内存中并用于namespace的查找。</p>
+<p><strong>chunk的存储位置并不会持久化保存</strong>，而是在master启动后向每个chunkserver询问得知。master会通过周期性心跳检测与chunkserver通信，保证自己的chunk信息是最新的。为什么不持久化保存chunk的位置信息？因为在数百台机器的集群中，chunkserver加入或离开、重启、宕机等情况经常发生，<strong>chunk的位置信息需要经常变更、并不稳定，持久化没有太大意义</strong>。</p>
+<p>但<strong>chunk版本号需要持久化</strong>，master需要通过chunk版本号判断chunkserver的chunk副本是不是最新的。为什么不向chunkserver询问chunk的版本号，然后取其中最大值呢？因为master询问时，持有最新chunk副本的chunkserver可能出现宕机等意外情况，导致master将过时的副本当作最新版本。<strong>master只会返回包含最新chunk的chunkserver</strong>，如果所有chunkserver都不包含该chunk的最新版本，master会让客户端等待或返回错误。</p>
+<h2 id="3-系统交互"><a href="#3-系统交互" class="headerlink" title="3. 系统交互"></a>3. 系统交互</h2><h3 id="读文件"><a href="#读文件" class="headerlink" title="读文件"></a>读文件</h3><p>如图1所示，一次简单的读文件过程如下：</p>
+<ol>
+<li><p>客户端根据要读取的文件名和偏移量，计算出chunk index，比如：读取文件第65MB至第80MB间的数据，其所在的chunk index为65MB&#x2F;64MB &#x3D; 1。</p>
+</li>
+<li><p>客户端向master发生文件名和chunk index，master会返回chunk handle和chunk所在的chunk server列表。</p>
+</li>
+<li><p>客户端向其中一个chunkserver发送请求，指定chunk handle和读取的字节范围，chunkserver返回相应的数据。</p>
+</li>
+</ol>
+<h3 id="写文件"><a href="#写文件" class="headerlink" title="写文件"></a>写文件</h3><p>写文件，包括对文件内容的修改和追加，每个写的变更操作都需要在对应chunk的<strong>所有副本上执行</strong>。</p>
+<p>对于一组变更操作，GFS通过<strong>租约(leases)<strong>来保证多个副本间变更顺序的一致性。master会向其中一个副本授予chunk租约，这个副本被称为</strong>主副本(primary)<strong>。主副本会对该chunk的所有变更选择一个顺序，然后所有的副本就会按照这个顺序去执行这些变更。租约的持续时间为60s，主副本可以向master请求延长租约。master可以在租约到期前撤销授权。</strong>若master与主副本失去通信，并不需要立即选择新的主副本（可能只是暂时的网络阻塞），它可以在旧租约过期后，安全地授权租约给另一个副本（避免同时出现两个主副本）。</strong> 授权和请求都伴随chunkserver和master间的心跳信息一起发送。</p>
+<p>一次写操作过程如下：</p>
+<p><img src="/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BGFS/image_NS3NXlZMea.png" alt="1"></p>
+<ol>
+<li><p>客户端会请求master所有副本位置，以及哪一个chunkserver持有当前的租约（谁是主副本）。如果没有副本持有租约，master会选一个副本授权租约给它（即设为主副本）。</p>
+</li>
+<li><p>master返回该主副本的标识(handle)和所有副本的位置信息，客户端<strong>缓存</strong>这些数据用于未来的变更。只有当主副本没有响应，或者发现租约已经到期了，客户端才会和master联系。</p>
+</li>
+<li><p>客户端向所有副本对应的chunkserver推送数据，可按任意顺序。chunkserver会缓存这些数据，直到被使用或过期。GFS通过<strong>分离控制流和数据流</strong>，将重要的数据流基于网络拓扑来进行调度，而不用考虑哪一个是主副本，从而提高性能。</p>
+</li>
+<li><p>一旦所有副本都确定收到数据，客户端会向主副本发送一个写请求，该请求标识了之前推送给所有副本的数据。然后，<strong>主副本会给它接收到的所有变更（可能来自于多个客户端）分配连续的序列号</strong>，并按照序列号将变更应用到本地的副本上。</p>
+</li>
+<li><p>主副本向其它副本发送写请求，每个副本都按照主副本规定的顺序应用这些变更。</p>
+</li>
+<li><p>其它副本变更完成后，会向主副本返回成功。</p>
+</li>
+<li><p>主副本再向客户端返回成功。任何副本碰到错误，都会返回给客户端。出现错误时，变更可能已经在主副本和部分副本上执行成功了（<strong>部分执行成功的变更会撤销吗？不会！</strong>）。若返回错误，客户端会重试这些变更，它会先重试3-7步骤，如果不行则从头重试写操作。</p>
+</li>
+</ol>
+<p>如果一个写操作数据量很大或跨chunk边界，GFS客户端会将其分割为多个写操作。</p>
+<p><strong>GFS并不保证强一致性</strong>：如果写操作发生错误，GFS并不会撤销已成功执行的副本中的变更，各副本可能不一致。如下图，对同一个文件，客户端1请求追加数据A，客户端2请求追加数据B，客户端3请求追加数据C，请求同时达到。primary将这些变更排序后发给其它副本，其中一个副本在执行追加数据B时发生错误，错误返回给客户端2。客户端2重新发送写请求，此次请求成功。最终，导致各副本间状态并不一致。</p>
+<p><img src="/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BGFS/image_YQzsfqbceJ.png" alt="1"></p>
+<p><strong>GFS分离控制流和数据流</strong>，以更好地利用网络带宽。当客户端向chunk所在的chunkserver节点推送数据时，它会先发给距离最近的。假设客户端要推送数据到chunkserver S1~S4，它先推送给最近的机器S1，然后S1推送给最近的S2，类似的S2推送给S3或者S4。</p>
+<p>GFS提供<strong>原子性的append操作，称作record append</strong>。多个客户端可以并发地append，而不需要进行复杂的同步操作，比如分布式锁。record append也是一种变更操作，其过程与上述过程基本类似，只是主副本会先检查append数据是否超过最后一个chunk大小，若超过，它就将该chunk填充到最大值，然后告知客户端剩余操作应该在下一个chunk上重试。</p>
+<h3 id="快照"><a href="#快照" class="headerlink" title="快照"></a>快照</h3><p>快照是一种完全可用拷贝，但并不是备份那样的完整拷贝。什么意思呢？备份是将全部数据完整拷贝到另一个副本上，而快照是在原数据的基础上，<strong>只将修改的新数据另存，而原数据保持不变</strong>。由于快照共享原数据，只需额外保存新数据，因此所占空间远小于备份，但容错性也更低。实现快照的方式有两种：**写时拷贝(COW, Copy On Write)<strong>、</strong>写时重定向(ROW, Redirect On Write)**。写时拷贝：在写数据时，将原数据拷贝到另一处，再将新数据写入。写重定向：在写数据时，直接将新数据写到另一处。</p>
+<p><img src="/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BGFS/image_bAUUBTRZXe.png" alt="1"></p>
+<p>GFS提供快照功能，并采用写时拷贝来实现。当master收到要对某个文件创建快照的请求时，它会撤销该文件对应所有chunk的租约，并进行一些配置。当客户端在快照请求后<strong>第一次</strong>对某个chunk C进行写操作时，master会选择一个新的chunk C’，然后让所有拥有chunk C的chunkserver都创建chunk C’，并将chunk C数据拷贝到chunk C’，接着客户端就可以正常进行写操作。</p>
+<h2 id="5-Master操作"><a href="#5-Master操作" class="headerlink" title="5. Master操作"></a>5. Master操作</h2><h3 id="namespace管理"><a href="#namespace管理" class="headerlink" title="namespace管理"></a>namespace管理</h3><p>不同于传统的文件系统，GFS不存在目录数据结构，并不能列出一个目录下的所有文件，也不提供别名。GFS只将文件的全路径作为文件的key，并通过<strong>前缀压缩</strong>高效地存储在内存中，namespace树（前缀压缩树）中每个节点（一个文件或目录）都有一个读写锁。</p>
+<p>master中操作需要一系列<strong>锁</strong>来配合，比如：如果要操作&#x2F;d1&#x2F;d2&#x2F;…&#x2F;dn&#x2F;leaf，那么他就需要从&#x2F;d1、&#x2F;d1&#x2F;d2、… 到&#x2F;d1&#x2F;d2&#x2F;…&#x2F;dn这些目录的读锁，以及&#x2F;d1&#x2F;d2&#x2F;…&#x2F;dn&#x2F;leaf全路径的读锁或者写锁。<strong>文件写操作并不需要父级目录的写锁</strong>，是因为我们没有“目录”或者类似于inode的数据结构，使用读锁已经能够有效防止目录被删除。</p>
+<p>这种锁模式的一个好处就是它允许对同一个目录进行并发的变更操作。比如多个文件创建操作可以并发地在同一个目录里面执行。每个操作需要一个目录的读锁和一个文件名的写锁。在目录上的读锁可以防止目录被删除，重命名或者快照。针对文件的写锁可以保证相同文件名的只会被创建一次。</p>
+<h3 id="副本放置"><a href="#副本放置" class="headerlink" title="副本放置"></a>副本放置</h3><p>chunk副本的放置策略：最大化数据可靠性和可用性，最小化网络带宽的使用。因此，GFS会把副本分散到不同位置的集群上。</p>
+<h3 id="创建chunk副本"><a href="#创建chunk副本" class="headerlink" title="创建chunk副本"></a>创建chunk副本</h3><p>创建chunk副本的情况有3种：chunk的初次创建、重备份、重平衡。</p>
+<p>初次创建chunk时，master会考虑以下因素来放置chunk副本：磁盘使用率较低的chunkserver；最近创建chunk次数较少的chunkserver；不同位置集群中的chunkserver。</p>
+<p>一旦可用的chunk备份数量低于用户指定的数量（chunkserver失效等情况），master就需要重新备份一个chunk。</p>
+<p>master会周期性地对副本进行重平衡：检查副本分布，将副本移动到磁盘使用率较低的chunkserver上。</p>
+<h3 id="垃圾回收"><a href="#垃圾回收" class="headerlink" title="垃圾回收"></a>垃圾回收</h3><p>一个文件被删除后，master会将删除操作记录到日志中，但不会立即释放资源，该删除的文件只是被重命名为一个包含了删除时间戳的隐藏文件名。当master对namespace进行常规扫描时，如果发现某个隐藏文件已存在3天以上，就会移除这个文件。在这之前，可以通过重命名为正常名字来撤销删除操作。当从namespace中移除文件后，文件相应的chunk也就孤立了，master还会将孤立的chunk从元数据中移除。</p>
+<p>当chunkserver与master心跳通信时，chunkserver会向master报告一个chunk集合，<strong>master会标识出其中已经不存在的chunk并返回</strong>，然后chunkserver就可以自由地删除这些chunk副本。</p>
+<p>这种垃圾回收方式的好处是简单可靠，master不需要准确知道哪些chunkserver有这些chunk，哪些没有。同时，伴随在namespace常规扫描、chunkserver心跳等操作中，减少额外开销。但坏处是不能及时清理，占用磁盘。</p>
+<h3 id="过期副本检测"><a href="#过期副本检测" class="headerlink" title="过期副本检测"></a>过期副本检测</h3><p>当一个chunkserver停机或者失效，它拥有的chunk副本将不能进行新的变更操作，导致chunk副本过期。对于每个chunk，master通过<strong>版本号来区分最新还是过期的副本</strong>。</p>
+<p>一旦master对一个chunk授权一个新的租约，就会增加该chunk的版本号，并通知chunk副本所在的所有chunkserver更新，master和chunkserver都会持久化地记录这个副本的新版本号。这发生在客户端写数据之前。</p>
+<p>如果一个chunkserver失效，它将收不到更新通知，它对应的chunk副本版本号也不会更新。当它重新启动时，会向master报告它的chunk集合和版本号，master就能检测到这个过期副本。master会通过周期性的垃圾回收来移除这些过期的副本。</p>
+<p>当master发现有chunkserver版本号大于它保存的，它就会更新自己的版本号。</p>
+<p>读数据时，若请求过期副本，会返回不存在。写数据时，master会将chunk的版本号一同发给客户端，客户端在执行操作前会验证版本号。</p>
+<h2 id="6-容错和诊断"><a href="#6-容错和诊断" class="headerlink" title="6. 容错和诊断"></a>6. 容错和诊断</h2><h3 id="高可用"><a href="#高可用" class="headerlink" title="高可用"></a>高可用</h3><p>GFS使用两个简单有效的策略来保证高可用：快速恢复和备份。</p>
+<p>master和chunkserver无论如何被终止，都会在几秒内恢复状态并启动。</p>
+<p>chunk会被备份到多个chunkserver上。</p>
+<p>master的操作日志和检查点也会被备份到多台机器上。一个对master状态的变更，只有在日志记录已经完全写到本地磁盘和其他所有的副本之后，才会认为是提交了。如果master所在的机器或者磁盘失败了，<strong>在GFS外部的一个监控基础设施</strong>就会在别的地方，通过备份的操作日志重新开启一个新的master进程。</p>
+<p>在主master已经挂掉了的情况下，<strong>“影子”master</strong>依然可以为这个文件系统提供只读访问。他们是影子，并不是镜像，所以他们可能会比主master稍微落后一些，通常是几秒。对于那些不经常变更文件或者应用程序不介意获取到的是有点旧的结果，这提高了读的可用性。影子master为了保证自身的实时性，一个影子master会读取一个不断增长的操作日志的副本，然后将这些操作序列应用在自己的数据结构上。</p>
+<h3 id="数据完整性"><a href="#数据完整性" class="headerlink" title="数据完整性"></a>数据完整性</h3><p>每个chunkserver使用<strong>校验和</strong>来检测数据是否被破坏。由于GFS不保证强一致性，不同chunkserver上的chunk副本可能不一致，chunkserver可以通过其它chunk副本来恢复数据，但需要自己维持校验和来独立地验证。一个chunk被分割成64KB大小的块，每个块都有32bit的校验和，这些校验和会被持久化保存。</p>
+<p>读操作时，chunkserver会验证读取的数据块的校验和，当校验和不一致时，chunkserver会返回错误。</p>
+<p>对于写操作，如果是append操作，会计算并保存新增加块的校验和。如果是覆盖原有内容，会先验证原有内容第一块和最后一个块，然后再执行写操作，最后重新计算并保存被覆盖块的校验和。</p>
+<h2 id="7-个人总结"><a href="#7-个人总结" class="headerlink" title="7. 个人总结"></a>7. 个人总结</h2><p>GFS对于大型的分布式文件存储有着革命性影响，虽然GFS的具体实现并未开源，许多细节也没有在论文中详细讲解，但它的许多设计理念依旧值得学习，比如：</p>
+<ul>
+<li><p>结合具体场景进行取舍。在文件存储系统中，并不一定要保证强一致性，不如牺牲部分一致性来提高性能。</p>
+</li>
+<li><p>将数据流和控制流分离，从而对数据流进行更好的优化。</p>
+</li>
+<li><p>通过租约将写操作交给主副本所在的chunkserver管控，分摊master压力。</p>
+</li>
+</ul>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li><p><a target="_blank" rel="noopener" href="https://static.googleusercontent.com/media/research.google.com/zh-CN//archive/gfs-sosp2003.pdf" title="The Google File System">The Google File System</a></p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://segmentfault.com/a/1190000023309479" title="The Google File System（个人翻译） - SegmentFault 思否">The Google File System（个人翻译） - SegmentFault 思否</a></p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://pdos.csail.mit.edu/6.824/schedule.html" title="MIT6.824 LEC3-GFS">MIT6.824 LEC3-GFS</a></p>
+</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Distributed/" rel="tag"><i class="fa fa-tag"></i> 分布式</a>
+              <a href="/tags/GFS/" rel="tag"><i class="fa fa-tag"></i> GFS</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+            </div>
+            <div class="post-nav-item">
+                <a href="/%E5%8C%BA%E5%9D%97%E9%93%BE2-0%E2%80%94%E2%80%94%E4%BB%A5%E5%A4%AA%E5%9D%8A.html" rel="next" title="区块链2.0——以太坊">
+                  区块链2.0——以太坊 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments utterances-container"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">dounine</span>
+</div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+      <span>站点总字数：</span>
+    <span title="站点总字数">499k</span>
+  </span>
+</div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/mist/" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+<script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.0/search.js" integrity="sha256-vXZMYLEqsROAXkEw93GGIvaB2ab+QW6w3+1ahD9nXXA=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.0/es5/tex-mml-chtml.js","integrity":"sha256-r+3itOMtGGjap0x+10hu6jW/gZCzxHsoKrOd7gyRSGY="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
+<script class="next-config" data-name="utterances" type="application/json">{"enable":true,"repo":"99MyCql/99MyCql.github.io","issue_term":"pathname","theme":"github-light"}</script>
+<script src="/js/third-party/comments/utterances.js"></script>
+
+</body>
+</html>

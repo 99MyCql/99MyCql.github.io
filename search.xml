@@ -10945,6 +10945,8 @@
     <title>分布式之VMwareFT</title>
     <url>/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BVMwareFT.html</url>
     <content><![CDATA[<h2 id="0-前言"><a href="#0-前言" class="headerlink" title="0. 前言"></a>0. 前言</h2><p>VMware公司在2010年发表了一篇有关虚拟机容错的论文：<a href="https://dl.acm.org/doi/10.1145/1899928.1899932" title="《The Design of a Practical System for Fault-Tolerant Virtual Machines》">《The Design of a Practical System for Fault-Tolerant Virtual Machines》</a>。同时，它也是MIT6.824 LEC4的Preparation Read。本文将结合课程简单介绍论文内容。</p>
+<span id="more"></span>
+
 <h2 id="1-主-x2F-备份"><a href="#1-主-x2F-备份" class="headerlink" title="1. 主&#x2F;备份"></a>1. 主&#x2F;备份</h2><p>实现服务器容错的一种通用方法是<strong>主&#x2F;备份(primary&#x2F;backup)</strong> 方法，当主服务器失效，备份服务器可以接管主服务器的工作。</p>
 <p>为了保持主备状态同步，有2种方法：</p>
 <ul>
@@ -10983,6 +10985,123 @@
 <li><p>通过外部权威来解决脑裂问题。感觉不如超半数投票？</p>
 </li>
 </ol>
+]]></content>
+      <categories>
+        <category>欲穷千里目，更上一层楼</category>
+        <category>分布式</category>
+      </categories>
+      <tags>
+        <tag>分布式</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>分布式之Zookeeper</title>
+    <url>/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BZookeeper.html</url>
+    <content><![CDATA[<h2 id="0-前言"><a href="#0-前言" class="headerlink" title="0. 前言"></a>0. 前言</h2><p><a href="https://pdos.csail.mit.edu/6.824/schedule.html" title="MIT6.824">MIT6.824</a> LEC9: Zookeeper。</p>
+<p>当单机性能到达瓶颈时，我们需要对应用服务进行横向扩展，将同一个应用部署到多台服务器上，以提高整体性能。但新的解决方法总会带来新的问题：应用的配置（比如数据库连接、地址黑名单）需要更新时，如何进行统一更新？当多个应用对同一个外部资源进行修改时，如何保证同步互斥？为了解决这些问题，就有了Zookeeper的出现。</p>
+<p>Zookeeper是大数据组件中的一员，由于它起到协调管理的作用，而其它大数据组件大多以动物名字命名，因此它就被称为动物园管理员。</p>
+<p>Zookeeper是一个提供分布式协调的中心化服务，官网中的一句话介绍了Zookeeper的主要功能：<strong>配置管理、命名服务（类似于DNS）、分布式同步（分布式锁）和集群管理（集群节点的加入与退出）</strong>。</p>
+<blockquote>
+<p>ZooKeeper is a centralized service for maintaining configuration information, naming, providing distributed synchronization, and providing group services.</p>
+</blockquote>
+<p>接下来将结合Zookeeper论文来学习它的具体设计与实现。</p>
+<span id="more"></span>
+
+<h2 id="1-Zookeeper简介"><a href="#1-Zookeeper简介" class="headerlink" title="1. Zookeeper简介"></a>1. Zookeeper简介</h2><p>移除特定原语，比如锁，转而提供API给开发人员实现自己的原语。</p>
+<p>无等待，ZooKeeper 实现了操作简单无等待数据对象的 API，这些数据对象的结构类似于文件系统。</p>
+<p>ZooKeeper 保证所有操作遵循先进先出顺序和线性化写。</p>
+<p>通过多副本，来实现高可用和高性能。</p>
+<p>一主多从架构，主节点负责写和复制，所有节点都可以读。</p>
+<p>实现了基于领导者的原子广播协议 Zab（类似Raft）。</p>
+<p>使用 watch 机制，当数据更新时，客户端会收到通知。</p>
+<h2 id="2-Zookeeper概述"><a href="#2-Zookeeper概述" class="headerlink" title="2. Zookeeper概述"></a>2. Zookeeper概述</h2><h3 id="2-1-会话"><a href="#2-1-会话" class="headerlink" title="2.1. 会话"></a>2.1. 会话</h3><p>客户端连接ZooKeeper时会初始化一个<strong>会话</strong>。会话有超时时间，当超时时间到期，ZooKeeper会认为客户端出现故障。当客户端关闭或者ZooKeeper探测到客户端故障之后，会话终止。在会话周期内，客户端可以观察到持续的状态变化，这些状态变化反映了有操作在执行。</p>
+<h3 id="2-2-数据模型"><a href="#2-2-数据模型" class="headerlink" title="2.2. 数据模型"></a>2.2. 数据模型</h3><p>Zookeeper的数据模型类似于文件系统的<strong>树形结构</strong>，每个节点是一个可供客户端操作的数据对象<strong>znode</strong>。znode的命名（标识）采用<strong>类似于文件系统路径的层次化命名方式</strong>，比如znode C的名称为<code>/A/B/C</code>，那么C的父节点是B，B的父节点是A。采用层次化命名，能够对不同应用的命名空间分配子树，并且设置权限也比较方便。</p>
+<p><img src="/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BZookeeper/image_iNW38w9gTq.png" alt="1"></p>
+<p>客户端可以创建两类znode：</p>
+<ul>
+<li><p><strong>普通</strong>：可以显式地删除，可以拥有孩子节点。</p>
+</li>
+<li><p><strong>临时</strong>：显式地删除或者在会话结束（主动结束或者因为故障结束）时自动删除，不可以拥有孩子节点。</p>
+</li>
+</ul>
+<p>创建新的znode节点时，可以指定<strong>sequential</strong>标识：会在节点名称后添加一个数值，这个值按照兄弟节点顺序递增。</p>
+<h3 id="2-3-客户端API"><a href="#2-3-客户端API" class="headerlink" title="2.3. 客户端API"></a>2.3. 客户端API</h3><ul>
+<li><p><code>create(path, data, flags)</code>：使用 path 名称创建一个 znode 节点，保存 data，返回新创建的 znode 名称。 flags 用于创建普通或者临时节点，也可以设置顺序标识。</p>
+</li>
+<li><p><code>delete(path, version)</code>：删除指定 path 和 version 的 znode 节点。</p>
+</li>
+<li><p><code>exists(path, watch)</code>：如果指定 path 的 znode 存在则返回真，如果不存在则返回假。watch 标识用于在 znode 上设置监视器。</p>
+</li>
+<li><p><code>getData(path, watch)</code>：返回数据和元数据，如版本信息。watch 标识与 <code>exists()</code> 的 watch 标识一样，但如果 znode 不存在则不会设置监视器。</p>
+</li>
+<li><p><code>setData(path, data, version)</code>：根据 path 和 version 将数据写入到 znode。</p>
+</li>
+<li><p><code>getChildren(path, watch)</code>：返回 znode 所有子节点的名称集合。</p>
+</li>
+</ul>
+<p>ZooKeeper实现了<strong>watch机制</strong>，使得客户端无需轮询就能够及时接受到状态变化的通知信息。当客户端发送了带有 watch 标识的读请求时，操作会正常完成，而<strong>服务器会在数据下一次发生变化时通知客户端</strong>。与一个会话关联的 watch只会触发一次；一旦触发或者会话结束，就会被注销。比如：客户端发送了<code>getData(&quot;/foo&quot;, watch=true)</code>请求，但客户端只会收到 <code>/foo</code> 第一次变化的通知信息。</p>
+<p>更新操作（delete和setData）时，需指定版本号version。如果实际版本号与指定的版本号不一致，更新操作就会失败。如果版本号为-1，不会检查版本号。</p>
+<h3 id="2-4-顺序保证"><a href="#2-4-顺序保证" class="headerlink" title="2.4. 顺序保证"></a>2.4. 顺序保证</h3><ul>
+<li><p><strong>线性化写入</strong>：所有更新 ZooKeeper 状态的请求（写请求）都是线性化的并且遵守优先级。</p>
+</li>
+<li><p><strong>先进先出客户端顺序</strong>：对于一个客户端的所有请求，都会按客户端发送的顺序执行。由于网络情况复杂，一个客户端发出的一系列请求，到达时的顺序可能与发出时不尽相同。对此，可通过对请求添加序号，来保证客户端请求的顺序。</p>
+</li>
+</ul>
+<h3 id="2-5-原语示例"><a href="#2-5-原语示例" class="headerlink" title="2.5. 原语示例"></a>2.5. 原语示例</h3><p>Zookeeper不提供特定原语，而是提供API由客户端自己实现原语，以下是一些原语的实现示例。</p>
+<h4 id="配置管理"><a href="#配置管理" class="headerlink" title="配置管理"></a>配置管理</h4><p>Zookeeper支持分布式应用的动态配置管理，一种简单的形式是：配置信息保存在节点Z中，应用启动时读取节点信息并设置watch为true，当配置发生更新会通知应用，应用读取新的配置信息，并再次将watch设置为true。</p>
+<h4 id="信息汇合"><a href="#信息汇合" class="headerlink" title="信息汇合"></a>信息汇合</h4><p>在一些分布式系统中，配置信息并不能提前知道，比如：客户端要启动一个主进程和几个工作进程，但启动进程由调度器完成，所以客户端不能提前知道进程的IP、端口等相关信息，而工作进程又需要知道主进程的IP和端口。</p>
+<p>对此，可以在Zookeeper上创建一个节点Z，客户端将节点Z的路径作为主进程和工作进程的启动参数。当主进程启动时，可以将IP和端口号填入节点Z；当工作进程启动时，查询节点中数据，并将watch设置为true，如果节点Z中没有数据，工作进程会一直等待。</p>
+<h4 id="群组关系"><a href="#群组关系" class="headerlink" title="群组关系"></a>群组关系</h4><p>创建一个节点Z表示一个群组。这个组的成员进程启动时，在节点Z下创建一个临时节点。进程故障或终止时，其关联的临时节点会被自动删除（会话结束）。</p>
+<h4 id="简单锁"><a href="#简单锁" class="headerlink" title="简单锁"></a>简单锁</h4><p>可以用一个znode表示锁。客户端获取锁时，需要创建一个指定路径的临时节点。如果创建成功，客户端获取这个锁。如果创建失败，客户端设置watch读取该节点，当节点被占有者删除（释放锁），客户端会收到通知。客户端创建该节点后，可通过终止会话或者显式删除节点来释放锁，让给其它等待的客户端。</p>
+<p>简单锁虽然简单，但存在着一些问题：</p>
+<ul>
+<li><p>群体效应。如果很多客户端等待锁，对这个锁的竞争就会很激烈，当锁释放时，仅有一个等待的客户端能获得锁。</p>
+</li>
+<li><p>仅仅实现了互斥锁。</p>
+</li>
+</ul>
+<h4 id="无群体效应的简单锁"><a href="#无群体效应的简单锁" class="headerlink" title="无群体效应的简单锁"></a>无群体效应的简单锁</h4><p>用一个节点Z实现锁，将所有客户端请求按顺序排序，依次获得锁。</p>
+<p>客户端lock伪代码：</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line">n = create(Z + “/lock-”, EPHEMERAL|SEQUENTIAL) <span class="comment">// 在节点Z下创建带递增序号的临时节点</span></span><br><span class="line">C = getChildren(Z, <span class="literal">false</span>) <span class="comment">// 获取节点Z下的所有节点</span></span><br><span class="line"><span class="comment">// 如果客户端创建的临时节点序号最小，获取锁</span></span><br><span class="line"><span class="keyword">if</span> n is lowest znode in C:</span><br><span class="line">  <span class="built_in">exit</span></span><br><span class="line"></span><br><span class="line">p = znode in C ordered just before n <span class="comment">// 获取子节点序列中，客户端所创建的临时节点的前一个节点</span></span><br><span class="line"><span class="comment">// 如果它存在，等待监听事件</span></span><br><span class="line"><span class="keyword">if</span> exists(p, <span class="literal">true</span>):</span><br><span class="line">  wait <span class="keyword">for</span> watch event</span><br><span class="line"><span class="comment">// 当前一个节点不存在了，跳转到第2行</span></span><br><span class="line"><span class="keyword">goto</span> <span class="number">2</span></span><br></pre></td></tr></table></figure>
+
+<p>unlock伪代码：</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line">delete(n) <span class="comment">// 删除客户端创建的临时节点，代表释放锁</span></span><br></pre></td></tr></table></figure>
+
+<p>改进后的优势：每次释放锁（移除节点），只会唤起一个客户端。</p>
+<h4 id="读写锁"><a href="#读写锁" class="headerlink" title="读写锁"></a>读写锁</h4><p>改进上述lock代码，分为读写锁，unlock代码不变。</p>
+<p>write lock:</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line">n = create(Z + “/write-”, EPHEMERAL|SEQUENTIAL) <span class="comment">// 创建代表写锁的带序号的临时节点</span></span><br><span class="line">C = getChildren(Z, <span class="literal">false</span>)</span><br><span class="line"><span class="keyword">if</span> n is lowest znode in C:</span><br><span class="line">  <span class="built_in">exit</span></span><br><span class="line"></span><br><span class="line">p = znode in C ordered just before n</span><br><span class="line"><span class="keyword">if</span> exists(p, <span class="literal">true</span>):</span><br><span class="line">  wait <span class="keyword">for</span> event</span><br><span class="line"><span class="keyword">goto</span> <span class="number">2</span></span><br></pre></td></tr></table></figure>
+
+<p>read lock:</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line">n = create(Z + “/read-”, EPHEMERAL|SEQUENTIAL) <span class="comment">// 创建代表读锁的带序号的临时节点</span></span><br><span class="line">C = getChildren(Z, <span class="literal">false</span>)</span><br><span class="line"><span class="comment">// 如果子节点中没有写锁节点，则得到锁</span></span><br><span class="line"><span class="keyword">if</span> no write znodes lower than n in C:</span><br><span class="line">  <span class="built_in">exit</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 等待当前节点的上一个写锁节点</span></span><br><span class="line">p = write znode in C ordered just before n</span><br><span class="line"><span class="keyword">if</span> exists(p, <span class="literal">true</span>):</span><br><span class="line">  wait <span class="keyword">for</span> event</span><br><span class="line"><span class="keyword">goto</span> <span class="number">4</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="3-Zookeeper实现"><a href="#3-Zookeeper实现" class="headerlink" title="3. Zookeeper实现"></a>3. Zookeeper实现</h2><p><img src="/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BZookeeper/image_7CYFU70Zb3.png" alt="1"></p>
+<p>Zookeeper通过复制（多副本）实现高可用。</p>
+<p>Zookeeper的数据保存在内存中。当数据更新时，会先将更新操作写入磁盘的日志中。当Zookeeper从故障中恢复时，会从日志中重放更新操作，以此恢复内存中数据到正常状态。</p>
+<p>当Zookeeper服务收到写请求时，会先通过请求处理器执行请求，再通过 <strong>ZAB协议（分布式一致性协议，类似于raft）</strong> 将状态变更提交到所有的数据库；当收到读请求时，直接读取本地数据库返回响应消息。</p>
+<h3 id="3-1-请求处理器Request-Processor"><a href="#3-1-请求处理器Request-Processor" class="headerlink" title="3.1. 请求处理器Request Processor"></a>3.1. 请求处理器Request Processor</h3><p>用于执行客户端的写请求，执行成功后，再将状态变更同步给其它副本。</p>
+<p><strong>为什么不将写请求直接同步给其它副本呢？因为写请求可能执行失败。</strong>若直接将写请求同步给其它副本，那同步完成之后，发现执行失败，还要进行同步回滚，以保证一致性。而先在leader服务器上执行，只有执行成功的才会进行同步，而执行失败的直接返回，就不会浪费同步的时间。</p>
+<h3 id="3-2-原子广播Atomic-Broadcast"><a href="#3-2-原子广播Atomic-Broadcast" class="headerlink" title="3.2. 原子广播Atomic Broadcast"></a>3.2. 原子广播Atomic Broadcast</h3><p>Zookeeper使用Zab协议来保证多副本一致性，Zab协议类似于Paxos和Raft。</p>
+<p>当客户端发起写请求时，请求会被转发到leader节点，leader节点执行完写请求，再将变更信息同步到其它节点。当状态同步完成（超半数服务器同步状态成功）后，再响应给客户端。</p>
+<h3 id="3-3-复制数据库Replicated-Database"><a href="#3-3-复制数据库Replicated-Database" class="headerlink" title="3.3. 复制数据库Replicated Database"></a>3.3. 复制数据库Replicated Database</h3><p>当Zookeeper从故障中恢复时，会重放日志中的操作。当日志中内容较多时，恢复需要很长时间。因此，当Zookeeper运行一段时间后，会生成快照。下次恢复时，只需要从快照开始即可。</p>
+<h3 id="3-4-C-x2F-S交互"><a href="#3-4-C-x2F-S交互" class="headerlink" title="3.4. C&#x2F;S交互"></a>3.4. C&#x2F;S交互</h3><p>Zookeeper按顺序处理写请求，并且不会并发地处理其它请求。</p>
+<p>读请求在每个服务器本地处理，不用转交给leader服务器，这样可以获取非常高的读性能。但缺点在于：<strong>可能会读到旧的状态数据（顺序一致性）</strong>。因为一次状态变更成功，只表明状态变更的日志提交到大多数的服务器上，并不代表所有服务器都已经执行了状态变更，有些服务器可能还处于旧状态。</p>
+<p>Zookeeper按先进先出的顺序处理写请求，并<strong>在响应中包含zxid信息（当前状态的版本号）</strong>。在与客户端的心跳通信中，也会包含最新的zxid。如果客户端连接到新的服务器，会对比客户端和服务器的zxid，如果客户端的zxid更大，将不会建立会话。以此保证读到较新的数据，不是最新，因为客户端拿到的zxid不一定是最新的，但绝不会读到已读过的数据。同时，<strong>这样能保证单个客户端请求先进先出的顺序，客户端一定能够读到它上一次写入的数据。</strong>因为客户端发起写请求后，会得到写请求执行成功后的zxid。<strong>但这并不能保证客户端读到其它客户端写入的最新数据。</strong></p>
+<p>另外，<strong>为了保证能够读到最新提交的数据（线性一致性），Zookeeper提供了<code>sync</code>接口：sync会等待leader将未处理的写操作全部写入到本地副本之后再执行</strong>（类似于一个不写数据的写请求）。客户端若要读取最新数据，可以先调用sync，再调用读操作。</p>
+<h2 id="4-个人总结"><a href="#4-个人总结" class="headerlink" title="4. 个人总结"></a>4. 个人总结</h2><p>Zookeeper亮点：</p>
+<ul>
+<li><p>提供可灵活组合的基础API而不是直接提供固定功能。</p>
+</li>
+<li><p>提供watch机制，而不是让客户端轮询。</p>
+</li>
+<li><p>让用户根据场景在性能与一致性之间做取舍，默认使用较弱的顺序一致性以达到更高的系统性能，用户也能通过API获取较强的线性一致性。</p>
+</li>
+</ul>
+<h2 id="5-参考"><a href="#5-参考" class="headerlink" title="5. 参考"></a>5. 参考</h2><ul>
+<li><a href="https://dl.acm.org/doi/10.5555/1855840.1855851">ZooKeeper | Proceedings of the 2010 USENIX conference on USENIX annual technical conference (acm.org)</a></li>
+<li><a href="https://iswade.github.io/translate/zookeeper/">Zookeeper论文翻译 - iswade’s blog</a></li>
+<li><a href="https://developer.aliyun.com/article/897839">漫画：什么是ZooKeeper？-阿里云开发者社区 (aliyun.com)</a></li>
+</ul>
 ]]></content>
       <categories>
         <category>欲穷千里目，更上一层楼</category>

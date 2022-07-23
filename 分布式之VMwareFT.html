@@ -21,12 +21,12 @@
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"blog.dounine.live","root":"/","images":"/images","scheme":"Mist","darkmode":false,"version":"8.11.1","exturl":false,"sidebar":{"position":"right","display":"always","padding":18,"offset":12},"copycode":{"enable":true,"style":"flat"},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":"utterances","storage":true,"lazyload":false,"nav":null,"activeClass":"utterances"},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
 
-    <meta name="description" content="0. 前言VMware公司在2010年发表了一篇有关虚拟机容错的论文：《The Design of a Practical System for Fault-Tolerant Virtual Machines》。同时，它也是MIT6.824 LEC4的Preparation Read。本文将结合课程简单介绍论文内容。 1. 主&#x2F;备份实现服务器容错的一种通用方法是主&#x2F;备份(pri">
+    <meta name="description" content="0. 前言VMware公司在2010年发表了一篇有关虚拟机容错的论文：《The Design of a Practical System for Fault-Tolerant Virtual Machines》。同时，它也是MIT6.824 LEC4的Preparation Read。本文将结合课程简单介绍论文内容。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="分布式之VMwareFT">
 <meta property="og:url" content="https://blog.dounine.live/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BVMwareFT.html">
 <meta property="og:site_name" content="dounine&#39;s blog">
-<meta property="og:description" content="0. 前言VMware公司在2010年发表了一篇有关虚拟机容错的论文：《The Design of a Practical System for Fault-Tolerant Virtual Machines》。同时，它也是MIT6.824 LEC4的Preparation Read。本文将结合课程简单介绍论文内容。 1. 主&#x2F;备份实现服务器容错的一种通用方法是主&#x2F;备份(pri">
+<meta property="og:description" content="0. 前言VMware公司在2010年发表了一篇有关虚拟机容错的论文：《The Design of a Practical System for Fault-Tolerant Virtual Machines》。同时，它也是MIT6.824 LEC4的Preparation Read。本文将结合课程简单介绍论文内容。">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://blog.dounine.live/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BVMwareFT/image_EVWkBerzKf.png">
 <meta property="og:image" content="https://blog.dounine.live/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BVMwareFT/image_2rKd5U6Fhq.png">
@@ -92,7 +92,7 @@
 
 
 <nav class="site-nav">
-  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">18</span></a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">50</span></a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">77</span></a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li>
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">18</span></a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">50</span></a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">78</span></a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li>
       <li class="menu-item menu-item-search">
         <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
         </a>
@@ -164,7 +164,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">77</span>
+          <span class="site-state-item-count">78</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -333,6 +333,8 @@
     
     <div class="post-body" itemprop="articleBody">
         <h2 id="0-前言"><a href="#0-前言" class="headerlink" title="0. 前言"></a>0. 前言</h2><p>VMware公司在2010年发表了一篇有关虚拟机容错的论文：<a target="_blank" rel="noopener" href="https://dl.acm.org/doi/10.1145/1899928.1899932" title="《The Design of a Practical System for Fault-Tolerant Virtual Machines》">《The Design of a Practical System for Fault-Tolerant Virtual Machines》</a>。同时，它也是MIT6.824 LEC4的Preparation Read。本文将结合课程简单介绍论文内容。</p>
+<span id="more"></span>
+
 <h2 id="1-主-x2F-备份"><a href="#1-主-x2F-备份" class="headerlink" title="1. 主&#x2F;备份"></a>1. 主&#x2F;备份</h2><p>实现服务器容错的一种通用方法是<strong>主&#x2F;备份(primary&#x2F;backup)</strong> 方法，当主服务器失效，备份服务器可以接管主服务器的工作。</p>
 <p>为了保持主备状态同步，有2种方法：</p>
 <ul>
@@ -387,6 +389,9 @@
 
           <div class="post-nav">
             <div class="post-nav-item">
+                <a href="/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BZookeeper.html" rel="prev" title="分布式之Zookeeper">
+                  <i class="fa fa-chevron-left"></i> 分布式之Zookeeper
+                </a>
             </div>
             <div class="post-nav-item">
                 <a href="/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BGFS.html" rel="next" title="分布式之GFS">
@@ -425,7 +430,7 @@
       <i class="fa fa-chart-line"></i>
     </span>
       <span>站点总字数：</span>
-    <span title="站点总字数">501k</span>
+    <span title="站点总字数">506k</span>
   </span>
 </div>
 <div class="busuanzi-count">

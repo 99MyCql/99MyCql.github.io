@@ -86,7 +86,7 @@
 
 
 <nav class="site-nav">
-  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">18</span></a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">50</span></a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">77</span></a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li>
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">18</span></a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">50</span></a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">78</span></a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li>
       <li class="menu-item menu-item-search">
         <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
         </a>
@@ -157,7 +157,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">77</span>
+          <span class="site-state-item-count">78</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -255,6 +255,109 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://blog.dounine.live/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BZookeeper.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://avatars.githubusercontent.com/u/41814469?s=400&u=48bf60a3428a3cb86a84a110c8688930cf6ceb08&v=4">
+      <meta itemprop="name" content="dounine">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dounine's blog">
+      <meta itemprop="description" content="回首向来萧瑟处">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | dounine's blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BZookeeper.html" class="post-title-link" itemprop="url">分布式之Zookeeper</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2022-07-23 16:59:01" itemprop="dateCreated datePublished" datetime="2022-07-23T16:59:01+08:00">2022-07-23</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Pro/" itemprop="url" rel="index"><span itemprop="name">欲穷千里目，更上一层楼</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Pro/Distributed/" itemprop="url" rel="index"><span itemprop="name">分布式</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>5.1k</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h2 id="0-前言"><a href="#0-前言" class="headerlink" title="0. 前言"></a>0. 前言</h2><p><a target="_blank" rel="noopener" href="https://pdos.csail.mit.edu/6.824/schedule.html" title="MIT6.824">MIT6.824</a> LEC9: Zookeeper。</p>
+<p>当单机性能到达瓶颈时，我们需要对应用服务进行横向扩展，将同一个应用部署到多台服务器上，以提高整体性能。但新的解决方法总会带来新的问题：应用的配置（比如数据库连接、地址黑名单）需要更新时，如何进行统一更新？当多个应用对同一个外部资源进行修改时，如何保证同步互斥？为了解决这些问题，就有了Zookeeper的出现。</p>
+<p>Zookeeper是大数据组件中的一员，由于它起到协调管理的作用，而其它大数据组件大多以动物名字命名，因此它就被称为动物园管理员。</p>
+<p>Zookeeper是一个提供分布式协调的中心化服务，官网中的一句话介绍了Zookeeper的主要功能：<strong>配置管理、命名服务（类似于DNS）、分布式同步（分布式锁）和集群管理（集群节点的加入与退出）</strong>。</p>
+<blockquote>
+<p>ZooKeeper is a centralized service for maintaining configuration information, naming, providing distributed synchronization, and providing group services.</p>
+</blockquote>
+<p>接下来将结合Zookeeper论文来学习它的具体设计与实现。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BZookeeper.html#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
     <link itemprop="mainEntityOfPage" href="https://blog.dounine.live/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BVMwareFT.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -318,45 +421,14 @@
     
     <div class="post-body" itemprop="articleBody">
           <h2 id="0-前言"><a href="#0-前言" class="headerlink" title="0. 前言"></a>0. 前言</h2><p>VMware公司在2010年发表了一篇有关虚拟机容错的论文：<a target="_blank" rel="noopener" href="https://dl.acm.org/doi/10.1145/1899928.1899932" title="《The Design of a Practical System for Fault-Tolerant Virtual Machines》">《The Design of a Practical System for Fault-Tolerant Virtual Machines》</a>。同时，它也是MIT6.824 LEC4的Preparation Read。本文将结合课程简单介绍论文内容。</p>
-<h2 id="1-主-x2F-备份"><a href="#1-主-x2F-备份" class="headerlink" title="1. 主&#x2F;备份"></a>1. 主&#x2F;备份</h2><p>实现服务器容错的一种通用方法是<strong>主&#x2F;备份(primary&#x2F;backup)</strong> 方法，当主服务器失效，备份服务器可以接管主服务器的工作。</p>
-<p>为了保持主备状态同步，有2种方法：</p>
-<ul>
-<li><p>**状态传递(State transfer)**。将主服务器上的所有状态（包括CPU、内存等等）都发送给备份服务器。这种方法能保证主备状态一致，但每次需同步大量数据，会占用大量宽带。</p>
-</li>
-<li><p>**复制状态机(Replicated state machine)**。主备服务器一开始处于相同状态，对于每一条发送给主服务器的输入请求（比如将一个数加1），主服务器会发送给备份服务器，它们以相同顺序执行输入请求，从而保持同步。这种方法同步的信息较少，效率更高。但是，对于一些不确定请求，比如获取当前时间、获取随机数、多核计算，主备服务器执行结果可能并不相同，还需要额外的操作来保持同步。</p>
-</li>
-</ul>
-<p>VMwareFT论文种使用了复制状态机来实现容错。</p>
-<h2 id="2-基本设计"><a href="#2-基本设计" class="headerlink" title="2. 基本设计"></a>2. 基本设计</h2><p><img src="/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BVMwareFT/image_EVWkBerzKf.png" alt="1"></p>
-<p>主备虚拟机运行在不同的机器上，它们共享一个磁盘(Shared Disk)，主VM接收到的输入都通过日志通道(Logging channel)发送给备份VM。主备VM都执行相同操作，但只有主VM的输出才返回给客户端。</p>
-<p>系统通过相关服务器之间的心跳和日志通道上的流量监控，来检测主备VM是否失效。</p>
-<h3 id="确定性重放"><a href="#确定性重放" class="headerlink" title="确定性重放"></a>确定性重放</h3><p>对于不确定事件或操作，比如中断、获取时间等，可能会导致主备VM状态不一致。</p>
-<p>VMware确定性重放(deterministic replay)机制，能够捕获所有输入和所有可能不确定输入，并记录到日志文件，通过读取日志，备份VM可以准确地重放执行。</p>
-<p>对于不确定输入，必须记录足够的信息来保证重放。当然论文中并未介绍是哪些信息，一种可能的方式是直接记录执行结果，备份VM只需复制结果即可，而不需要再次执行。而<strong>对于多核计算，暂时没有有效机制来保证执行结果一致，因此论文中的虚拟机VM都规定是单核的</strong>。</p>
-<p>（注：这一节为什么讲了跟没讲一样）</p>
-<h3 id="FT-协议"><a href="#FT-协议" class="headerlink" title="FT 协议"></a>FT 协议</h3><p>考虑一种情况：VM上有一个数A值为10，客户端请求将A+&#x3D;1并返回结果，主VM接收请求后执行+1并返回11，但它正要将该请求告诉给备份VM时宕机了。备份VM接替了主VM，但由于备份VM并未收到请求，A的值依旧是10。此时，客户端再请求将A+&#x3D;1并返回，它再次得到11，显然这是不正确的。</p>
-<p>为了防止这种情况的发生，论文设计了一条<strong>输出规则：对于需要输出的请求，主VM会等备份VM确认收到请求后（备份VM会返回ACK），再将输出返回。同时，主VM只是延迟输出，并不会阻塞后面的任务（异步）。</strong></p>
-<p><img src="/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BVMwareFT/image_2rKd5U6Fhq.png" alt="1"></p>
-<p>但是，规则并不能保证结果只输出一次。比如：当主VM收到备份VM的ACK后，正要返回输出，但突然宕机了。备份VM接替之后，并不知道主VM是否已经返回输出，所以它会将最后一次输出再返回一次（其实之前的输出备份VM都不知道是否返回吧？）。当重复输出并无大碍，比如：对磁盘同一个位置重复写，一个数据包发两次（TCP能够检测重复的数据包）。</p>
-<h3 id="检测和故障响应"><a href="#检测和故障响应" class="headerlink" title="检测和故障响应"></a>检测和故障响应</h3><p>主VM和备VM之间会通过<strong>UDP心跳</strong>和<strong>监控日志通道流量</strong>来检测对方服务是否正常，若停止的时间超过阈值，就说明出现故障。</p>
-<p>不过这种检测方法并不能避免脑裂问题(split-brain) 。当备份VM长时间没有收到主VM的心跳和日志消息，可能是主VM宕机，也可能是网络问题。如果是因为暂时的网络问题，此时备份VM若顶替主VM，那网络上将出现2个主VM。</p>
-<p>为了解决这个问题，VMware在共享磁盘上设置了test-and-set的原子操作 ，类似于一个锁，只能被一个VM获取，而只有拿到这个锁才能对共享磁盘进行操作。</p>
-<h2 id="3-FT实际应用"><a href="#3-FT实际应用" class="headerlink" title="3. FT实际应用"></a>3. FT实际应用</h2><h3 id="创建备份VM"><a href="#创建备份VM" class="headerlink" title="创建备份VM"></a>创建备份VM</h3><p>VMware使用VMware vSphere现有的VMotion功能：将一个运行中的VM克隆到新机器上，而VM只需暂停不到1秒的时间。</p>
-<p>同时，VMware vSphere实现了一个集群服务，它会根据主VM的备份请求选择合适的机器，然后通过VMotion进行克隆，这过程只需几分钟。</p>
-<p>（细节啥也没说）</p>
-<h3 id="管理日志通道"><a href="#管理日志通道" class="headerlink" title="管理日志通道"></a>管理日志通道</h3><p>为了管理监控日志通道，管理程序为日志通道维持了一个日志缓冲区，主VM向缓冲区写，备份VM从缓冲区读。</p>
-<p>当缓冲区被填满（主VM写太快，备份VM读太慢）时，主VM将会停止执行，等待缓冲区有空闲。显然，这会影响客户端体验。为此，当缓冲区日志太多时，管理程序会降低主VM的执行速度（比如分配更少的CPU资源），等待备份VM消化缓存，更上日志进度。</p>
-<p>当然，这种主VM减速很罕见。</p>
-<h2 id="4-个人总结"><a href="#4-个人总结" class="headerlink" title="4. 个人总结"></a>4. 个人总结</h2><p>不同于数据库备份，虚拟机这种整个操作系统的备份确实困难且复杂。因为它存在许多不确定操作，比如中断、多核并行等，复现难度大。</p>
-<p>个人认为， <em>对于操作繁多且复杂的场景，应该避免做操作的同步，而应该做数据状态的同步</em> 。比如，客户端请求对A进行+1操作，那么不应该让备份机器同步执行这个+1操作，而应该将A进行+1的结果同步给备份机器。当然，这其实就是在状态转移和复制状态机两种方式间做抉择。</p>
-<p>这篇论文虽然并不详细，也没有带来多大的影响，但也有值得借鉴的点：</p>
-<ol>
-<li><p>主VM需要确定备份VM获取到请求后，再返回给客户端。不过要是备份VM执行失败了怎么办？</p>
-</li>
-<li><p>通过外部权威来解决脑裂问题。感觉不如超半数投票？</p>
-</li>
-</ol>
-
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BVMwareFT.html#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
       
     </div>
 
@@ -1144,102 +1216,6 @@
 
 
 
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://blog.dounine.live/%E8%A3%85%E9%A5%B0%E5%99%A8%E6%A8%A1%E5%BC%8F.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="https://avatars.githubusercontent.com/u/41814469?s=400&u=48bf60a3428a3cb86a84a110c8688930cf6ceb08&v=4">
-      <meta itemprop="name" content="dounine">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dounine's blog">
-      <meta itemprop="description" content="回首向来萧瑟处">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="undefined | dounine's blog">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/%E8%A3%85%E9%A5%B0%E5%99%A8%E6%A8%A1%E5%BC%8F.html" class="post-title-link" itemprop="url">装饰器模式</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2021-11-05 13:58:21" itemprop="dateCreated datePublished" datetime="2021-11-05T13:58:21+08:00">2021-11-05</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/Base/" itemprop="url" rel="index"><span itemprop="name">九层之台，起于累土</span></a>
-        </span>
-          ，
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/Base/SoftwareEngineering/" itemprop="url" rel="index"><span itemprop="name">软件工程</span></a>
-        </span>
-    </span>
-
-  
-    <span class="post-meta-item" title="本文字数">
-      <span class="post-meta-item-icon">
-        <i class="far fa-file-word"></i>
-      </span>
-      <span class="post-meta-item-text">本文字数：</span>
-      <span>3.8k</span>
-    </span>
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>装饰器模式是一种结构型设计模式，它可以<strong>向现有对象动态地添加任意功能，而不改变其原本结构</strong> 。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/%E8%A3%85%E9%A5%B0%E5%99%A8%E6%A8%A1%E5%BC%8F.html#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
   <nav class="pagination">
     <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/page/8/">8</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
@@ -1265,7 +1241,7 @@
       <i class="fa fa-chart-line"></i>
     </span>
       <span>站点总字数：</span>
-    <span title="站点总字数">501k</span>
+    <span title="站点总字数">506k</span>
   </span>
 </div>
 <div class="busuanzi-count">

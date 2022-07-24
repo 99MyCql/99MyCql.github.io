@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.2.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/golang32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/golang16.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="baidu-site-verification" content="code-RpvRDWfflk">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" integrity="sha256-DfWjNxDkM94fVBWx1H5BMMp0Zq7luBlV8QRcSES7s+0=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"blog.dounine.live","root":"/","images":"/images","scheme":"Mist","darkmode":false,"version":"8.11.1","exturl":false,"sidebar":{"position":"right","display":"always","padding":18,"offset":12},"copycode":{"enable":true,"style":"flat"},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":"utterances","storage":true,"lazyload":false,"nav":null,"activeClass":"utterances"},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="0 前言实习期间调研的公链跨链项目THORChain——一个去中心化跨链流动性网络，类似于Layer1 Uniswap，分享给大家。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="THORChain项目调研">
+<meta property="og:url" content="https://blog.dounine.live/THORChain%E9%A1%B9%E7%9B%AE%E8%B0%83%E7%A0%94.html">
+<meta property="og:site_name" content="dounine&#39;s blog">
+<meta property="og:description" content="0 前言实习期间调研的公链跨链项目THORChain——一个去中心化跨链流动性网络，类似于Layer1 Uniswap，分享给大家。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://blog.dounine.live/THORChain%E9%A1%B9%E7%9B%AE%E8%B0%83%E7%A0%94/image_8KSJZTRHpJ.png">
+<meta property="og:image" content="https://blog.dounine.live/THORChain%E9%A1%B9%E7%9B%AE%E8%B0%83%E7%A0%94/image_ES3WSxPiuK.png">
+<meta property="og:image" content="https://blog.dounine.live/THORChain%E9%A1%B9%E7%9B%AE%E8%B0%83%E7%A0%94/image_IcjVO-YTK0.png">
+<meta property="og:image" content="https://blog.dounine.live/THORChain%E9%A1%B9%E7%9B%AE%E8%B0%83%E7%A0%94/image_JwSThFcjGt.png">
+<meta property="og:image" content="https://blog.dounine.live/THORChain%E9%A1%B9%E7%9B%AE%E8%B0%83%E7%A0%94/image_s9_L1l34Yg.png">
+<meta property="og:image" content="https://blog.dounine.live/THORChain%E9%A1%B9%E7%9B%AE%E8%B0%83%E7%A0%94/image_9JBUN36zRy.png">
+<meta property="og:image" content="https://blog.dounine.live/THORChain%E9%A1%B9%E7%9B%AE%E8%B0%83%E7%A0%94/image_Rpq4qxMaGu.png">
+<meta property="og:image" content="https://blog.dounine.live/THORChain%E9%A1%B9%E7%9B%AE%E8%B0%83%E7%A0%94/image_j_QsTXJV0N.png">
+<meta property="og:image" content="https://blog.dounine.live/THORChain%E9%A1%B9%E7%9B%AE%E8%B0%83%E7%A0%94/image_Z-VrU_zINp.png">
+<meta property="og:image" content="https://blog.dounine.live/THORChain%E9%A1%B9%E7%9B%AE%E8%B0%83%E7%A0%94/image_m6yHsc2xZa.png">
+<meta property="og:image" content="https://blog.dounine.live/THORChain%E9%A1%B9%E7%9B%AE%E8%B0%83%E7%A0%94/%E7%BD%91%E9%A1%B5%E6%8D%95%E8%8E%B7_18-7-2022_171527_thorchain.org_4NPUF1xvAd.jpeg">
+<meta property="og:image" content="https://blog.dounine.live/THORChain%E9%A1%B9%E7%9B%AE%E8%B0%83%E7%A0%94/image_wnxQSe5dPH.png">
+<meta property="og:image" content="https://blog.dounine.live/THORChain%E9%A1%B9%E7%9B%AE%E8%B0%83%E7%A0%94/image_dkF2rQwLXk.png">
+<meta property="og:image" content="https://blog.dounine.live/THORChain%E9%A1%B9%E7%9B%AE%E8%B0%83%E7%A0%94/image_0j6rvGwQ7h.png">
+<meta property="og:image" content="https://blog.dounine.live/THORChain%E9%A1%B9%E7%9B%AE%E8%B0%83%E7%A0%94/image_XMHKUDjdR7.png">
+<meta property="og:image" content="https://blog.dounine.live/THORChain%E9%A1%B9%E7%9B%AE%E8%B0%83%E7%A0%94/image_SfA5XGdOrY.png">
+<meta property="og:image" content="https://blog.dounine.live/THORChain%E9%A1%B9%E7%9B%AE%E8%B0%83%E7%A0%94/image_5f_ngRvaMQ.png">
+<meta property="og:image" content="https://blog.dounine.live/THORChain%E9%A1%B9%E7%9B%AE%E8%B0%83%E7%A0%94/image_1zvjBRtaxV.png">
+<meta property="article:published_time" content="2022-07-24T02:42:43.000Z">
+<meta property="article:modified_time" content="2022-07-24T02:42:43.000Z">
+<meta property="article:author" content="dounine">
+<meta property="article:tag" content="区块链">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://blog.dounine.live/THORChain%E9%A1%B9%E7%9B%AE%E8%B0%83%E7%A0%94/image_8KSJZTRHpJ.png">
+
+
+<link rel="canonical" href="https://blog.dounine.live/THORChain%E9%A1%B9%E7%9B%AE%E8%B0%83%E7%A0%94.html">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://blog.dounine.live/THORChain%E9%A1%B9%E7%9B%AE%E8%B0%83%E7%A0%94.html","path":"THORChain项目调研.html","title":"THORChain项目调研"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>THORChain项目调研 | dounine's blog</title>
+  
+
+  <script src="/js/third-party/analytics/baidu-analytics.js"></script>
+  <script async src="https://hm.baidu.com/hm.js?66c7065aa71681df47eb23eff557978b"></script>
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">dounine's blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">18</span></a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">50</span></a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">79</span></a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#0-%E5%89%8D%E8%A8%80"><span class="nav-text">0 前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-THORChain%E9%A1%B9%E7%9B%AE%E8%B0%83%E7%A0%94"><span class="nav-text">1 THORChain项目调研</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-%E9%A1%B9%E7%9B%AE%E5%9B%A2%E9%98%9F%E4%BB%8B%E7%BB%8D"><span class="nav-text">1.1 项目团队介绍</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-%E9%A1%B9%E7%9B%AE%E8%9E%8D%E8%B5%84%E6%A6%82%E5%86%B5"><span class="nav-text">1.2 项目融资概况</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-3-%E4%BA%A7%E5%93%81%E5%AE%9A%E4%BD%8D"><span class="nav-text">1.3 产品定位</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E6%8A%80%E6%9C%AF%E8%B0%83%E7%A0%94%E6%83%85%E5%86%B5"><span class="nav-text">2 技术调研情况</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-%E6%8A%80%E6%9C%AF%E4%BB%8B%E7%BB%8D"><span class="nav-text">2.1 技术介绍</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B5%81%E5%8A%A8%E6%80%A7%E6%A8%A1%E5%9E%8B"><span class="nav-text">流动性模型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%B7%A8%E9%93%BE%E4%BA%A4%E6%98%93%E6%B5%81%E7%A8%8B%E6%A6%82%E8%BF%B0"><span class="nav-text">跨链交易流程概述</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-%E6%A0%B8%E5%BF%83%E5%8A%9F%E8%83%BD"><span class="nav-text">2.2 核心功能</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-1-THORNode"><span class="nav-text">2.2.1 THORNode</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-2-%E9%87%91%E5%BA%93"><span class="nav-text">2.2.2 金库</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%85%A5%E7%AB%99%E9%87%91%E5%BA%93Asgard-vaults"><span class="nav-text">入站金库Asgard vaults</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%87%BA%E7%AB%99%E9%87%91%E5%BA%93Yggdrasil-Vaults"><span class="nav-text">出站金库Yggdrasil Vaults</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-3-Bifrost%E5%8D%8F%E8%AE%AE"><span class="nav-text">2.2.3 Bifröst协议</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-4-%E6%90%85%E5%8A%A8"><span class="nav-text">2.2.4 搅动</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-5-%E8%B4%B9%E7%94%A8"><span class="nav-text">2.2.5 费用</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-%E9%A1%B9%E7%9B%AE%E7%94%9F%E6%80%81%E7%8E%B0%E7%8A%B6%E4%B8%8E%E8%B6%8B%E5%8A%BF"><span class="nav-text">2.3 项目生态现状与趋势</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-4-%E4%BA%A7%E5%93%81Dapp%E4%BD%93%E9%AA%8C"><span class="nav-text">2.4 产品Dapp体验</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E5%8F%82%E8%80%83"><span class="nav-text">3 参考</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="dounine"
+      src="https://avatars.githubusercontent.com/u/41814469?s=400&u=48bf60a3428a3cb86a84a110c8688930cf6ceb08&v=4">
+  <p class="site-author-name" itemprop="name">dounine</p>
+  <div class="site-description" itemprop="description">回首向来萧瑟处</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">79</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">18</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">50</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/99MyCql" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;99MyCql" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+
+  <div class="links-of-blogroll site-overview-item animated">
+    <div class="links-of-blogroll-title"><i class="fa fa-globe fa-fw"></i>
+      Links
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://bkfish.gitee.io/" title="https:&#x2F;&#x2F;bkfish.gitee.io&#x2F;" rel="noopener" target="_blank">bkfish</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://hitworld.github.io/" title="https:&#x2F;&#x2F;hitworld.github.io&#x2F;" rel="noopener" target="_blank">w4rd3n</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://wyjoutstanding.github.io/" title="https:&#x2F;&#x2F;wyjoutstanding.github.io&#x2F;" rel="noopener" target="_blank">wyjoutstanding</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://iwtf.github.io/" title="https:&#x2F;&#x2F;iwtf.github.io&#x2F;" rel="noopener" target="_blank">IWTF</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://wood1314.github.io/" title="https:&#x2F;&#x2F;wood1314.github.io&#x2F;" rel="noopener" target="_blank">wood</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://desperadoccy.xyz/" title="https:&#x2F;&#x2F;desperadoccy.xyz&#x2F;" rel="noopener" target="_blank">desperadoccy</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://doudouqaq.github.io/" title="https:&#x2F;&#x2F;doudouqaq.github.io&#x2F;" rel="noopener" target="_blank">doudouqaq</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://kylinnnnn.github.io/" title="https:&#x2F;&#x2F;kylinnnnn.github.io&#x2F;" rel="noopener" target="_blank">kylinnnnn</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://miaotony.xyz/" title="https:&#x2F;&#x2F;miaotony.xyz" rel="noopener" target="_blank">miaotony</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://110.40.153.120:3030/" title="http:&#x2F;&#x2F;110.40.153.120:3030&#x2F;" rel="noopener" target="_blank">AZhou</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.csdn.net/weixin_40986490" title="https:&#x2F;&#x2F;blog.csdn.net&#x2F;weixin_40986490" rel="noopener" target="_blank">白速龙王的回眸</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.csdn.net/weixin_43116322" title="https:&#x2F;&#x2F;blog.csdn.net&#x2F;weixin_43116322" rel="noopener" target="_blank">Ethan</a>
+        </li>
+    </ul>
+  </div>
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.dounine.live/THORChain%E9%A1%B9%E7%9B%AE%E8%B0%83%E7%A0%94.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://avatars.githubusercontent.com/u/41814469?s=400&u=48bf60a3428a3cb86a84a110c8688930cf6ceb08&v=4">
+      <meta itemprop="name" content="dounine">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dounine's blog">
+      <meta itemprop="description" content="回首向来萧瑟处">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="THORChain项目调研 | dounine's blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          THORChain项目调研
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2022-07-24 10:42:43" itemprop="dateCreated datePublished" datetime="2022-07-24T10:42:43+08:00">2022-07-24</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Pro/" itemprop="url" rel="index"><span itemprop="name">欲穷千里目，更上一层楼</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Pro/BlockChain/" itemprop="url" rel="index"><span itemprop="name">区块链</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>5.5k</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h2 id="0-前言"><a href="#0-前言" class="headerlink" title="0 前言"></a>0 前言</h2><p>实习期间调研的公链跨链项目THORChain——一个去中心化跨链流动性网络，类似于Layer1 Uniswap，分享给大家。</p>
+<span id="more"></span>
+
+<h2 id="1-THORChain项目调研"><a href="#1-THORChain项目调研" class="headerlink" title="1 THORChain项目调研"></a>1 THORChain项目调研</h2><h3 id="1-1-项目团队介绍"><a href="#1-1-项目团队介绍" class="headerlink" title="1.1 项目团队介绍"></a>1.1 项目团队介绍</h3><p>THORChain（雷神链）第一次现身是在2018年的Binance Hackathon，THORChain团队在竞赛中以DEX为目标开发了THORChain雏形。在此之后，THORChain团队持续对THORChain的技术进行开发。团队在2021年4月13日正式上线THORChain的测试网络ChaosNet，并计划在2022年1月上线主网，7月之前将网络控制权完全移交给社区。</p>
+<p>THORChain的开发团队始终都保持着隐私性，直至今日，THORChain官方始终没有公布开发团队的信息，唯一可知的就是核心团队大概有20人左右构成。目前THORChain有一个官方发言人Chad Barraford，Chad是目前THORChain的CTO，为核心成员之一。</p>
+<p>Chad于2019年加入THORChain，曾就读于University of Massachusetts Dartmouth。在2005年毕业后，Chad曾在不同的公司担任软件开发者的职位。Chad在2017年正式了解和进入crypto领域，并在同年创立了自己的第一个公司Cryptocades，Cryptocades利用游戏玩家电脑上的空闲算力来为开采Monero，但是公司在推出Beta版本后快速遇到技术问题，在六个月后关闭。之后，Chad加入了一个叫做Octagon Careers的线上职业申请平台公司，担任CTO的职位，Octagon Careers在五个月后倒闭，随后Chad加入了THORChain。</p>
+<p><img src="/THORChain%E9%A1%B9%E7%9B%AE%E8%B0%83%E7%A0%94/image_8KSJZTRHpJ.png" alt="1"></p>
+<h3 id="1-2-项目融资概况"><a href="#1-2-项目融资概况" class="headerlink" title="1.2 项目融资概况"></a>1.2 项目融资概况</h3><p>市值情况：</p>
+<p><img src="/THORChain%E9%A1%B9%E7%9B%AE%E8%B0%83%E7%A0%94/image_ES3WSxPiuK.png" alt="1"></p>
+<p>融资概述：</p>
+<ol>
+<li><p>Seed Round：2018年，未知投资者投资600K USD。在此时间段，THORChain参与了Binance组织的Hackathon；</p>
+</li>
+<li><p>Private Sale：2019年7月，True Ventures领投1.6M USD；</p>
+</li>
+<li><p>IDO：2019年7月，220K USD；</p>
+</li>
+<li><p>2021年10月，THORSwap完成375万美元融资，IDEO CoLab Ventures领投，True Ventures、Sanctor Capital、THORChain、Nine Realms、Proof Group、0xVentures、Qi Capital等参投。</p>
+</li>
+</ol>
+<h3 id="1-3-产品定位"><a href="#1-3-产品定位" class="headerlink" title="1.3 产品定位"></a>1.3 产品定位</h3><p>THORChain目标是创建一个具有激励性的去中心化交易平台(DEX)，具有以下特点：</p>
+<ul>
+<li><p>能够跨链交换Layer1币（原生币），比如BTC、ETH；</p>
+</li>
+<li><p>用户不需要许可就可以加入；</p>
+</li>
+<li><p>透明、公开的价格，无中心化的第三方；</p>
+</li>
+<li><p>能够最大化效率的连续流动性池(Continuous Liquidity Pools)。</p>
+</li>
+</ul>
+<p>综上，THORChain可以看作Layer1的Uniswap。</p>
+<h2 id="2-技术调研情况"><a href="#2-技术调研情况" class="headerlink" title="2 技术调研情况"></a>2 技术调研情况</h2><h3 id="2-1-技术介绍"><a href="#2-1-技术介绍" class="headerlink" title="2.1 技术介绍"></a>2.1 技术介绍</h3><p>THORChain是一款基于<strong>Tendermint&amp;Cosmos-SDK</strong>和<strong>TSS</strong>的区块链。其中，Tendermint是一个拜占庭容错（BFT）共识算法，Cosmos-SDK是一个用于快速构建区块链的框架，TSS是门限签名算法。这3个技术较为著名，网上文档比较多，就不在此赘述了。以下将主要介绍THORChain特有的一些技术。</p>
+<h3 id="流动性模型"><a href="#流动性模型" class="headerlink" title="流动性模型"></a>流动性模型</h3><p>THORChain作为一个去中心交易平台(DEX, decentralised exchanges)，它不同于传统的中心化交易所，它通过流动性模型让用户能以公开透明的价格交易资产，无需依赖第三方。THORChain使用的流动性模型为持续流动性池(CLP, continuous liquidity pools)，它与uniswap的流动性模型基本相同。</p>
+<p>在THORChain中，有多个流动池，每个流动池由RUNE原生币和其它资产组成。流动池有两类参与者：</p>
+<ul>
+<li><p>流动性提供者(LP, Liquidity Provider)。它们会向流动池提供<strong>资产对</strong>（注入流动性）并从中获益，比如：向RUNE:ETH流动池中注入10个RUNE和1个ETH。</p>
+</li>
+<li><p>交易者(Trader)。它们通过流动池进行资产交易，比如：交易者想要用ETH交换RUNE时，可以向RUNE:ETH流动池中，注入（卖出）RUNE，而后提取（买入）ETH。交易者与流动性提供者的一个大区别在于：交易者一次只注入一种资产，从而换取另一种资产，而流动性提供者一次注入 <strong>一对（两种）</strong> 资产。</p>
+</li>
+</ul>
+<p><img src="/THORChain%E9%A1%B9%E7%9B%AE%E8%B0%83%E7%A0%94/image_IcjVO-YTK0.png" alt="1"></p>
+<p>在流动池中，假设两种资产的数量分别为X和Y，它们需满足一个恒定的公式<code>X * Y = K</code>，其中K是一个常量（LP可以改变这个K）。通过这个公式：</p>
+<ul>
+<li><p>用户能够自动进行交易，示例：假设RUNE:ETH的流动池中，有10个RUNE和1个ETH，那么<code>K = 10*1 = 10</code>。此时一个用户注入了3个RUNE，为了满足公式，池中剩余的ETH应该为<code>K/(10+3) = 10/13 = 0.77</code>，那么用户将兑换得到<code>1 - 0.77 = 0.23</code>个ETH。</p>
+</li>
+<li><p>资产汇率会趋于市场正常价格，示例：假设起初某个流动性提供者向RUNE:ETH池中注入了10个RUNE和1个ETH，K为10，汇率为10:1。而某个时刻市场实际汇率变为1:1，此时就会有大量投机者向池中注入ETH兑换RUNE，以套取高额利益。比如，投机者可以向池中注入3个ETH，为了满足公式，池中剩余的RUNE应该为<code>K/(1+3) = 10/4 = 2.5</code>，那么投机者将得到<code>10 - 2.5 = 7.5</code>个RUNE，而池中剩余2.5个RUNE和4个ETH，汇率逐渐趋于1:1。</p>
+</li>
+</ul>
+<h3 id="跨链交易流程概述"><a href="#跨链交易流程概述" class="headerlink" title="跨链交易流程概述"></a>跨链交易流程概述</h3><p>假设用户需要用BTC交换ETH。</p>
+<p>首先，用户需要向BTC上THORChain的 <strong>金库(Vaults)</strong> 发送一笔交易（THORChain在每个支持的应用链上都有一些金库，其本质是应用链上的一个账户地址）。在这笔交易中，用户需要指定跨链交易的目的链和目标地址。</p>
+<p>当THORChain上的节点监听到金库收到一笔交易后，会通过<strong>bifrost协议</strong>将交易转换成THORChain上的交易，并广播到THORChain网络中。</p>
+<p>当超大多数的节点对交易达成共识之后，交易会被执行。在本示例中，交易的类型是跨链交易，交易执行过程中会先从BTC:RUNE流动池中兑换出RUNE，再到ETH:RUNE流动池中兑换出ETH。</p>
+<p>最终，THORChain会通过ETH上的金库向目标账户地址发起转账，跨链交易完成。</p>
+<h3 id="2-2-核心功能"><a href="#2-2-核心功能" class="headerlink" title="2.2 核心功能"></a>2.2 核心功能</h3><h4 id="2-2-1-THORNode"><a href="#2-2-1-THORNode" class="headerlink" title="2.2.1 THORNode"></a>2.2.1 THORNode</h4><p>任何人可以向系统交纳担保资金来申请成为节点，请求通常会在几小时内被处理。当申请成功后，节点会加入系统白名单，为系统运行提供服务，并赚取收益。如果节点懒政或作恶，比如不发送交易、不提交区块、或打断签名，将会收到惩罚。节点可以在任何时候申请退出网络，当节点退出网络后，他的押金和获取的收益将会被退回。</p>
+<p>一个节点需包含如下三大主要部分：</p>
+<ol>
+<li><p><strong>thornode</strong> - 连接THORChain。</p>
+</li>
+<li><p><strong>bifrost</strong> - 用于连接THORChain与应用链的协议。</p>
+</li>
+<li><p><strong>Full nodes</strong> - 应用链的全节点，用于连接应用链。</p>
+</li>
+</ol>
+<p>目前，THORChain网络中有80多个THORNode。</p>
+<h4 id="2-2-2-金库"><a href="#2-2-2-金库" class="headerlink" title="2.2.2 金库"></a>2.2.2 金库</h4><p>THORChain中存在两种类型的金库，这些金库分布在THORChain支持的各个应用链上，其本质就是应用链上的一个账户地址。</p>
+<h4 id="入站金库Asgard-vaults"><a href="#入站金库Asgard-vaults" class="headerlink" title="入站金库Asgard vaults"></a>入站金库Asgard vaults</h4><p>入站金库用于接收用户的入站交易，每个THORChain支持的应用链上，通常都有1个入站金库，各个应用链上入站金库的地址可参考：<a target="_blank" rel="noopener" href="https://midgard.thorchain.info/v2/thorchain/inbound_addresses" title="https://midgard.thorchain.info/v2/thorchain/inbound_addresses">https://midgard.thorchain.info/v2/thorchain/inbound_addresses</a>。</p>
+<p>由于入站金库存储着大量资金，它的私钥需要系统中的节点通过门限签名TSS共同控制。任何有关入站金库的签名操作，包括入站交易的验证，都需要超大多数(67%)节点达成共识。由于共识过程较为耗时，为了提高系统效率，THORChain规定每40个节点管理1个入站金库，比如100个节点就有3个入站金库。THORChain会不断检查哪个入站金库更安全，并指示用户向该金库发送交易。</p>
+<p>同时，入站金库是用户与THORChain进行互动的入口。用户可以通过对入站金库地址发送交易，来进行相关操作，比如：跨链交易、注入流动性等等。对于一笔发送给入站金库的交易，需包含如下内容：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;from&quot;</span><span class="punctuation">:</span><span class="string">&quot;&quot;</span><span class="punctuation">,</span>        <span class="comment">// the user</span></span><br><span class="line">    <span class="attr">&quot;to&quot;</span><span class="punctuation">:</span><span class="string">&quot;&quot;</span><span class="punctuation">,</span>          <span class="comment">// the vault</span></span><br><span class="line">    <span class="attr">&quot;amount&quot;</span><span class="punctuation">:</span><span class="string">&quot;&quot;</span><span class="punctuation">,</span>      <span class="comment">// the amount to send (swap, add liquidity)</span></span><br><span class="line">    <span class="attr">&quot;memo&quot;</span><span class="punctuation">:</span><span class="string">&quot;&quot;</span><span class="punctuation">,</span>        <span class="comment">// the transaction intent</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>其中，<code>memo</code>字段标明了用户需要进行的操作和相关参数，其格式如下：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">FUNCTION<span class="punctuation">:</span>PARAM1<span class="punctuation">:</span>PARAM2<span class="punctuation">:</span>PARAM3<span class="punctuation">:</span>PARAM4</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>FUNCTION决定用户的操作，比如SWAP表示跨链交易、ADD表示注入流动性等。如果是SWAP操作，其格式要求如下：</p>
+<p><img src="/THORChain%E9%A1%B9%E7%9B%AE%E8%B0%83%E7%A0%94/image_JwSThFcjGt.png" alt="1"></p>
+<p>对于类EVM链，memo字段可通过payload传入；对于UTXO链，memo字段可通过输出脚本传入。</p>
+<p>如果交易或memo字段格式错误，THORChain将会自动退还资产。</p>
+<h4 id="出站金库Yggdrasil-Vaults"><a href="#出站金库Yggdrasil-Vaults" class="headerlink" title="出站金库Yggdrasil Vaults"></a>出站金库Yggdrasil Vaults</h4><p>出站金库用于在目的链上发送交易，在THORChain支持的应用链上都有分布。为了提高出站效率，每个THORNode都运行着一个出站金库，且单独由它管控，金库内的资金为THORNode抵押资金的25%。当节点退出网络时，需要将资金返还给入站金库。</p>
+<h4 id="2-2-3-Bifrost协议"><a href="#2-2-3-Bifrost协议" class="headerlink" title="2.2.3 Bifröst协议"></a>2.2.3 Bifröst协议</h4><p>Bifrost定义了应用链如何与THORChain连接，它采用单向状态锚定(1-way State Pegs)的方式，从应用类同步状态到THORChain。</p>
+<p>每个节点都会运行一个Bifrost服务，它包含Observer和Signer两大模块。</p>
+<p><img src="/THORChain%E9%A1%B9%E7%9B%AE%E8%B0%83%E7%A0%94/image_s9_L1l34Yg.png" alt="1"></p>
+<p>Observer会通过THORNode上运行的应用链节点，监听应用链上入站金库的地址，当入站金库收到一笔有效交易时，它会将交易转换成THORChain上的见证交易(witness transaction)：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> Tx <span class="keyword">struct</span> &#123;</span><br><span class="line">  ID          TxID    <span class="string">`json:&quot;id&quot;`</span></span><br><span class="line">  Chain       Chain   <span class="string">`json:&quot;chain&quot;`</span></span><br><span class="line">  FromAddress Address <span class="string">`json:&quot;from_address&quot;`</span></span><br><span class="line">  ToAddress   Address <span class="string">`json:&quot;to_address&quot;`</span></span><br><span class="line">  Coins       Coins   <span class="string">`json:&quot;coins&quot;`</span></span><br><span class="line">  Gas         Gas     <span class="string">`json:&quot;gas&quot;`</span></span><br><span class="line">  Memo        <span class="type">string</span>  <span class="string">`json:&quot;memo&quot;`</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="/THORChain%E9%A1%B9%E7%9B%AE%E8%B0%83%E7%A0%94/image_9JBUN36zRy.png" alt="1"></p>
+<p>起初，见证交易的状态为<code>pending</code>，节点会将交易广播到网络中，当超大多数(67%)节点对交易达成共识后，交易状态变为<code>finalised</code>。对于finalised交易，系统会按照下图逻辑处理：交易排序，执行交易，指定出站金库，最终生成txOut（记录目的链、目标地址、出站金库等信息）。</p>
+<p><img src="/THORChain%E9%A1%B9%E7%9B%AE%E8%B0%83%E7%A0%94/image_Rpq4qxMaGu.png" alt="1"></p>
+<p>Signer收到finalised交易后，会通过目标链客户端，将其转换成目标链上的交易，交易通过TSS模块完成签名，最终发送到目标链上。</p>
+<p><img src="/THORChain%E9%A1%B9%E7%9B%AE%E8%B0%83%E7%A0%94/image_j_QsTXJV0N.png" alt="1"></p>
+<h4 id="2-2-4-搅动"><a href="#2-2-4-搅动" class="headerlink" title="2.2.4 搅动"></a>2.2.4 搅动</h4><p>系统中每3天或每50000区块，或者节点加入&#x2F;离开网络时，会触发一次搅动(Churning)。</p>
+<p>当搅动发生后，会创建新的入站金库，由新节点控制，并将旧金库中的资金转移到新金库中。</p>
+<p>在一次搅动事件中，满足以下条件的节点会被移出THORChain网络（但不会超过总节点的1&#x2F;3）：</p>
+<ol>
+<li><p>self-removal: 自己申请退出；</p>
+</li>
+<li><p>network-removal: 网络中其它节点决定将它移出；</p>
+</li>
+<li><p>oldest gets removed: 最早提交区块的（最懒的）；</p>
+</li>
+<li><p>accrued slash points for poor node operation: 做坏事被检测出的。</p>
+</li>
+</ol>
+<p>而新的节点会被接入THORChain网络，缴纳担保金额多的节点优先被接入。接入后，节点数量最多比原先节点总数多1。</p>
+<h4 id="2-2-5-费用"><a href="#2-2-5-费用" class="headerlink" title="2.2.5 费用"></a>2.2.5 费用</h4><p>当用户与THORChain交互时，他们需要考虑3种消耗：</p>
+<ol>
+<li><p>流动性池的手续费；</p>
+</li>
+<li><p>THORChain网络资源消耗（共识、处理交易等）；</p>
+</li>
+<li><p>目的链的网络资源消耗（交易手续费、gas费等）。</p>
+</li>
+</ol>
+<p>对于每笔交易，THORChain会收取两种费用：</p>
+<ol>
+<li><p>固定的网络费用(Network Fee)：用于支付网络资源，包括目的链交易费用。</p>
+</li>
+<li><p>动态的流动性费用(Liquidity Fee)：用于支付给流动性池。</p>
+</li>
+</ol>
+<p><img src="/THORChain%E9%A1%B9%E7%9B%AE%E8%B0%83%E7%A0%94/image_Z-VrU_zINp.png" alt="1"></p>
+<h3 id="2-3-项目生态现状与趋势"><a href="#2-3-项目生态现状与趋势" class="headerlink" title="2.3 项目生态现状与趋势"></a>2.3 项目生态现状与趋势</h3><p>现状：</p>
+<p><img src="/THORChain%E9%A1%B9%E7%9B%AE%E8%B0%83%E7%A0%94/image_m6yHsc2xZa.png" alt="1"></p>
+<p><a target="_blank" rel="noopener" href="https://thorchain.org/ecosystem" title="生态系统">生态系统</a>：</p>
+<p><img src="/THORChain%E9%A1%B9%E7%9B%AE%E8%B0%83%E7%A0%94/%E7%BD%91%E9%A1%B5%E6%8D%95%E8%8E%B7_18-7-2022_171527_thorchain.org_4NPUF1xvAd.jpeg" alt="1"></p>
+<h3 id="2-4-产品Dapp体验"><a href="#2-4-产品Dapp体验" class="headerlink" title="2.4 产品Dapp体验"></a>2.4 产品Dapp体验</h3><p>跨链交易APP：<a target="_blank" rel="noopener" href="https://app.thorswap.finance/swap" title="https://app.thorswap.finance/swap">https://app.thorswap.finance/swap</a></p>
+<p>跨链交易讲解：<a target="_blank" rel="noopener" href="https://docs.thorswap.finance/thorswap/how-tos/tutorials/sidebar-navigation" title="Navigate THORSwap - THORSwap">Navigate THORSwap - THORSwap</a></p>
+<p>跨链交易首页：</p>
+<p><img src="/THORChain%E9%A1%B9%E7%9B%AE%E8%B0%83%E7%A0%94/image_wnxQSe5dPH.png" alt="1"></p>
+<p>用户可以同时连接多个钱包，因为跨链交易时需要一个发送一个接收：</p>
+<p><img src="/THORChain%E9%A1%B9%E7%9B%AE%E8%B0%83%E7%A0%94/image_dkF2rQwLXk.png" alt="1"></p>
+<p><img src="/THORChain%E9%A1%B9%E7%9B%AE%E8%B0%83%E7%A0%94/image_0j6rvGwQ7h.png" alt="1"></p>
+<p>发送跨链交易：</p>
+<p><img src="/THORChain%E9%A1%B9%E7%9B%AE%E8%B0%83%E7%A0%94/image_XMHKUDjdR7.png" alt="1"></p>
+<p><img src="/THORChain%E9%A1%B9%E7%9B%AE%E8%B0%83%E7%A0%94/image_SfA5XGdOrY.png" alt="1"></p>
+<p><img src="/THORChain%E9%A1%B9%E7%9B%AE%E8%B0%83%E7%A0%94/image_5f_ngRvaMQ.png" alt="1"></p>
+<p>可以在设置中选择“指定接收方地址”，这样只需要连接发出代币的钱包地址：</p>
+<p><img src="/THORChain%E9%A1%B9%E7%9B%AE%E8%B0%83%E7%A0%94/image_1zvjBRtaxV.png" alt="1"></p>
+<h2 id="3-参考"><a href="#3-参考" class="headerlink" title="3 参考"></a>3 参考</h2><ul>
+<li><p><a target="_blank" rel="noopener" href="https://thorchain.org/" title="官网">官网</a></p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://docs.thorchain.org/" title="官方文档">官方文档</a></p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://twitter.com/THORChain" title="Twitter">Twitter</a></p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://github.com/thorchain" title="Github">Github</a></p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://www.youtube.com/watch?v=dNDh-mPboPc&ab_channel=Finematics" title="How Does THORCHAIN Work? DEFI Explained - YouTube">How Does THORCHAIN Work? DEFI Explained - YouTube</a></p>
+</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/BlockChain/" rel="tag"><i class="fa fa-tag"></i> 区块链</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+            </div>
+            <div class="post-nav-item">
+                <a href="/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BZookeeper.html" rel="next" title="分布式之Zookeeper">
+                  分布式之Zookeeper <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments utterances-container"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">dounine</span>
+</div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+      <span>站点总字数：</span>
+    <span title="站点总字数">512k</span>
+  </span>
+</div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/mist/" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+<script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.0/search.js" integrity="sha256-vXZMYLEqsROAXkEw93GGIvaB2ab+QW6w3+1ahD9nXXA=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.0/es5/tex-mml-chtml.js","integrity":"sha256-r+3itOMtGGjap0x+10hu6jW/gZCzxHsoKrOd7gyRSGY="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
+<script class="next-config" data-name="utterances" type="application/json">{"enable":true,"repo":"99MyCql/99MyCql.github.io","issue_term":"pathname","theme":"github-light"}</script>
+<script src="/js/third-party/comments/utterances.js"></script>
+
+</body>
+</html>

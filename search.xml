@@ -11034,7 +11034,7 @@
 </li>
 <li><p><code>getData(path, watch)</code>：返回数据和元数据，如版本信息。watch 标识与 <code>exists()</code> 的 watch 标识一样，但如果 znode 不存在则不会设置监视器。</p>
 </li>
-<li><p><code>setData(path, data, version)</code>：根据 path 和 version 将数据写入到 znode。</p>
+<li><p><code>setData(path, data, version)</code>：根据 path 将数据写入到 znode，<strong>只有znode中数据的version与传入的version一致时，写入操作才会执行成功</strong>。</p>
 </li>
 <li><p><code>getChildren(path, watch)</code>：返回 znode 所有子节点的名称集合。</p>
 </li>
@@ -11055,10 +11055,9 @@
 <h4 id="简单锁"><a href="#简单锁" class="headerlink" title="简单锁"></a>简单锁</h4><p>可以用一个znode表示锁。客户端获取锁时，需要创建一个指定路径的临时节点。如果创建成功，客户端获取这个锁。如果创建失败，客户端设置watch读取该节点，当节点被占有者删除（释放锁），客户端会收到通知。客户端创建该节点后，可通过终止会话或者显式删除节点来释放锁，让给其它等待的客户端。</p>
 <p>简单锁虽然简单，但存在着一些问题：</p>
 <ul>
-<li><p>群体效应。如果很多客户端等待锁，对这个锁的竞争就会很激烈，当锁释放时，仅有一个等待的客户端能获得锁。</p>
-</li>
-<li><p>仅仅实现了互斥锁。</p>
-</li>
+<li>仅仅实现了互斥锁。</li>
+<li><strong>群体效应</strong>：如果很多客户端等待锁，对这个锁的竞争就会很激烈，当锁释放时，仅有一个等待的客户端能获得锁。</li>
+<li><strong>不能保证原子性</strong>：当某个客户端获取锁，它对数据进行一系列修改，但过程中它崩溃了，锁被释放，其它客户端将会看到这些未修改完成的脏数据。这个问题的一种解决方法是，下一个客户端需要清理上一个崩溃客户端的脏数据（undo更新操作）。</li>
 </ul>
 <h4 id="无群体效应的简单锁"><a href="#无群体效应的简单锁" class="headerlink" title="无群体效应的简单锁"></a>无群体效应的简单锁</h4><p>用一个节点Z实现锁，将所有客户端请求按顺序排序，依次获得锁。</p>
 <p>客户端lock伪代码：</p>
@@ -11094,7 +11093,9 @@
 </li>
 <li><p>提供watch机制，而不是让客户端轮询。</p>
 </li>
-<li><p>让用户根据场景在性能与一致性之间做取舍，默认使用较弱的顺序一致性以达到更高的系统性能，用户也能通过API获取较强的线性一致性。</p>
+<li><p>无群体效应锁的实现，类似于信号量机制，对所有等待者排序，每次只唤醒一个。</p>
+</li>
+<li><p>让用户根据场景在性能与一致性之间做取舍，默认使用较弱的顺序一致性，将读请求分配给任意副本，以提高系统性能。同时，用户也能通过sync接口获取较强的线性一致性。</p>
 </li>
 </ul>
 <h2 id="5-参考"><a href="#5-参考" class="headerlink" title="5. 参考"></a>5. 参考</h2><ul>
@@ -11271,6 +11272,94 @@
       </categories>
       <tags>
         <tag>区块链</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>分布式之ChainReplication</title>
+    <url>/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BChainReplication.html</url>
+    <content><![CDATA[<h2 id="0-前言"><a href="#0-前言" class="headerlink" title="0. 前言"></a>0. 前言</h2><p>MIT6.824 LEC10</p>
+<p>为了容错，我们需要对数据进行备份。而当数据有多个备份副本之后，我们又需要保证各副本的一致性，即需要将状态（数据）同步到各个副本。</p>
+<p>常见的一致性算法，比如raft，都采用<strong>主从拓扑结构</strong>。这种结构下，主节点接收读写请求，并负责将状态同步到所有备份节点。主节点负载较高，系统整体性能将受限于主节点。当然，也可以与Zookeeper一样，舍弃强一致性（线性一致性），将读请求分摊给备份节点。</p>
+<p>而链式复制(CR, Chain Replication)采用<strong>链式拓扑结构</strong>，不选择主节点，每个节点只需将状态同步到下一个节点。CRAQ是基于CR的改进，它允许从任意副本中读数据，同时还保证线性一致性。</p>
+<span id="more"></span>
+
+<h2 id="1-链式复制CR"><a href="#1-链式复制CR" class="headerlink" title="1. 链式复制CR"></a>1. 链式复制CR</h2><p><img src="/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BChainReplication/image_d0STs1PF9W.png" alt="1"></p>
+<p>所有节点呈链式排布，头节点(HEAD)负责处理写请求，尾节点(TAIL)负责处理读请求：</p>
+<ul>
+<li><p>写请求：头节点收到写请求后，会将其传递到下一个节点，下个节点再传递给下下个节点。当尾节点完成写请求后，则代表该请求是<strong>已提交的</strong>，它会向客户端返回响应。</p>
+</li>
+<li><p>读请求：尾节点处理所有读请求，客户端只会读到已提交的最新数据，保证了线性一致性。</p>
+</li>
+</ul>
+<p>故障恢复：</p>
+<ul>
+<li><p>头节点故障，下一个节点会顶替头节点。如果一个写请求在头节点故障之前发送到了下一个节点，那下一个节点会继续完成并传递该请求；如果一个写请求在头节点故障之前未发送到下一个节点，那这个写请求肯定是未提交的。</p>
+</li>
+<li><p>尾节点故障，上一个节点会顶替尾节点。所有在尾节点中提交的状态，必定在上一个节点中也提交了。尾节点故障前，可能未将已提交的请求，响应给客户端。此时，客户端将重新发送写请求，头节点会判断该请求是否重复，若重复则不会被再次执行。</p>
+</li>
+<li><p>中间节点故障，会被移除，前后节点相接。前一个节点需要重新发送最近的写请求给下一个节点。</p>
+</li>
+</ul>
+<p>存在的问题：</p>
+<ul>
+<li><p><strong>脑裂问题</strong>：当头节点与其它节点之间的网络发送故障，头节点的下一个节点会顶替头节点，此时网络中将出现两个头节点。链式结构无法解决脑裂问题，需要第三方（比如Zookeeper）的帮助，来判断哪个节点存活哪个故障、哪个是头节点哪个是尾节点。</p>
+</li>
+<li><p><strong>单个节点变慢，会影响整体性能</strong>。</p>
+</li>
+</ul>
+<h2 id="2-CRAQ"><a href="#2-CRAQ" class="headerlink" title="2. CRAQ"></a>2. CRAQ</h2><p>在CR中，所有读请求都由尾节点处理，读请求较多时，尾节点的负载较高。</p>
+<p><strong>CRAQ(Chain Replication with ApportionedQueries)</strong> 是CR的一种改进：它允许客户端从任意节点读取数据，同时还保证了线性一致性。主要改进如下：</p>
+<ol>
+<li><p>CRAQ中的每个节点会存储一个数据对象的多个版本，每个版本包括一个单调递增的版本号和一个附加的属性（其值为<code>clean</code>或<code>dirty</code>），所有数据对象初始都被标记为clean。</p>
+</li>
+<li><p>当节点收到一个数据对象的新版本时（对这个数据对象的更新写），该节点会将此最新版本附加到该数据对象的版本列表中：</p>
+<ul>
+<li><p>如果节点不是尾节点，则将版本标记为<code>dirty</code>，并向后续节点传递写操作；</p>
+</li>
+<li><p>如果节点是尾节点，则将版本标记为<code>clean</code>。此时写操作是已提交的，尾节点会通过链回传ACK，来通知其它节点操作已提交。</p>
+</li>
+</ul>
+</li>
+<li><p>当节点收到ACK后，它将对应数据对象的版本标记为clean，然后删除该对象的所有旧版本。</p>
+</li>
+<li><p>当节点收到读请求时：</p>
+<ul>
+<li>如果数据对象的最新版本是clean，则直接将值返回；</li>
+</ul>
+<p> <img src="/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BChainReplication/image_Hg1687ET1W.png" alt="1"></p>
+<ul>
+<li>如果数据对象的最新版本是dirty，节点则与尾节点通信，询问该数据对象已提交的最新版本号，然后返回这个版本下的数据对象。</li>
+</ul>
+<p> <img src="/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BChainReplication/image_bNiYZylcGH.png" alt="1"></p>
+</li>
+</ol>
+<h2 id="3-个人总结"><a href="#3-个人总结" class="headerlink" title="3. 个人总结"></a>3. 个人总结</h2><p>CR与Raft对比：</p>
+<ul>
+<li><p>CR处理单个写请求的总时间比不上Raft，因为Raft只需要超半数节点提交。</p>
+</li>
+<li><p>Raft中主节点需要单独负责将状态同步到集群中其它节点，而CR中每个节点只需将状态同步到下一个节点，相当于将主节点的负载分摊到了所有节点。</p>
+</li>
+<li><p>CR不能算共识算法，它无法解决脑裂问题，无法对谁是头节点达成一致。</p>
+</li>
+<li><p>CR实现起来更加简单。</p>
+</li>
+</ul>
+<p>Raft中，为了保证线性一致性，客户端必须向leader读取数据，那能否将CRAQ的改进思路应用到Raft中呢？大概是不能的。因为CRAQ中，每个节点都知道数据是否在发生变更以及是否提交。但Raft中，由于网络延迟，部分follower可能并不知道数据发生变更，因此对于每个读请求，follower都需要向leader确认数据是否变更，这相当于读请求都转交给leader。</p>
+<h2 id="4-参考"><a href="#4-参考" class="headerlink" title="4. 参考"></a>4. 参考</h2><ul>
+<li><p><a href="https://www.usenix.org/legacy/events/osdi04/tech/full_papers/renesse/renesse.pdf" title="Chain Replication for Supporting High Throughput and Availability">Chain Replication for Supporting High Throughput and Availability</a></p>
+</li>
+<li><p><a href="https://www.usenix.org/legacy/event/usenix09/tech/full_papers/terrace/terrace.pdf" title="Object Storage on CRAQ High-throughput chain replication for read-mostly workloads">Object Storage on CRAQ High-throughput chain replication for read-mostly workloads</a></p>
+</li>
+<li><p><a href="https://www.cnblogs.com/brianleelxt/p/13275647.html" title="https://www.cnblogs.com/brianleelxt/p/13275647.html">https://www.cnblogs.com/brianleelxt/p/13275647.html</a></p>
+</li>
+</ul>
+]]></content>
+      <categories>
+        <category>欲穷千里目，更上一层楼</category>
+        <category>分布式</category>
+      </categories>
+      <tags>
+        <tag>分布式</tag>
       </tags>
   </entry>
 </search>

@@ -92,7 +92,7 @@
 
 
 <nav class="site-nav">
-  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">18</span></a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">50</span></a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">79</span></a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li>
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">18</span></a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">50</span></a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">80</span></a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li>
       <li class="menu-item menu-item-search">
         <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
         </a>
@@ -164,7 +164,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">79</span>
+          <span class="site-state-item-count">80</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -321,7 +321,7 @@
         <i class="far fa-file-word"></i>
       </span>
       <span class="post-meta-item-text">本文字数：</span>
-      <span>5.1k</span>
+      <span>5.3k</span>
     </span>
 </div>
 
@@ -369,7 +369,7 @@
 </li>
 <li><p><code>getData(path, watch)</code>：返回数据和元数据，如版本信息。watch 标识与 <code>exists()</code> 的 watch 标识一样，但如果 znode 不存在则不会设置监视器。</p>
 </li>
-<li><p><code>setData(path, data, version)</code>：根据 path 和 version 将数据写入到 znode。</p>
+<li><p><code>setData(path, data, version)</code>：根据 path 将数据写入到 znode，<strong>只有znode中数据的version与传入的version一致时，写入操作才会执行成功</strong>。</p>
 </li>
 <li><p><code>getChildren(path, watch)</code>：返回 znode 所有子节点的名称集合。</p>
 </li>
@@ -390,10 +390,9 @@
 <h4 id="简单锁"><a href="#简单锁" class="headerlink" title="简单锁"></a>简单锁</h4><p>可以用一个znode表示锁。客户端获取锁时，需要创建一个指定路径的临时节点。如果创建成功，客户端获取这个锁。如果创建失败，客户端设置watch读取该节点，当节点被占有者删除（释放锁），客户端会收到通知。客户端创建该节点后，可通过终止会话或者显式删除节点来释放锁，让给其它等待的客户端。</p>
 <p>简单锁虽然简单，但存在着一些问题：</p>
 <ul>
-<li><p>群体效应。如果很多客户端等待锁，对这个锁的竞争就会很激烈，当锁释放时，仅有一个等待的客户端能获得锁。</p>
-</li>
-<li><p>仅仅实现了互斥锁。</p>
-</li>
+<li>仅仅实现了互斥锁。</li>
+<li><strong>群体效应</strong>：如果很多客户端等待锁，对这个锁的竞争就会很激烈，当锁释放时，仅有一个等待的客户端能获得锁。</li>
+<li><strong>不能保证原子性</strong>：当某个客户端获取锁，它对数据进行一系列修改，但过程中它崩溃了，锁被释放，其它客户端将会看到这些未修改完成的脏数据。这个问题的一种解决方法是，下一个客户端需要清理上一个崩溃客户端的脏数据（undo更新操作）。</li>
 </ul>
 <h4 id="无群体效应的简单锁"><a href="#无群体效应的简单锁" class="headerlink" title="无群体效应的简单锁"></a>无群体效应的简单锁</h4><p>用一个节点Z实现锁，将所有客户端请求按顺序排序，依次获得锁。</p>
 <p>客户端lock伪代码：</p>
@@ -429,7 +428,9 @@
 </li>
 <li><p>提供watch机制，而不是让客户端轮询。</p>
 </li>
-<li><p>让用户根据场景在性能与一致性之间做取舍，默认使用较弱的顺序一致性以达到更高的系统性能，用户也能通过API获取较强的线性一致性。</p>
+<li><p>无群体效应锁的实现，类似于信号量机制，对所有等待者排序，每次只唤醒一个。</p>
+</li>
+<li><p>让用户根据场景在性能与一致性之间做取舍，默认使用较弱的顺序一致性，将读请求分配给任意副本，以提高系统性能。同时，用户也能通过sync接口获取较强的线性一致性。</p>
 </li>
 </ul>
 <h2 id="5-参考"><a href="#5-参考" class="headerlink" title="5. 参考"></a>5. 参考</h2><ul>
@@ -494,7 +495,7 @@
       <i class="fa fa-chart-line"></i>
     </span>
       <span>站点总字数：</span>
-    <span title="站点总字数">512k</span>
+    <span title="站点总字数">514k</span>
   </span>
 </div>
 <div class="busuanzi-count">

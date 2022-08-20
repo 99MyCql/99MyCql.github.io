@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.2.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/golang32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/golang16.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="baidu-site-verification" content="code-RpvRDWfflk">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" integrity="sha256-DfWjNxDkM94fVBWx1H5BMMp0Zq7luBlV8QRcSES7s+0=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"blog.dounine.live","root":"/","images":"/images","scheme":"Mist","darkmode":false,"version":"8.11.1","exturl":false,"sidebar":{"position":"right","display":"always","padding":18,"offset":12},"copycode":{"enable":true,"style":"flat"},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":"utterances","storage":true,"lazyload":false,"nav":null,"activeClass":"utterances"},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="0. 前言一台服务器的读写性能有限，当数据量过大时，我们需要将数据分割到不同的服务器上，从而使系统能够并行处理客户请求，提高系统整体性能。但这又引出新的问题：分布式事务(Distributed Transactions) 。 举个例子：一家银行将北京用户的数据存放在北京的服务器中，将上海用户的数据存储在上海的服务器中。此时，一个北京的用户A向上海的用户B汇款100元。按照正常流程，需要同时进行2个">
+<meta property="og:type" content="article">
+<meta property="og:title" content="分布式之Distributed Transactions">
+<meta property="og:url" content="https://blog.dounine.live/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BDistributedTransactions.html">
+<meta property="og:site_name" content="dounine&#39;s blog">
+<meta property="og:description" content="0. 前言一台服务器的读写性能有限，当数据量过大时，我们需要将数据分割到不同的服务器上，从而使系统能够并行处理客户请求，提高系统整体性能。但这又引出新的问题：分布式事务(Distributed Transactions) 。 举个例子：一家银行将北京用户的数据存放在北京的服务器中，将上海用户的数据存储在上海的服务器中。此时，一个北京的用户A向上海的用户B汇款100元。按照正常流程，需要同时进行2个">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://blog.dounine.live/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BDistributedTransactions/image_eKkCnj4L28.png">
+<meta property="og:image" content="https://blog.dounine.live/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BDistributedTransactions/image_lsDl4ru87T.png">
+<meta property="article:published_time" content="2022-08-20T12:12:28.000Z">
+<meta property="article:modified_time" content="2022-08-20T12:12:28.000Z">
+<meta property="article:author" content="dounine">
+<meta property="article:tag" content="分布式">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://blog.dounine.live/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BDistributedTransactions/image_eKkCnj4L28.png">
+
+
+<link rel="canonical" href="https://blog.dounine.live/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BDistributedTransactions.html">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://blog.dounine.live/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BDistributedTransactions.html","path":"分布式之DistributedTransactions.html","title":"分布式之Distributed Transactions"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>分布式之Distributed Transactions | dounine's blog</title>
+  
+
+  <script src="/js/third-party/analytics/baidu-analytics.js"></script>
+  <script async src="https://hm.baidu.com/hm.js?66c7065aa71681df47eb23eff557978b"></script>
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">dounine's blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">18</span></a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">50</span></a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">81</span></a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#0-%E5%89%8D%E8%A8%80"><span class="nav-text">0. 前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E4%BA%8B%E5%8A%A1%E6%A6%82%E8%BF%B0"><span class="nav-text">1. 事务概述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1"><span class="nav-text">2. 分布式事务</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B9%B6%E5%8F%91%E6%8E%A7%E5%88%B6%E2%80%94%E2%80%942PL"><span class="nav-text">并发控制——2PL</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8E%9F%E5%AD%90%E6%8F%90%E4%BA%A4%E2%80%94%E2%80%942PC"><span class="nav-text">原子提交——2PC</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E6%80%BB%E7%BB%93"><span class="nav-text">3. 总结</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="dounine"
+      src="https://avatars.githubusercontent.com/u/41814469?s=400&u=48bf60a3428a3cb86a84a110c8688930cf6ceb08&v=4">
+  <p class="site-author-name" itemprop="name">dounine</p>
+  <div class="site-description" itemprop="description">回首向来萧瑟处</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">81</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">18</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">50</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/99MyCql" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;99MyCql" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+
+  <div class="links-of-blogroll site-overview-item animated">
+    <div class="links-of-blogroll-title"><i class="fa fa-globe fa-fw"></i>
+      Links
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://bkfish.gitee.io/" title="https:&#x2F;&#x2F;bkfish.gitee.io&#x2F;" rel="noopener" target="_blank">bkfish</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://hitworld.github.io/" title="https:&#x2F;&#x2F;hitworld.github.io&#x2F;" rel="noopener" target="_blank">w4rd3n</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://wyjoutstanding.github.io/" title="https:&#x2F;&#x2F;wyjoutstanding.github.io&#x2F;" rel="noopener" target="_blank">wyjoutstanding</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://iwtf.github.io/" title="https:&#x2F;&#x2F;iwtf.github.io&#x2F;" rel="noopener" target="_blank">IWTF</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://wood1314.github.io/" title="https:&#x2F;&#x2F;wood1314.github.io&#x2F;" rel="noopener" target="_blank">wood</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://desperadoccy.xyz/" title="https:&#x2F;&#x2F;desperadoccy.xyz&#x2F;" rel="noopener" target="_blank">desperadoccy</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://doudouqaq.github.io/" title="https:&#x2F;&#x2F;doudouqaq.github.io&#x2F;" rel="noopener" target="_blank">doudouqaq</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://kylinnnnn.github.io/" title="https:&#x2F;&#x2F;kylinnnnn.github.io&#x2F;" rel="noopener" target="_blank">kylinnnnn</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://miaotony.xyz/" title="https:&#x2F;&#x2F;miaotony.xyz" rel="noopener" target="_blank">miaotony</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://110.40.153.120:3030/" title="http:&#x2F;&#x2F;110.40.153.120:3030&#x2F;" rel="noopener" target="_blank">AZhou</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.csdn.net/weixin_40986490" title="https:&#x2F;&#x2F;blog.csdn.net&#x2F;weixin_40986490" rel="noopener" target="_blank">白速龙王的回眸</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.csdn.net/weixin_43116322" title="https:&#x2F;&#x2F;blog.csdn.net&#x2F;weixin_43116322" rel="noopener" target="_blank">Ethan</a>
+        </li>
+    </ul>
+  </div>
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.dounine.live/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BDistributedTransactions.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://avatars.githubusercontent.com/u/41814469?s=400&u=48bf60a3428a3cb86a84a110c8688930cf6ceb08&v=4">
+      <meta itemprop="name" content="dounine">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dounine's blog">
+      <meta itemprop="description" content="回首向来萧瑟处">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="分布式之Distributed Transactions | dounine's blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          分布式之Distributed Transactions
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2022-08-20 20:12:28" itemprop="dateCreated datePublished" datetime="2022-08-20T20:12:28+08:00">2022-08-20</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Pro/" itemprop="url" rel="index"><span itemprop="name">欲穷千里目，更上一层楼</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Pro/Distributed/" itemprop="url" rel="index"><span itemprop="name">分布式</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>5k</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h2 id="0-前言"><a href="#0-前言" class="headerlink" title="0. 前言"></a>0. 前言</h2><p>一台服务器的读写性能有限，当数据量过大时，我们需要将数据分割到不同的服务器上，从而使系统能够并行处理客户请求，提高系统整体性能。但这又引出新的问题：<strong>分布式事务(Distributed Transactions)</strong> 。</p>
+<p>举个例子：一家银行将北京用户的数据存放在北京的服务器中，将上海用户的数据存储在上海的服务器中。此时，一个北京的用户A向上海的用户B汇款100元。按照正常流程，需要同时进行2个操作：到北京服务器中将用户A的余额-100，到上海服务器中将用户B的余额+100。但是，分布式网络充满复杂性，如果北京服务器操作完之后，<strong>上海服务器宕机了</strong>，那用户A的余额-100，而用户B的余额并没有+100。或者，<strong>北京服务器执行操作出错了</strong>，因为用户A余额并不够100，而上海服务器执行操作成功，用户B余额+100。不管是哪种结果，这肯定是不符合预期的，系统应该保证2个操作都成功或都失败。而这就是分布式事务所要解决的问题之一。</p>
+<span id="more"></span>
+
+<h2 id="1-事务概述"><a href="#1-事务概述" class="headerlink" title="1. 事务概述"></a>1. 事务概述</h2><p>事务可以看作一种由底层数据库提供给上层应用的抽象，一些常见的数据库都会提供事务的接口，比如MySQL。使用者只需标明事务的起点和终点，并在事务中包含读写等一系列相关操作。</p>
+<p>以下是事务的例子，假设有两个银行账户x和y，它们的余额都是10元，现在有2个事务如下：</p>
+<ul>
+<li><p>T1：x向y转账1元。</p>
+  <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">BEGIN-X      <span class="comment">// 事务开始</span></span><br><span class="line">  add(x, <span class="number">-1</span>) <span class="comment">// x余额-1</span></span><br><span class="line">  add(y, <span class="number">1</span>)  <span class="comment">// y余额+1</span></span><br><span class="line">END-X        <span class="comment">// 事务结束</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>T2：查看x和y的余额。</p>
+  <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">BEGIN-X            <span class="comment">// 事务开始</span></span><br><span class="line">  tmp1 = get(x)    <span class="comment">// 读取x余额</span></span><br><span class="line">  tmp2 = get(y)    <span class="comment">// 读取y余额</span></span><br><span class="line">  print tmp1, tmp2 <span class="comment">// 打印x和y的余额</span></span><br><span class="line">END-X              <span class="comment">// 事务结束</span></span><br></pre></td></tr></table></figure></li>
+</ul>
+<p>数据库会保证事务满足以下特性：</p>
+<ul>
+<li><p><strong>Atomicity（原子性）</strong>：一个事务中的所有操作，要么全部成功，要么全部失败。如果事务在执行过程中发生错误，数据会被恢复到事务开始前的状态，就像这个事务从来没有执行过一样。以上述事务T1为例，如果第3步add(y, 1)执行出错，那add(x, -1)的操作会被撤销，不会出现，x余额为9，y余额依旧为10的情况。原子性通常由<strong>日志</strong>实现。</p>
+</li>
+<li><p><strong>Consistency（一致性）</strong>：在事务开始前、进行中、结束后，数据库的完整性没有被破坏。完整性包括外键约束、应用定义的约束不会被破坏，比如银行中所有账户余额总和需等于一个固定值。一致性由其它3个特性共同保证。</p>
+</li>
+<li><p><strong>Isolation（隔离性）</strong>：多个事务并发执行时，它们之间不会相互干扰，也看不到对方事务的中间值，<strong>所有事务就像按序进行的一样(serializable)<strong>。以上述T1和T2为例，两个事务并发执行，T2可能先于T1执行打印”10,10”，也可能在T1之后执行打印”9,11”，但T2不会看到T1事务执行过程中x余额为9、y余额为10的中间状态（幻读）。隔离性通常由</strong>锁</strong>实现。</p>
+</li>
+<li><p><strong>Durability（持久性）</strong>：事务结束后，对数据的修改就是永久的，即便系统故障也不会丢失。持久性需要确保事务成功时，能够写入<strong>磁盘</strong>。</p>
+</li>
+</ul>
+<h2 id="2-分布式事务"><a href="#2-分布式事务" class="headerlink" title="2. 分布式事务"></a>2. 分布式事务</h2><p>分布式事务是一种特殊的事务，它需要在分布式的情况下，保证ACID四大特性。不同于单机数据库，在分布式情况下，数据分布在不同机器上，比如上述示例中x和y的账户数据可能分布在银行的不同服务器上，甚至分布在不同银行中。因此，事务执行还需要考虑网络拥塞、机器崩溃等等问题。</p>
+<p>分布式事务有两大重要部分：</p>
+<ol>
+<li><p><strong>并发控制(concurrency control)，保证隔离性(Before-or-After)</strong> 。</p>
+</li>
+<li><p><strong>原子提交(atomic commit)，保证原子性(All-or-Nothing)</strong> 。</p>
+</li>
+</ol>
+<h3 id="并发控制——2PL"><a href="#并发控制——2PL" class="headerlink" title="并发控制——2PL"></a>并发控制——2PL</h3><p>并发控制分为两大类：</p>
+<ul>
+<li><p><strong>悲观(pessimistic)</strong> 。在使用数据时加锁，发生冲突会产生延迟。</p>
+</li>
+<li><p><strong>乐观(optimistic)</strong> 。使用数据时不加锁，但在事务提交时，检查读写是否满足序列化（比如检查版本号），若发生冲突则会中断并重试。</p>
+</li>
+</ul>
+<p>如果冲突经常发生，悲观并发控制会快于乐观；如果冲突不经常发生，乐观并发控制会快于悲观（因为锁的开销）。</p>
+<p>接下来将主要介绍悲观并发控制。</p>
+<p>在悲观并发控制中，锁可以有很多粒度，比如：数据库中针对表的表锁，针对一行记录的行锁。同时，锁也有不同类型，比如：排它锁(X锁)和共享锁(S锁)。</p>
+<p><strong>两段锁(Two-phase locking, 2PL)</strong> 是悲观并发控制的一种规则，它的定义如下：</p>
+<ol>
+<li><p><strong>在对数据进行读写之前，事务需要获取该数据对应的锁</strong>。</p>
+</li>
+<li><p><strong>事务只有在提交或终止之后，才能释放它所获得的锁</strong>。为什么在事务结束后才释放锁，而不是在数据读写完之后？以上述事务T1和T2为例，假设T1先拿到x的锁，add(x, -1)之后释放x锁，此时T2拿到x锁执行get(x)，再抢先一步拿到y锁执行get(y)，那T2将看到一个中间状态”9, 10”，这显然不满足串行化(serializable)，即不满足隔离性。</p>
+</li>
+</ol>
+<p>虽然两段锁规则能保证隔离性，但会发生<strong>死锁</strong>的情况。比如，有T3和T4两个事务，它们同时分别拿到x锁和y锁，接下来T3等待y锁释放，T4等待x锁释放，发生死锁。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">T3      T4</span><br><span class="line"><span class="title function_">get</span><span class="params">(x)</span>  <span class="title function_">get</span><span class="params">(y)</span></span><br><span class="line"><span class="title function_">get</span><span class="params">(y)</span>  <span class="title function_">get</span><span class="params">(x)</span></span><br></pre></td></tr></table></figure>
+
+<p>通常，数据库会通过一些方法来避免和检测死锁，比如：通过银行家算法来避免死锁，通过跟踪周期或超时机制来检测死锁等等。</p>
+<p>以上是标准数据库的并发控制，单机数据库是这样，分布式数据库也是这样，只是会稍微有趣些。</p>
+<h3 id="原子提交——2PC"><a href="#原子提交——2PC" class="headerlink" title="原子提交——2PC"></a>原子提交——2PC</h3><p>对于单机数据库，可以通过日志REDO&#x2F;UNDO机制来实现原子性。但在分布式下，则更为复杂。</p>
+<p>继续以上述事务T1、T2为例，假设现在x存储在服务器S1上，而y存储在服务器S2上。在事务T1中，需要先让S1执行add(x, -1)，再让S2执行add(y, 1)。当S1执行完后，由于网络堵塞、机器故障等各种原因，S2未能成功执行。此时，事务只执行了一半，为了保证正确性，我们应让S1的x值回滚。这正是原子性所要保证的，事务中的所有操作，要么全部执行成功，要么全部不执行（All-or-Nothing）。</p>
+<p>在分布式下，保证一系列操作原子性的算法，被称为<strong>原子提交协议(Atomic Commit Protocols)</strong> 。其中较为常见的一种原子提交协议，是<strong>两阶段提交(Two-Phase Commit, 2PC)</strong> 。</p>
+<p>首先，为了方便，我们需要指定一台服务器来管理事务（类似leader），它被称为<strong>事务协调者(Transaction Coordinator, TC)<strong>，而负责执行操作的服务器被称为</strong>参与者</strong>，由TC来通知参与者执行相关操作。同一时刻，可能有多个事务并发执行，为了分辨这些事务，TC会给每个事务分配唯一ID，。</p>
+<p>依旧假设x存储在参与者A上，而y存储在参与者B上，现在有一个分布式事务先get(x)再put(y)。按照正常流程，TC会先向A请求get(x)，得到成功回复后，再向B请求put(x)，并得到成功回复。</p>
+<p><img src="/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BDistributedTransactions/image_eKkCnj4L28.png" alt="1"></p>
+<p>2PC协议过程如下：</p>
+<ol>
+<li><p>TC会先向所有参与者发送Prepare消息。</p>
+</li>
+<li><p>参与者收到Prepare消息后，会判断自己能否成功执行操作，并向TC回复Yes&#x2F;No。<strong>在回复Yes&#x2F;No之前，参与者需持久化保存事务状态</strong>。</p>
+</li>
+<li><p>TC会等待所有参与者的回复。若都回复Yes，TC则会向所有参与者发送Commit消息；若其中一个参与者回复No，或者<strong>未收到所有参与者的回复</strong>，TC将会发送Abort消息给所有参与者，让它们回滚相关操作。<strong>在发送Commit&#x2F;Abort消息之前，TC需持久化保存事务状态</strong>。</p>
+</li>
+<li><p>参与者会<strong>一直等待</strong>TC的Commit&#x2F;Abort消息（阻塞），期间会向TC主动询问。当收到Commit&#x2F;Abort消息后，参与者会提交&#x2F;回滚操作，并返回ACK。<strong>返回ACK之后，参与者可以删除事务相关记录</strong>。</p>
+</li>
+<li><p>TC回向客户返回事务结果（不需要等待所有ACK）。若未到某个参与者的ACK，TC将重新发送Commit&#x2F;Abort消息。<strong>当TC收到所有参与者的ACK后，可以删除事务相关记录</strong>。</p>
+</li>
+</ol>
+<p><img src="/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BDistributedTransactions/image_lsDl4ru87T.png" alt="1"></p>
+<p>值得一提，为了遵循两段锁规则，参与者会在Prepare时对数据加锁，在完成Commit或Abort时解锁。参与者会自己维护一张lock表，记录锁与对应事务操作的数据对象。</p>
+<p>接下来考虑<strong>参与者发生故障</strong>的情况：</p>
+<ol>
+<li><p>参与者B在收到Prepare消息之后、回复Yes&#x2F;No之前崩溃了。TC未收到B的回复，将不会进行Commit，系统其它参与者也不会提交事务。这种情况下，参与者不需要保存事务状态，重启后就当任何事情都未发生一样。</p>
+</li>
+<li><p>参与者B在回复Yes之后崩溃了。假设TC收到所有参与者的Yes回复，将会发送Commit消息，A收到Commit后，会实际执行操作，持久化结果，并释放锁。为了保证原子性，B重启后需要继续完成操作并提交。因此，<strong>B在回复Prepare之前，需要持久化保存事务的状态、操作的内容和事务相关的锁等等</strong>。当B重启后，会读取日志中的数据，恢复相关事务的状态。之后，若收到Commit&#x2F;Abort消息，B将继续完成事务；若一直未收到Commit&#x2F;Abort消息，B将向TC询问。</p>
+</li>
+<li><p>参与者B在完成Commit之后崩溃了，数据已经持久化，事务已完成。</p>
+</li>
+</ol>
+<p>考虑<strong>TC发生故障</strong>的情况：</p>
+<ol>
+<li><p>在发送Commit消息之前崩溃，这种情况<strong>相当于事务中止</strong>。当各参与者发现事务一直未收到Commit消息，会向重启后的TC询问，TC发现自己并不知道这个事务，参与者则会中止这个事务。</p>
+</li>
+<li><p>在发送一个或多个Commit消息之后崩溃，这种情况TC不能忘记事务。因此，<strong>TC需要在发送Commit之前，将事务状态保存到磁盘中</strong>。当TC重启后，会从磁盘中恢复相关事务。对于未完成的事务，TC会向所有的参与者重发Commit&#x2F;Abort消息。</p>
+</li>
+</ol>
+<p>考虑<strong>网络数据包丢失</strong>的情况：</p>
+<ol>
+<li><p>TC发送Prepare消息后，未收到所有参与者的Yes&#x2F;No回复。TC可以重新发送一轮的Prepare消息，并继续等待。但<strong>当Prepare过程超时后，Prepare将单方面中止事务</strong>，并发送Abort消息。</p>
+</li>
+<li><p>参与者B对Prepare消息并回复Yes后，未收到TC的Commit&#x2F;Abort消息，<strong>参与者B将会一直等待，不能单方面中止事务（阻塞）</strong>。因为其它参与者可能已收到Commit并完成持久化，而B由于网络原因未能收到，此时B若独自中止事务，那将破坏事务的原子性（有人Commit有人Abort）。</p>
+</li>
+<li><p><strong>当TC没有收到Commit&#x2F;Abort的ACK时，会重复发送Commit&#x2F;Abort消息</strong>。参与者B收到TC发来的Commit&#x2F;Abort消息时，它会进行判断：若对应的事务未完成（还在内存中），参与者会继续完成事务；<strong>若对应事务不存在，则说明事务已完成，参与者会简单回复一个ACK</strong>。</p>
+</li>
+</ol>
+<p>对于故障情况，不论TC还是参与者，<strong>一旦进入Commit&#x2F;Abort阶段，就必须保证事务原子性地完成</strong>：</p>
+<ul>
+<li><p>因此，TC需要在发送Commit&#x2F;Abort之前持久化事务状态，在收到所有参与者的ACK之后，才能删除事务状态。</p>
+</li>
+<li><p>因此，参与者需要在对Prepare回复Yes之前持久化事务状态，在完成Commit&#x2F;Abort操作之后，才能删除事务状态。</p>
+</li>
+<li><p>因此，当参与者回复Yes之后，必须无限等待Commit&#x2F;Abort消息。</p>
+</li>
+</ul>
+<p>2PC的缺点：</p>
+<ul>
+<li><p>慢：网络通信轮次较多；TC必须等待所有参与者的回复；大量的写磁盘操作。</p>
+</li>
+<li><p>阻塞：参与者回复Yes之后，必须无限等待Commit&#x2F;Abort消息。</p>
+</li>
+</ul>
+<h2 id="3-总结"><a href="#3-总结" class="headerlink" title="3. 总结"></a>3. 总结</h2><p>最后，我们需要区分：</p>
+<ul>
+<li><p><strong>分布式一致性算法</strong>。由于单机一旦出错将难以恢复，为了容错&#x2F;高可用，需要将<strong>同一份数据备份</strong>到多台服务器上，分布式一致性算法是为了保证这些备份数据的一致。在分布式一致性算法中，<strong>所有服务器都做相同操作</strong>，因此只需要<strong>超半数</strong>的服务器成功即可。</p>
+</li>
+<li><p><strong>分布式事务</strong>。由于单机存储、读写性能有限，为了提高性能，需要将<strong>一份数据分割</strong>存储到不同服务器上，分布式事务则是为了保证同时涉及多台服务器上不同数据的一系列操作能够顺利完成。在分布式事务中，如果事务涉及多个服务器，<strong>不同服务器将做不同操作</strong>，因此需要<strong>所有</strong>服务器都成功。</p>
+</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Distributed/" rel="tag"><i class="fa fa-tag"></i> 分布式</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+            </div>
+            <div class="post-nav-item">
+                <a href="/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BChainReplication.html" rel="next" title="分布式之ChainReplication">
+                  分布式之ChainReplication <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments utterances-container"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">dounine</span>
+</div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+      <span>站点总字数：</span>
+    <span title="站点总字数">519k</span>
+  </span>
+</div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/mist/" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+<script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.0/search.js" integrity="sha256-vXZMYLEqsROAXkEw93GGIvaB2ab+QW6w3+1ahD9nXXA=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.0/es5/tex-mml-chtml.js","integrity":"sha256-r+3itOMtGGjap0x+10hu6jW/gZCzxHsoKrOd7gyRSGY="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
+<script class="next-config" data-name="utterances" type="application/json">{"enable":true,"repo":"99MyCql/99MyCql.github.io","issue_term":"pathname","theme":"github-light"}</script>
+<script src="/js/third-party/comments/utterances.js"></script>
+
+</body>
+</html>

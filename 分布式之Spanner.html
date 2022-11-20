@@ -347,6 +347,8 @@
 </li>
 </ol>
 <p>Spanner如何保证这些特性呢？具体内容请看下文。</p>
+<span id="more"></span>
+
 <h2 id="1-架构"><a href="#1-架构" class="headerlink" title="1. 架构"></a>1. 架构</h2><p><img src="/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B9%8BSpanner/image_tMMwVOJHss.png" alt="1"></p>
 <p>Spanner的架构如上图所示，Spanner管理着多个Zone，每个Zone管理着成百上千个spanserver，一个数据中心可能有一个或多个Zone。为了更好地理解，我们做如下假设。</p>
 <p>假设，Spanner在北京、上海、杭州各有一个数据中心（一个数据中心只有一个Zone），每个数据中心都有数台服务器(spanserver)。某个应用将数据通过Spanner进行<strong>分片</strong>存储：在北京的数据中心有2台服务器，1台存储着a-m的数据，1台存储着n-z的数据。不同分片服务器处理不同分片的请求，提高系统<strong>并行吞吐量</strong>。同时，在上海的数据中心，也有1台存储着a-m数据的副本，1台存储着n-z数据的副本；杭州同理。这些不同数据中心的副本，相互保持一致。如此，每个数据中心的副本都可以<strong>快速地为当地的用户进行服务</strong>，且彼此之间<strong>保证高可用&#x2F;容错</strong>。</p>
@@ -446,7 +448,7 @@
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">T1:  Wx=<span class="number">9</span> Wy=<span class="number">11</span> C</span><br><span class="line">T2:                        Wx=<span class="number">8</span> Wy=<span class="number">12</span> C</span><br><span class="line">T3:                  Rx                   Ry</span><br></pre></td></tr></table></figure>
 
 <p>假设x是用户的一个银行账户余额为10，y是另一个银行账户余额也为10，<strong>初始总余额是20</strong>。有三个事务，T1和T2都是读写事务，T3是只读事务。由于没加锁，T3执行过程中，Rx读取到的是T1事务执行后x的值9，而Ry读取到的是T2事务执行后y的值12。此时，<strong>用户会发现他的两个银行账户的总余额为21</strong>，这肯定是不正确的。那为什么呢？因为对这三个事务，我们无法得到一个可串行化的顺序，既不是<code>T1 T2 T3</code>，也不是<code>T1 T3 T2</code>。</p>
-<p>为了解决上述问题，有一种方法称为**快照隔离(Snapshot Isolation, SI)<strong>，这称为</strong>多版本并发控制(MVCC)**。</p>
+<p>为了解决上述问题，有一种方法称为 <strong>快照隔离(Snapshot Isolation, SI)</strong> ，这称为 <strong>多版本并发控制(MVCC)</strong> 。</p>
 <p>首先，我们需要一种机制对事务进行排序：</p>
 <ol>
 <li><p>假设参与事务的<strong>每台机器上都有一个时钟，且相互同步</strong>。</p>
@@ -470,7 +472,7 @@
 <p>考虑上述示例，当客户端向本地数据中心的follower副本发起事务T3（时间戳为15）时，follower的safe time为0，x的状态为<code>x@0 = 10</code>，它会等待leader的新日志。直到新日志的时间戳大于等于15，follower才会将x的值返回给客户端。</p>
 <p>关于safe time的问题：</p>
 <ol>
-<li><p>日志的时间戳与事务时间戳相等吗？应该是不相等的，比如事务T1的提交时间戳为10，但leader发送相关状态变更日志（比如<code>W(x@10)=9</code>）的时间戳，可能稍微大于T1的时间戳。另外，论文中提到：$t_{safe} &#x3D; min(t^{Paxos}<em>{safe}, t^{Tx}</em>{safe})$，<strong>真正safe time是Paxos safe time和事务safe time的最小值</strong>。</p>
+<li><p>日志的时间戳与事务时间戳相等吗？应该是不相等的，比如事务T1的提交时间戳为10，但leader发送相关状态变更日志（比如<code>W(x@10)=9</code>）的时间戳，可能稍微大于T1的时间戳。另外，论文中提到：$t_{safe} &#x3D; min(t^{Paxos}_{safe}, t^{Tx}_{safe})$，<strong>真正safe time是Paxos safe time和事务safe time的最小值</strong>。</p>
 </li>
 <li><p>如果一直没有状态更新，leader一直没发送新的日志，难道就一直阻塞不响应只读事务吗？</p>
 </li>

@@ -11805,4 +11805,248 @@
         <tag>Vue</tag>
       </tags>
   </entry>
+  <entry>
+    <title>LayerZero调研</title>
+    <url>/LayerZero%E8%B0%83%E7%A0%94.html</url>
+    <content><![CDATA[<h1 id="0-前言"><a href="#0-前言" class="headerlink" title="0. 前言"></a>0. 前言</h1><p>实习期间，去年年末调研的一个跨链项目。由于焦虑着毕业论文，一直拖着没更新到博客上，今天一时兴起打算先把这篇更新了。我本人比较看好这个项目，也在此介绍给大家。</p>
+<h1 id="1-项目调研"><a href="#1-项目调研" class="headerlink" title="1. 项目调研"></a>1. 项目调研</h1><h2 id="1-1-团队介绍"><a href="#1-1-团队介绍" class="headerlink" title="1.1. 团队介绍"></a>1.1. 团队介绍</h2><p><img src="/LayerZero%E8%B0%83%E7%A0%94/image_7KkizG1GRt.png" alt="1"></p>
+<span id="more"></span>
+
+<p><img src="/LayerZero%E8%B0%83%E7%A0%94/image_5g60PwZpfD.png" alt="1"></p>
+<p><img src="/LayerZero%E8%B0%83%E7%A0%94/image_zy8Qpcp9o1.png" alt="1"></p>
+<p><img src="/LayerZero%E8%B0%83%E7%A0%94/image_nOSFb4wzuX.png" alt="1"></p>
+<p>联合创始人&amp;CEO：Bryan Pellegrino。曾是世界顶尖牌手，在2009-2014年期间多次获得世界 Poker 大赛前几名。后来退圈是因为，登上巅峰之后想去创造一些提供价值的工具。</p>
+<blockquote>
+<p>I was just trying to be the best. Once I got there, I realized, hey—there’s no leverage. There’s no anything. I hadn’t realized until then, you need to focus on the utility payoff of what you’re doing.</p>
+</blockquote>
+<p>然后去帮 MLB（美国职棒大联盟）的几支球队（如Oakland Athletics）进行数据分析，帮助他们提升成绩。也创办过一两家区块链安全公司，积累一些区块链工程经验。2020 年左右更是和 Facebook AI Lab 研究员 Noam Brown 合作开发了全世界最强的单挑扑克机器人。</p>
+<p><img src="/LayerZero%E8%B0%83%E7%A0%94/image_g08RK0Zg19.png" alt="1"></p>
+<p>联合创始人&amp;CTO：Ryan Zarick，是一名有丰富机器学习算法和智能合约开发经验的资深工程师。</p>
+<p><img src="/LayerZero%E8%B0%83%E7%A0%94/image_3GAiIJUIA4.png" alt="1"></p>
+<p>联合创始人：Caleb Banister。</p>
+<p>三人均毕业于新罕布什尔大学的CS专业，毕业后也有非常多的职业交集。2010年，三人联合创办软件开发公司Coder Den。Ryan Zarick和Caleb Banister后续还联合创办过智能合约服务公司 80Trill ( 负责智能合约的撰写，审计，咨询 ) 和 机器学习咨询开发公司 Minimal AI。直到2021年，三人再次聚首，联合创办了LayerZero Labs。</p>
+<p>目前团队总共有24人，耗时13个月完成了LayerZero。</p>
+<p><img src="/LayerZero%E8%B0%83%E7%A0%94/image_N7RXMRyHFS.png" alt="1"></p>
+<p><img src="/LayerZero%E8%B0%83%E7%A0%94/image_EOnPUO6Z6m.png" alt="1"></p>
+<p>2022年3月15日，官方Medium宣布，0xMaki全职加入LayerZero，他曾是Sushiswap创始人和核心开发者之一，在 2021 年 9 月因为 Sushi 内部的宫斗而被迫退出。他将主要负责生态发展，比如Sushiswap 的跨链项目 SushiXSwap 就是在 0xmaki 的牵头下完成，为两个协议增添了应用场景。</p>
+<h2 id="1-2-融资情况"><a href="#1-2-融资情况" class="headerlink" title="1.2. 融资情况"></a>1.2. 融资情况</h2><p>2021年4月，团队获得一笔200万美元的种子轮融资。</p>
+<p>2021年9月，获得A轮的630万美元融资，由Binance Labs和Multicoin Capital领投，其他参投方包括Sino Global Capital、Defiance、Delphi Digital、Robot Ventures，Spartan、Hypersphere Ventures、Protocol Ventures和Gen Block Capital。</p>
+<p>2022年3月31日最新公布，LayerZero Labs以10亿美元估值获得1.35亿美元的A+轮投资。本轮由FTX Ventures、红杉资本与a16z领投，Coinbase Ventures、PayPal Ventures、Tiger Global和Uniswap Labs等参投。</p>
+<p>目前估值已达到30亿美元。</p>
+<h2 id="1-3-产品定位和路线图"><a href="#1-3-产品定位和路线图" class="headerlink" title="1.3. 产品定位和路线图"></a>1.3. 产品定位和路线图</h2><p>产品定位： 一个去信任的全链互操作协议。</p>
+<blockquote>
+<p>An Omnichain Interoperability Protocol</p>
+</blockquote>
+<p>路线图（来自2022&#x2F;3&#x2F;15官方发表的一篇推文——<a href="https://medium.com/layerzero-official/the-omnichain-future-is-here-74389f6d70c3" title="The Omnichain Future is Here">The Omnichain Future is Here</a>）：</p>
+<ol>
+<li>接入更多的链。<blockquote>
+<p>We’re live on Ethereum, Avalanche, Polygon, BNB Chain, Fantom, Arbitrum and Optimism. In 6–8 weeks consider Solana, Terra, Cosmos Hub and Osmosis slam dunks and LayerZero to be everywhere in 4–6 months.</p>
+</blockquote>
+</li>
+<li>上线跨链桥Stargate。</li>
+<li>0xMaki的加入。</li>
+</ol>
+<h2 id="1-4-生态现状"><a href="#1-4-生态现状" class="headerlink" title="1.4. 生态现状"></a>1.4. 生态现状</h2><p><img src="https://img.foresightnews.pro/202210/5-1666163547138.jpeg?x-oss-process=style/scale70"></p>
+<p><a href="https://www.odaily.news/post/5182510" title="一文盘点LayerZero生态重点项目-ODAILY">一文盘点LayerZero生态重点项目-ODAILY</a></p>
+<p>几个重点项目：</p>
+<ul>
+<li><a href="https://stargate.finance/" title="Stargate">Stargate</a>，跨链桥。它上线仅半年，营收就达到跨链龙头Multichain当时收入的一半。目前官网显示TVL已达到3亿美金。</li>
+<li>SushiXSwap，是SushiSwap推出的基于LayerZero的全链交易协议。</li>
+<li>Gh0stly Gh0sts，全链NFT。</li>
+</ul>
+<h1 id="2-技术调研"><a href="#2-技术调研" class="headerlink" title="2. 技术调研"></a>2. 技术调研</h1><h2 id="2-1-引言"><a href="#2-1-引言" class="headerlink" title="2.1. 引言"></a>2.1. 引言</h2><p>在介绍LayerZero相关技术之前，先考虑单链的情况。在某一条特定链上（比如以太坊），对方发起一笔交易，我们需要证明这笔交易是否成功，最安全的方式是部署全节点进行验证。但这种方式成本太高，更具性价比的方式是轻节点验证。</p>
+<p>回顾轻节点验证的过程：</p>
+<p><img src="/LayerZero%E8%B0%83%E7%A0%94/image_teneLa5zR8.png" alt="1"></p>
+<ol>
+<li>轻节点获取并<strong>验证区块头是否满足条件</strong>（困难度是否达到要求），然后保存到本地。</li>
+<li>获取交易和<strong>交易证明（关联的Merkle 树路径）</strong>。由交易发起方提供，或向全节点请求。</li>
+<li>验证：<ol>
+<li>正确性&#x2F;有效性：验证交易内容是否正确，比如转账地址是否正确。</li>
+<li>存在性：通过交易哈希和Merkle 树路径计算出Merkle Root，若与对应区块头的一致，则证明交易在链上已存在。在以太坊等链上，还需要等待15个确认区块。</li>
+</ol>
+</li>
+</ol>
+<p>回到跨链场景，跨链有两个关键：消息转发和证明（证明这笔交易在对方链上正确且存在）。现有的跨链方案可分为两类：</p>
+<ol>
+<li>中间链（或者称为中间方）负责验证和转发，也可归纳为<strong>外部验证</strong>。用户需要完全信任中间链，中间链通常会采用确定性共识，并结合MPC和质押的方式来保证跨链安全性，比如THORChain、Multichain等。但中间链还是经常受到攻击，并且去中心化程度有待商榷。</li>
+<li><strong>链上的轻节点验证</strong>（由目的链智能合约实现）。由于<strong>黑客难以伪造区块头和交易通过验证</strong>，PoW区块头需要满足困难度要求、PoS则需要签名验证，而交易的merkle根又保存在区块头中。同时，智能合约可以保证验证的去中心化和公开透明。所以，这种方案最为安全。但成本也较为昂贵，目的链上的智能合约需要保存来源链连续的区块头。而且可扩展性不高，每条目的链需要针对不同来源链实现不同验证逻辑，以及保存不同数据。</li>
+</ol>
+<p><img src="/LayerZero%E8%B0%83%E7%A0%94/image_JViar_dKMK.png" alt="1"></p>
+<p>有没有鱼和熊掌兼得的方案呢？LayerZero采用这样一种方案：</p>
+<ol>
+<li>LayerZero也有中间层，但<strong>中间层只负责消息转发（比如交易和交易证明），不负责验证</strong>，验证交给目的链上的“轻节点”。</li>
+<li>链上的“轻节点”是由合约实现的，验证逻辑就写在代码中。根据来源链的不同，会采用不同的验证逻辑。</li>
+<li>但由合约完全实现轻节点的功能，成本很高，尤其是区块头的存储。因此，LayerZero<strong>并不存储所有区块头，只存储交易相关的区块头</strong>，区块头也由中间层转发，合约主要实现了验证功能，LayerZero把这称之为“超轻节点”。</li>
+<li>由于LayerZero只存储交易相关的区块头，那么<strong>对于区块头的验证就不够完善</strong>：无法验证是否是沿着最长链挖出来的区块、以及区块是否已提交（比如比特币等待6个区块才能确定提交）。中间伪造证明和发起攻击的可能性增大。为此，LayerZero将中间层一分为二——预言机和中继器，<strong>预言机转发区块头，中继器转发交易证明</strong>。预言机和中继器都可由用户程序(DApp)自己选择，预言机可使用现有成熟的Chainlink，中继器可以根据官方提供的代码进行改造。</li>
+</ol>
+<p><img src="/LayerZero%E8%B0%83%E7%A0%94/image_E0f9l9wGy3.png" alt="1"></p>
+<p>安全性保证：中继器和预言机相互独立，当且仅当它们串通时，作恶才会发生。并且，一个用户程序所使用的中继器和预言机被攻击，其它用户程序并不受影响。</p>
+<p><img src="/LayerZero%E8%B0%83%E7%A0%94/image_CdjBPmAy3P.png" alt="1"></p>
+<p>具体细节参考下文。第2节结合官网和白皮书上有关内容进行技术介绍，第3节分析合约源码，第4节是使用体验。</p>
+<h2 id="2-2-技术介绍"><a href="#2-2-技术介绍" class="headerlink" title="2.2. 技术介绍"></a>2.2. 技术介绍</h2><p><img src="/LayerZero%E8%B0%83%E7%A0%94/image_OGpGSbsX4r.png" alt="1"></p>
+<p>LayerZero是第一个去信任的全链互操作协议，它提供了一个强大的底层通信原语，可在此基础上构建不同的跨链应用程序。</p>
+<blockquote>
+<p>LayerZero, the first trustless omnichain interoperability protocol, which provides a powerful, low level communication primitive upon which adiverse set of crosschain applications can be built.</p>
+</blockquote>
+<h3 id="2-2-1-LayerZero组件"><a href="#2-2-1-LayerZero组件" class="headerlink" title="2.2.1. LayerZero组件"></a>2.2.1. LayerZero组件</h3><h4 id="端点-Endpoints"><a href="#端点-Endpoints" class="headerlink" title="端点(Endpoints)"></a><strong>端点(Endpoints)</strong></h4><p>面向用户程序(DApp)的LayerZero接口，每个链上都有一个端点，由<strong>一系列智能合约</strong>实现。</p>
+<p>端点分为四个模块：</p>
+<ul>
+<li>通信器(Communicator)</li>
+<li>验证器(Validator)</li>
+<li>网络(Network)</li>
+<li>库(Libraries)</li>
+</ul>
+<p>前三个组成了端点的核心模块，库是辅助智能合约，它定义了特定链的通信应该如何处理，每条链都有一个相关联的库。两个链之间的通信，只需要它们各自的库出现在两端。这种设计允许我们在不修改三个核心模块的情况下，添加对新链的支持。</p>
+<h4 id="预言机-Oracle"><a href="#预言机-Oracle" class="headerlink" title="预言机(Oracle)"></a>预言机(Oracle)</h4><p>预言机是一种数据输入应用程序，它从区块链外部（链外）的数据源获取数据，并输入到区块链（链上），以供智能合约使用。智能合约本身无法获取链外信息，因此需要预言机。比如，一些股市预测的智能合约，需要预言机提供链外股市价格的输入。</p>
+<p>在LayerZero中，预言机负责从一个链上读取区块头，并将其发送到另一个链上。这个预言机可以是任何提供这种机制的第三方服务，但在实践中，LayerZero推荐使用Chainlink，它是目前DON(decentralized oracle network)行业的领导者。</p>
+<h4 id="中继器-Relayer"><a href="#中继器-Relayer" class="headerlink" title="中继器(Relayer)"></a><strong>中继器(Relayer)</strong></h4><p>中继器是一个链下服务，在功能上与Oracle类似，但它不是获取区块头，而是获取指定交易的证明。</p>
+<p>LayerZero官方提供默认的中继器：</p>
+<p><img src="/LayerZero%E8%B0%83%E7%A0%94/image_b1U3-SDQjY.png" alt="1"></p>
+<p>用户程序也可以选择它们自己实现的中继器：</p>
+<p><img src="/LayerZero%E8%B0%83%E7%A0%94/image_MIiaaujjCL.png" alt="1"></p>
+<h3 id="2-2-2-LayerZero协议"><a href="#2-2-2-LayerZero协议" class="headerlink" title="2.2.2. LayerZero协议"></a>2.2.2. LayerZero协议</h3><p><img src="/LayerZero%E8%B0%83%E7%A0%94/image_eMjsZEsuqi.png" alt="1"></p>
+<p>协议步骤：</p>
+<ol>
+<li><p>Chain A上的应用向LayerZero的Communicator模块发送交易T，包含如下信息：</p>
+<ul>
+<li>t：交易的唯一标识。</li>
+<li>dst：Chain B上智能合约的全局标识。</li>
+<li>payload：应用A想要发给应用B的任何数据。</li>
+<li>relayer_args：应用A使用Relayer时传入的参数。</li>
+</ul>
+</li>
+<li><p>Communicator构造一个消息包<code>Packet(dst, payload)</code>，将它与t和relayer_args一起发送给Validator。</p>
+<p><img src="/LayerZero%E8%B0%83%E7%A0%94/image_uyDkttyLhA.png" alt="1"></p>
+</li>
+<li><p>Validator发送t和dst给Network，通知Network将Chain A上当前区块的区块头发送给Chain B。</p>
+</li>
+<li><p>Validator将Packet、t和relayer_args发送给Relayer，通知Relayer去获取交易的证明，并最终发给Chain B。这一步可以与第3步并发进行。</p>
+</li>
+<li><p>Network发送dst和当前交易所在的区块ID(cur_blk_id)给Oracle。这会通知Oracle获取Chain A区块头并且发送给Chain B。如果一个区块里有多笔跨链交易，该步骤只会进行一次。</p>
+</li>
+<li><p>Oracle从Chain A读取区块头(blk_hdr)。</p>
+</li>
+<li><p>Relayer从Chain A获取交易T的证明并保存。</p>
+</li>
+<li><p>Oracle确认区块头(blk_hdr)关联的区块在Chain A上已提交（需等待一定数量的区块确认），然后将区块头发给Chain B的Network。</p>
+</li>
+<li><p>Chain B的Network将区块头的哈希(blk_hdr_hash)发送给Validator。</p>
+</li>
+<li><p>Validator将blk_hdr_hash发送给Relayer。</p>
+</li>
+<li><p>Ralyer收到blk_hdr_hash后，它会返回与该区块关联的所有交易，每一项格式为<code>&lt;Packet(dst, payload), t, proof(t)&gt;</code>。这样是因为，多个用户同时发送的跨链交易，可能都在一个区块中。</p>
+</li>
+<li><p>Validator通过返回的交易证明和Network保存的区块头信息，验证交易是否有效且已提交。如果验证失败，消息则被丢弃；如果成功，则将Packet发送给Communicator。</p>
+</li>
+<li><p>Communicator将Packet抛给App B。</p>
+</li>
+</ol>
+<h2 id="2-3-源码分析"><a href="#2-3-源码分析" class="headerlink" title="2.3. 源码分析"></a>2.3. 源码分析</h2><p><a href="https://github.com/LayerZero-Labs/LayerZero" title="LayerZero-Labs/LayerZero: An Omnichain Interoperability Protocol (github.com)">LayerZero-Labs&#x2F;LayerZero: An Omnichain Interoperability Protocol (github.com)</a></p>
+<p><a href="https://github.com/LayerZero-Labs/solidity-examples" title="LayerZero-Labs/solidity-examples: example contracts (github.com)">LayerZero-Labs&#x2F;solidity-examples: example contracts (github.com)</a></p>
+<h3 id="发送消息"><a href="#发送消息" class="headerlink" title="发送消息"></a>发送消息</h3><p><code>ILayerZeroEndpoint.sol</code>接口合约提供<code>send</code>接口，接口定义如下：</p>
+<p><img src="/LayerZero%E8%B0%83%E7%A0%94/image_IkrjPdiU2B.png" alt="1"></p>
+<p>各个链的ChainId定义在文档中：<a href="https://layerzero.gitbook.io/docs/technical-reference/mainnet/supported-chain-ids" title="Mainnet Addresses - LayerZero Docs (gitbook.io)">Mainnet Addresses - LayerZero Docs (gitbook.io)</a></p>
+<p>用户程序发送跨链消息时，需调用该接口，一个调用示例如下：</p>
+<p><img src="/LayerZero%E8%B0%83%E7%A0%94/image_-7MyjCm8_e.png" alt="1"></p>
+<p><img src="/LayerZero%E8%B0%83%E7%A0%94/image_10nIyEDf5u.png" alt="1"></p>
+<p><code>send</code>接口的实现在<code>Endpoint.sol</code>合约中：</p>
+<p><img src="/LayerZero%E8%B0%83%E7%A0%94/image_59qzUJhGNT.png" alt="1"></p>
+<p><code>_getSendLibrary</code>函数获取用户配置的相关库，用户也可以使用默认的库，官方提供的具体实现在<code>UltraLightNode.sol</code>合约中。最终，这调用该合约的<code>send</code>函数：</p>
+<p><img src="/LayerZero%E8%B0%83%E7%A0%94/image_8iLmdrHGhB.png" alt="1"></p>
+<p>该函数分为以下几个步骤：</p>
+<p>(a) 给协议、Oracle和Relayer支付费用。</p>
+<ol>
+<li><p>Oracle的费用值是固定的，可通过合约进行设置(<code>ChainlinkOracleClient.sol</code>)。</p>
+<p><img src="/LayerZero%E8%B0%83%E7%A0%94/image_yUh9-s-CH0.png" alt="1"></p>
+</li>
+<li><p>Relayer的费用根据不同的目的链进行计算(<code>Relayer.sol</code>, LayerZero will provide a reference implementation)。给Relayer支付费用的同时，它也会通知Relayer。</p>
+<p><img src="/LayerZero%E8%B0%83%E7%A0%94/image_85aZ8pc35e.png" alt="1"></p>
+</li>
+<li><p>少量的协议费用(<code>Treasury.sol</code>)。</p>
+<p><img src="/LayerZero%E8%B0%83%E7%A0%94/image_wzTdzje9dL.png" alt="1"></p>
+</li>
+</ol>
+<p>(b) 构造Packet消息包，包括目的合约地址和payload。</p>
+<p><img src="/LayerZero%E8%B0%83%E7%A0%94/image_hRvnIpsGlC.png" alt="1"></p>
+<p>(c) 通知Oracle(<code>ChainlinkOracleClient.sol</code>)，规定了目的链id、库版本、目的合约地址、区块确认数等信息。</p>
+<p><img src="/LayerZero%E8%B0%83%E7%A0%94/image_xq5-_zHBZq.png" alt="1"></p>
+<h3 id="接收消息"><a href="#接收消息" class="headerlink" title="接收消息"></a>接收消息</h3><p><code>UltraLightNode.sol</code>合约的<code>updateHash</code>函数接受Oracle合约的调用，用于接收区块头。</p>
+<p><img src="/LayerZero%E8%B0%83%E7%A0%94/image_EdmXneoD8x.png" alt="1"></p>
+<p><code>UltraLightNode.sol</code>合约的<code>validateTransactionProof</code>函数接受Relayer合约的调用，用于接收交易证明。</p>
+<p><img src="/LayerZero%E8%B0%83%E7%A0%94/image_oyfMOjV0IU.png" alt="1"></p>
+<p>具体步骤：</p>
+<p>(a) 调用者必须是用户程序(UA&#x2F;DApp)的Relayer。</p>
+<p>(b) 获取UA指定的验证库。</p>
+<p>(c) Oracle提交的区块头必须达到UA指定的区块确认数。</p>
+<p>(d) 通过UA指定的验证库进行解压和验证。官方提供的验证函数在<code>MPTValidator01.sol</code>合约中：</p>
+<p><img src="/LayerZero%E8%B0%83%E7%A0%94/image_JHzMmarvzs.png" alt="1"></p>
+<p><img src="/LayerZero%E8%B0%83%E7%A0%94/image_nOl3dIqm5v.png" alt="1"></p>
+<p>(e) packet的来源地址必须是来源链上指定的ULN(ultra light node)地址。</p>
+<p>(f) packet的目的地址必须与参数中的目的地址相同。</p>
+<p>(g) 调用<code>Endpoint.sol</code>合约的<code>receivePayload</code>将payload发给目的合约。</p>
+<h2 id="2-4-LayerZero使用体验"><a href="#2-4-LayerZero使用体验" class="headerlink" title="2.4. LayerZero使用体验"></a>2.4. LayerZero使用体验</h2><p>官方示例：<a href="https://github.com/LayerZero-Labs/solidity-examples/tree/main/contracts/examples" title="solidity-examples/contracts/examples at main · LayerZero-Labs/solidity-examples (github.com)">solidity-examples&#x2F;contracts&#x2F;examples at main · LayerZero-Labs&#x2F;solidity-examples (github.com)</a></p>
+<p>ETH-Goerli和Optimism-Goerli的chainId和Endpoint合约地址参考：<a href="https://layerzero.gitbook.io/docs/technical-reference/testnet/testnet-addresses" title="Testnet Addresses - LayerZero Docs (gitbook.io)">Testnet Addresses - LayerZero Docs (gitbook.io)</a>。</p>
+<p>ETH-Goerli水龙头地址：<a href="https://goerlifaucet.com/" title="Goerli Faucet">Goerli Faucet</a>。</p>
+<p>Optimism-Goerli水龙头地址：<a href="https://optimismfaucet.xyz/" title="Faucet | Optimism Goerli (optimismfaucet.xyz)">Faucet | Optimism Goerli (optimismfaucet.xyz)</a>。</p>
+<p>体验Optimism-Goerli跨ETH-Goerli，步骤如下：</p>
+<ol>
+<li>Remix上打开LayerZero-Labs&#x2F;solidity-examples项目，编译示例合约OmniCounter.sol。</li>
+<li>分别在ETH-Goerli和Optimism-Goerli上部署，部署时需传入各链上Endpoint合约的地址。</li>
+<li>调用Goerli链上OmniCounter.sol的<code>setTrustedRemoteAddress</code>函数，填入：<ul>
+<li><code>10132</code>，Optimism-Goerli的chainId。</li>
+<li><code>0x6Ea105ba51b8e1e68a6Fc2b32b017F88dBCe44CD</code>，Optimism-Goerli上OmniCounter.sol的地址，依据你具体部署的合约地址而定。</li>
+</ul>
+</li>
+<li>调用Optimism-Goerli链上OmniCounter.sol的<code>setTrustedRemoteAddress</code>函数，填入：<ul>
+<li><code>10121</code>，ETH-Goerli的chainId。</li>
+<li><code>0x4aa2e60fcD907f388fD1a251a0E6107d8f76002d</code>，ETH-Goerli上OmniCounter.sol的地址。</li>
+</ul>
+</li>
+<li>调用Optimism-Goerli链上OmniCounter.sol的<code>incrementCounter</code>函数发送跨链消息，填入ETH-Goerli的chainId：<code>10121</code>。</li>
+</ol>
+<p>具体请观看现场演示。</p>
+<h1 id="3-主要产品Stargate"><a href="#3-主要产品Stargate" class="headerlink" title="3. 主要产品Stargate"></a>3. 主要产品Stargate</h1><p><img src="/LayerZero%E8%B0%83%E7%A0%94/image_ZtwlQfW0EE.png" alt="1"></p>
+<p>Stargate是第一个完全可组合的原生资产桥，也是基于LayerZero协议构建的第一款DApp。它的愿景是让跨链流动性转移成为一个无缝、单一的交易过程。</p>
+<blockquote>
+<p>Stargate is a community-driven organization building the first fully composable native asset bridge, and the first dApp built on LayerZero.</p>
+</blockquote>
+<blockquote>
+<p><strong>Stargate’s vision is to make cross-chain liquidity transfer a seamless, single transaction process.</strong></p>
+</blockquote>
+<p>Stargate的作用：</p>
+<ul>
+<li>DeFi用户可以通过Stargate跨链交换原生资产。</li>
+<li>其它应用可以结合Stargate去创建原生跨链交易。</li>
+<li>跨链交易由社区所有的统一流动性池支持。</li>
+</ul>
+<p>Stargate的优势：</p>
+<ol>
+<li>第一个解决了跨链三角难题(<a href="https://medium.com/stargate-official/the-bridging-trilemma-d80788cce4ef" title="Bridging Trilemma">Bridging Trilemma</a>)。通常，跨链桥会采用Lock + Mint和Burn + Redeem的方式，将包装资产发给用户，来保证即时确定性，但用户需要将包装资产转换成他们真正需要的资产。另一种方式，是采用原生资产的流动性池，但当链上流动性池被耗尽时，交易将会阻塞。Stargate宣称他们采用了一个***Delta(Δ)***算法，既能提供统一的流动性池，又能保证即时确定性。<ul>
+<li>即时保证的确定性(Instant Guaranteed Finality)：交易在来源链上提交时，用户能在目的链上即时收到对应资产。</li>
+<li>原生资产(Native Assets)：用户能得到原生资产而不是包装后的资产。</li>
+<li>统一的流动性(Unified Liquidity)：多个链之间共享单个流动性池。</li>
+</ul>
+</li>
+<li>可组合性。其它应用可结合Stargate进行跨链，比如：SushiSwap用户想要将以太坊上的wBTC交换为Avalanche上的JOE。在这种情况下，他们现在可以在源链上的单个事务中完成这一操作，而无需离开SushiSwap的界面。</li>
+</ol>
+<p>Stargate已支持ETH、BNB、Aval、Matic、Arbitrum、Optimism、Fantom七种链，并专注于对三大稳定币（USDT、USDC和 BUSD）的支持。</p>
+<h1 id="4-总结"><a href="#4-总结" class="headerlink" title="4. 总结"></a>4. 总结</h1><p>首先，LayerZero是一个去信任的互操作协议，它仅仅提供了基本的跨链功能——消息的有效交付。至于资产转移等，是上层程序基于LayerZero进行实现。<strong>LayerZero更像网络中的HTTP协议</strong>，Stargate等才是上层应用。</p>
+<p>其次，LayerZero保留了链上验证方式大部分的安全性，舍弃了小部分的安全性来实现更低的成本。然后，通过中间层设计，来弥补这小部分的安全性。中间层先通过将转发任务分成两半，一半给预言机，一半给中继器，来提高作恶的难度；再允许用户可以选择不同的预言机和中继器，来将不同用户间的风险隔离。但从目前来看，预言机使用chainlink，中继器则由LayerZero自己实现的且并未开源，用户的选择也不多。不过，未来肯定会朝着好的方向发展的。</p>
+<h1 id="5-参考"><a href="#5-参考" class="headerlink" title="5. 参考"></a>5. 参考</h1><ul>
+<li>官网：Home | LayerZero</li>
+<li>官方文档：What is LayerZero - LayerZero Docs (<a href="http://gitbook.io/" title="gitbook.io">gitbook.io</a>)</li>
+<li>官方博客：LayerZero Official – Medium</li>
+<li>CEO推特：<a href="https://twitter.com/PrimordialAA" title="https://twitter.com/PrimordialAA">https://twitter.com/PrimordialAA</a></li>
+<li>官方CTO介绍LayerZero：<a href="https://medium.com/layerzero-official/layerzero-an-omnichain-interoperability-protocol-b43d2ae975b6" title="https://medium.com/layerzero-official/layerzero-an-omnichain-interoperability-protocol-b43d2ae975b6">https://medium.com/layerzero-official/layerzero-an-omnichain-interoperability-protocol-b43d2ae975b6</a></li>
+<li><a href="https://www.odaily.news/post/5182452" title="万字详解LayerZero Labs：普及全链资产，抢占多链生态核心-ODAILY">万字详解LayerZero Labs：普及全链资产，抢占多链生态核心-ODAILY</a></li>
+</ul>
+]]></content>
+      <categories>
+        <category>欲穷千里目，更上一层楼</category>
+        <category>区块链</category>
+      </categories>
+      <tags>
+        <tag>区块链</tag>
+      </tags>
+  </entry>
 </search>

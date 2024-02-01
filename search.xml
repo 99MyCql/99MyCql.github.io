@@ -12052,10 +12052,14 @@
   <entry>
     <title>LevelDB知识整理与总结</title>
     <url>/LevelDB%E7%9F%A5%E8%AF%86%E6%95%B4%E7%90%86%E4%B8%8E%E6%80%BB%E7%BB%93.html</url>
-    <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>参考：<a href="https://leveldb-handbook.readthedocs.io/zh/latest/basic.html" title="https://leveldb-handbook.readthedocs.io/zh/latest/basic.html">https://leveldb-handbook.readthedocs.io/zh/latest/basic.html</a></p>
-<p>在区块链中，谈到数据库就不得不提LevelDB，比特币、以太坊等都使用LevelDB作为底层数据库。</p>
+    <content><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>此前区块链实习时，接触的数据库，碍于2023年事情较多，一直未总结。</p>
+<p>本文将整理LevelDB相关知识，并进行总结。</p>
+<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>在区块链中，谈到数据库就不得不提LevelDB，比特币、以太坊等都使用LevelDB作为底层数据库。</p>
 <p>LevelDB的前身是Google的Bigtable——大数据三驾马车之一。Bigtable由Google在2006发表的<a href="https://static.googleusercontent.com/media/research.google.com/en//archive/bigtable-osdi06.pdf" title="Bigtable: A Distributed Storage System for Structured Data">Bigtable: A Distributed Storage System for Structured Data</a>论文中提出，是一个分布式的高性能KV数据库，但Bigtable的具体实现并未开源。LevelDB可以看作单机版的Bigtable，它由Bigtable的作者共同完成，并被Google开源。</p>
 <p>LevelDB是一个单机KV数据库，采用<strong>LSM(Log Structured Merge)<strong>结构，具有</strong>很高的写性能</strong>和较高的读性能，适用于<strong>写多读少</strong>的情况。LSM的基本思想是：<strong>顺序写代替随机写</strong>、延时进行归并处理。</p>
+<span id="more"></span>
+
+<p>参考：<a href="https://leveldb-handbook.readthedocs.io/zh/latest/basic.html" title="https://leveldb-handbook.readthedocs.io/zh/latest/basic.html">https://leveldb-handbook.readthedocs.io/zh/latest/basic.html</a></p>
 <h2 id="架构"><a href="#架构" class="headerlink" title="架构"></a>架构</h2><p><img src="/LevelDB%E7%9F%A5%E8%AF%86%E6%95%B4%E7%90%86%E4%B8%8E%E6%80%BB%E7%BB%93/image_Zjc8HEuGRz.png" alt="1"></p>
 <p>包含以下几个重要组件：</p>
 <ul>
@@ -12108,7 +12112,7 @@
 <li><strong>快照</strong>：在LevelDB中，用户对同一个key的若干次修改（包括删除）是以<strong>维护多条数据项</strong>的方式进行存储的（直至Compaction时才会合并成同一条记录），每条数据项都会被赋予一个<strong>序列号</strong>，代表这条数据项的新旧状态。序列号就相当于快照，读数据时可指定序列号，即指定快照。</li>
 <li><strong>隔离性（并发读写）</strong>：通过快照读保证。</li>
 </ul>
-<h2 id="MemTable"><a href="#MemTable" class="headerlink" title="MemTable"></a>MemTable</h2><p>内存中的数据结构，由<strong>跳表</strong>实现。写入操作时，写入的是MemTable。MemTable达到阈值后，转换为Immutable MemTable，同时生成一个新的MemTable。</p>
+<h2 id="MemTable"><a href="#MemTable" class="headerlink" title="MemTable"></a>MemTable</h2><p>内存中的数据结构，由<strong>跳表</strong>（详情可参考<a href="https://github.com/99MyCql/DataStructures-and-Algorithms/blob/master/note/dataStructures/%E8%B7%B3%E8%A1%A8.md">本人数据结构笔记</a>）实现。写入操作时，写入的是MemTable。MemTable达到阈值后，转换为Immutable MemTable，同时生成一个新的MemTable。</p>
 <p>Immutable MemTable是只读的，它一旦生成，很快就会被异步线程持久化到磁盘上（minor compaction），转换成Level0中的一个SST文件。这个过程需要耗费一定的时间，而如果MemTable数据量增长过快，马上又满了，<strong>写线程就会阻塞，并等待异步线程持久化Immutable MemTable完成</strong>。这是 LevelDB 的卡顿点之一，也是未来 RocksDB 的优化点。</p>
 <h2 id="SST"><a href="#SST" class="headerlink" title="SST"></a>SST</h2><p>物理结构：为了提高整体的读写效率，一个sstable文件按照固定大小进行块划分，默认每个块(block)的大小为4KB。</p>
 <p><img src="/LevelDB%E7%9F%A5%E8%AF%86%E6%95%B4%E7%90%86%E4%B8%8E%E6%80%BB%E7%BB%93/image_yha5uPd2UL.png" alt="1"></p>

@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.2.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/golang32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/golang16.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="baidu-site-verification" content="code-RpvRDWfflk">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" integrity="sha256-DfWjNxDkM94fVBWx1H5BMMp0Zq7luBlV8QRcSES7s+0=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"blog.dounine.live","root":"/","images":"/images","scheme":"Mist","darkmode":false,"version":"8.11.1","exturl":false,"sidebar":{"position":"right","display":"always","padding":18,"offset":12},"copycode":{"enable":true,"style":"flat"},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":"utterances","storage":true,"lazyload":false,"nav":null,"activeClass":"utterances"},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="概述参考：https:&#x2F;&#x2F;leveldb-handbook.readthedocs.io&#x2F;zh&#x2F;latest&#x2F;basic.html 在区块链中，谈到数据库就不得不提LevelDB，比特币、以太坊等都使用LevelDB作为底层数据库。 LevelDB的前身是Google的Bigtable——大数据三驾马车之一。Bigtable由Google在2006发表的Bigtable: A Distribute">
+<meta property="og:type" content="article">
+<meta property="og:title" content="LevelDB知识整理与总结">
+<meta property="og:url" content="https://blog.dounine.live/LevelDB%E7%9F%A5%E8%AF%86%E6%95%B4%E7%90%86%E4%B8%8E%E6%80%BB%E7%BB%93.html">
+<meta property="og:site_name" content="dounine&#39;s blog">
+<meta property="og:description" content="概述参考：https:&#x2F;&#x2F;leveldb-handbook.readthedocs.io&#x2F;zh&#x2F;latest&#x2F;basic.html 在区块链中，谈到数据库就不得不提LevelDB，比特币、以太坊等都使用LevelDB作为底层数据库。 LevelDB的前身是Google的Bigtable——大数据三驾马车之一。Bigtable由Google在2006发表的Bigtable: A Distribute">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://blog.dounine.live/LevelDB%E7%9F%A5%E8%AF%86%E6%95%B4%E7%90%86%E4%B8%8E%E6%80%BB%E7%BB%93/image_Zjc8HEuGRz.png">
+<meta property="og:image" content="https://blog.dounine.live/LevelDB%E7%9F%A5%E8%AF%86%E6%95%B4%E7%90%86%E4%B8%8E%E6%80%BB%E7%BB%93/image__7zeZhZ5h5.png">
+<meta property="og:image" content="https://blog.dounine.live/LevelDB%E7%9F%A5%E8%AF%86%E6%95%B4%E7%90%86%E4%B8%8E%E6%80%BB%E7%BB%93/image_CgsN9t2fjw.png">
+<meta property="og:image" content="https://blog.dounine.live/LevelDB%E7%9F%A5%E8%AF%86%E6%95%B4%E7%90%86%E4%B8%8E%E6%80%BB%E7%BB%93/image_1GS4IKQc35.png">
+<meta property="og:image" content="https://blog.dounine.live/LevelDB%E7%9F%A5%E8%AF%86%E6%95%B4%E7%90%86%E4%B8%8E%E6%80%BB%E7%BB%93/image_yha5uPd2UL.png">
+<meta property="og:image" content="https://blog.dounine.live/LevelDB%E7%9F%A5%E8%AF%86%E6%95%B4%E7%90%86%E4%B8%8E%E6%80%BB%E7%BB%93/image_WPh75dzovM.png">
+<meta property="og:image" content="https://blog.dounine.live/LevelDB%E7%9F%A5%E8%AF%86%E6%95%B4%E7%90%86%E4%B8%8E%E6%80%BB%E7%BB%93/image_GNLloQcHpq.png">
+<meta property="og:image" content="https://blog.dounine.live/LevelDB%E7%9F%A5%E8%AF%86%E6%95%B4%E7%90%86%E4%B8%8E%E6%80%BB%E7%BB%93/image_aYC8uNNRsS.png">
+<meta property="og:image" content="https://blog.dounine.live/LevelDB%E7%9F%A5%E8%AF%86%E6%95%B4%E7%90%86%E4%B8%8E%E6%80%BB%E7%BB%93/image_7HdQQ6jU1x.png">
+<meta property="og:image" content="https://blog.dounine.live/LevelDB%E7%9F%A5%E8%AF%86%E6%95%B4%E7%90%86%E4%B8%8E%E6%80%BB%E7%BB%93/version_update.jpeg">
+<meta property="article:published_time" content="2024-02-01T10:13:22.000Z">
+<meta property="article:modified_time" content="2024-02-01T10:13:22.000Z">
+<meta property="article:author" content="dounine">
+<meta property="article:tag" content="区块链">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://blog.dounine.live/LevelDB%E7%9F%A5%E8%AF%86%E6%95%B4%E7%90%86%E4%B8%8E%E6%80%BB%E7%BB%93/image_Zjc8HEuGRz.png">
+
+
+<link rel="canonical" href="https://blog.dounine.live/LevelDB%E7%9F%A5%E8%AF%86%E6%95%B4%E7%90%86%E4%B8%8E%E6%80%BB%E7%BB%93.html">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://blog.dounine.live/LevelDB%E7%9F%A5%E8%AF%86%E6%95%B4%E7%90%86%E4%B8%8E%E6%80%BB%E7%BB%93.html","path":"LevelDB知识整理与总结.html","title":"LevelDB知识整理与总结"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>LevelDB知识整理与总结 | dounine's blog</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-SZN5WSXHZY"></script>
+  <script class="next-config" data-name="google_analytics" type="application/json">{"tracking_id":"G-SZN5WSXHZY","only_pageview":false}</script>
+  <script src="/js/third-party/analytics/google-analytics.js"></script>
+
+  <script src="/js/third-party/analytics/baidu-analytics.js"></script>
+  <script async src="https://hm.baidu.com/hm.js?66c7065aa71681df47eb23eff557978b"></script>
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-SZN5WSXHZY"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-SZN5WSXHZY');
+  </script>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">dounine's blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">18</span></a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">50</span></a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">85</span></a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A6%82%E8%BF%B0"><span class="nav-text">概述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9E%B6%E6%9E%84"><span class="nav-text">架构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%86%99"><span class="nav-text">写</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%BB"><span class="nav-text">读</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#MemTable"><span class="nav-text">MemTable</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SST"><span class="nav-text">SST</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Compaction"><span class="nav-text">Compaction</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#minor-compaction"><span class="nav-text">minor compaction</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#major-compaction"><span class="nav-text">major compaction</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BC%93%E5%AD%98"><span class="nav-text">缓存</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%89%88%E6%9C%AC%E6%8E%A7%E5%88%B6"><span class="nav-text">版本控制</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-text">总结</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%8E%E8%AF%BB%E5%86%99%E6%80%A7%E8%83%BD%E7%9A%84%E8%A7%92%E5%BA%A6%E8%BF%9B%E8%A1%8C%E5%88%86%E6%9E%90%E6%80%BB%E7%BB%93"><span class="nav-text">从读写性能的角度进行分析总结</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%8EACID%E7%AD%89%E7%89%B9%E6%80%A7%E8%A7%92%E5%BA%A6%E8%BF%9B%E8%A1%8C%E5%88%86%E6%9E%90%E6%80%BB%E7%BB%93"><span class="nav-text">从ACID等特性角度进行分析总结</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="dounine"
+      src="https://avatars.githubusercontent.com/u/41814469?s=400&u=48bf60a3428a3cb86a84a110c8688930cf6ceb08&v=4">
+  <p class="site-author-name" itemprop="name">dounine</p>
+  <div class="site-description" itemprop="description">回首向来萧瑟处</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">85</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">18</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">50</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/99MyCql" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;99MyCql" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+
+  <div class="links-of-blogroll site-overview-item animated">
+    <div class="links-of-blogroll-title"><i class="fa fa-globe fa-fw"></i>
+      Links
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://bkfish.gitee.io/" title="https:&#x2F;&#x2F;bkfish.gitee.io&#x2F;" rel="noopener" target="_blank">bkfish</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://hitworld.github.io/" title="https:&#x2F;&#x2F;hitworld.github.io&#x2F;" rel="noopener" target="_blank">w4rd3n</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://wyjoutstanding.github.io/" title="https:&#x2F;&#x2F;wyjoutstanding.github.io&#x2F;" rel="noopener" target="_blank">wyjoutstanding</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://iwtf.github.io/" title="https:&#x2F;&#x2F;iwtf.github.io&#x2F;" rel="noopener" target="_blank">IWTF</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://wood1314.github.io/" title="https:&#x2F;&#x2F;wood1314.github.io&#x2F;" rel="noopener" target="_blank">wood</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://desperadoccy.xyz/" title="https:&#x2F;&#x2F;desperadoccy.xyz&#x2F;" rel="noopener" target="_blank">desperadoccy</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://doudouqaq.github.io/" title="https:&#x2F;&#x2F;doudouqaq.github.io&#x2F;" rel="noopener" target="_blank">doudouqaq</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://kylinnnnn.github.io/" title="https:&#x2F;&#x2F;kylinnnnn.github.io&#x2F;" rel="noopener" target="_blank">kylinnnnn</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://miaotony.xyz/" title="https:&#x2F;&#x2F;miaotony.xyz" rel="noopener" target="_blank">miaotony</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://110.40.153.120:3030/" title="http:&#x2F;&#x2F;110.40.153.120:3030&#x2F;" rel="noopener" target="_blank">AZhou</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.csdn.net/weixin_40986490" title="https:&#x2F;&#x2F;blog.csdn.net&#x2F;weixin_40986490" rel="noopener" target="_blank">白速龙王的回眸</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.csdn.net/weixin_43116322" title="https:&#x2F;&#x2F;blog.csdn.net&#x2F;weixin_43116322" rel="noopener" target="_blank">Ethan</a>
+        </li>
+    </ul>
+  </div>
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.dounine.live/LevelDB%E7%9F%A5%E8%AF%86%E6%95%B4%E7%90%86%E4%B8%8E%E6%80%BB%E7%BB%93.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://avatars.githubusercontent.com/u/41814469?s=400&u=48bf60a3428a3cb86a84a110c8688930cf6ceb08&v=4">
+      <meta itemprop="name" content="dounine">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dounine's blog">
+      <meta itemprop="description" content="回首向来萧瑟处">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="LevelDB知识整理与总结 | dounine's blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          LevelDB知识整理与总结
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2024-02-01 18:13:22" itemprop="dateCreated datePublished" datetime="2024-02-01T18:13:22+08:00">2024-02-01</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Base/" itemprop="url" rel="index"><span itemprop="name">九层之台，起于累土</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Base/DataBase/" itemprop="url" rel="index"><span itemprop="name">数据库</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>7.4k</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>参考：<a target="_blank" rel="noopener" href="https://leveldb-handbook.readthedocs.io/zh/latest/basic.html" title="https://leveldb-handbook.readthedocs.io/zh/latest/basic.html">https://leveldb-handbook.readthedocs.io/zh/latest/basic.html</a></p>
+<p>在区块链中，谈到数据库就不得不提LevelDB，比特币、以太坊等都使用LevelDB作为底层数据库。</p>
+<p>LevelDB的前身是Google的Bigtable——大数据三驾马车之一。Bigtable由Google在2006发表的<a target="_blank" rel="noopener" href="https://static.googleusercontent.com/media/research.google.com/en//archive/bigtable-osdi06.pdf" title="Bigtable: A Distributed Storage System for Structured Data">Bigtable: A Distributed Storage System for Structured Data</a>论文中提出，是一个分布式的高性能KV数据库，但Bigtable的具体实现并未开源。LevelDB可以看作单机版的Bigtable，它由Bigtable的作者共同完成，并被Google开源。</p>
+<p>LevelDB是一个单机KV数据库，采用<strong>LSM(Log Structured Merge)<strong>结构，具有</strong>很高的写性能</strong>和较高的读性能，适用于<strong>写多读少</strong>的情况。LSM的基本思想是：<strong>顺序写代替随机写</strong>、延时进行归并处理。</p>
+<h2 id="架构"><a href="#架构" class="headerlink" title="架构"></a>架构</h2><p><img src="/LevelDB%E7%9F%A5%E8%AF%86%E6%95%B4%E7%90%86%E4%B8%8E%E6%80%BB%E7%BB%93/image_Zjc8HEuGRz.png" alt="1"></p>
+<p>包含以下几个重要组件：</p>
+<ul>
+<li><strong>MemTable</strong>：内存中的有序的存储区，底层使用 <strong>跳表</strong> 数据结构。写操作先写入MemTable，达到阈值后，转换为Immutable MemTable。</li>
+<li><strong>Immutable MemTable</strong>：内存中的只读的存储区，会被后台线程异步地持久化到磁盘中，形成一个sstable。</li>
+<li><strong>log</strong>：预写式日志**WAL(Write-Ahead Logging)**，类似于MySQL的undolog+redolog，用于防止写入内存的数据因进程异常、系统掉电等情况而丢失。LevelDB在写MemTable之前，会将所有的写操作写到log文件中。LevelDB在重启后，会从log文件中恢复MemTable数据。</li>
+<li><strong>sstable(Sorted String Table)<strong>：磁盘数据存储文件。SST文件内</strong>数据有序</strong>，且<strong>不可修改</strong>。LevelDB磁盘数据分为 Level0 到 LevelN 多层，每一层包含多个 SST 文件。Level0 中的SST文件直接由 Immutable Memtable转换而来，<strong>Level0中的不同SST文件之间可能存在交集</strong>，非严格有序。剩余每一层都是有序的，数据由上一层进行 <strong>Compaction</strong> 得到。</li>
+<li><strong>manifest</strong>：用于版本控制。<ul>
+<li>LevelDB中的 <strong>版本（version）</strong> 记录着每一层中所有文件的元数据，包括文件大小、最小key值和最大key值。</li>
+<li>每次Compaction完成，LevelDB都会创建一个新版本，并记录变化的内容（增量），比如：新增哪些sst文件、删除哪些sst文件等等，<strong>manifest</strong>文件就是用来记录这些变化信息的。</li>
+</ul>
+</li>
+<li><strong>current</strong>：记录当前manifest的文件名。</li>
+</ul>
+<h2 id="写"><a href="#写" class="headerlink" title="写"></a>写</h2><p><img src="/LevelDB%E7%9F%A5%E8%AF%86%E6%95%B4%E7%90%86%E4%B8%8E%E6%80%BB%E7%BB%93/image__7zeZhZ5h5.png" alt="1"></p>
+<p>流程：</p>
+<ol>
+<li>先写log。</li>
+<li>再写入MemTable。</li>
+</ol>
+<p>关键点：</p>
+<ul>
+<li>支持的写操作：Put、Delete，同时支持批量写。</li>
+<li><strong>快照</strong>：将键值写入MemTable时，LevelDB会对key进行特殊编码，格式如下。其中，<strong>序列号（sequence number）</strong> 是累加的，最大的表示最新。<br>  <img src="/LevelDB%E7%9F%A5%E8%AF%86%E6%95%B4%E7%90%86%E4%B8%8E%E6%80%BB%E7%BB%93/image_CgsN9t2fjw.png" alt="1"></li>
+<li>并发问题（<strong>写-写冲突</strong>）：LevelDB同一时间只允许一个写入操作（锁）。当发生并发写入时，为了提高性能，LevelDB会将<strong>多个写入合并成一个批量写入</strong>。</li>
+<li><strong>原子性</strong>：先写日志，写入成功，就代表操作完成。若写日志到一半，进程退出，重启后会<strong>删除异常日志</strong>。</li>
+<li><strong>持久性</strong>：只要写日志成功，就算持久化。数据库重启后，会根据日志恢复MemTable。</li>
+</ul>
+<h2 id="读"><a href="#读" class="headerlink" title="读"></a>读</h2><p><img src="/LevelDB%E7%9F%A5%E8%AF%86%E6%95%B4%E7%90%86%E4%B8%8E%E6%80%BB%E7%BB%93/image_1GS4IKQc35.png" alt="1"></p>
+<p>流程：</p>
+<ol>
+<li><p>读MemTable；</p>
+</li>
+<li><p>读Immutable MemTable；</p>
+</li>
+<li><p>按Level0~LevelN的顺序，在每一层的sstable文件中查找指定的key，若搜索到符合条件的数据项，结束查找，否则返回Not Found错误，表示数据库中不存在指定的数据。</p>
+<ul>
+<li><p>LevelDB在每一层sstable中查找数据时，都是按序依次查找sstable的。</p>
+</li>
+<li><p>0层的文件比较特殊。由于0层的文件中可能存在key重合的情况，因此在0层中，<strong>文件编号大的sstable优先查找</strong>。理由是文件编号较大的sstable中存储的总是最新的数据。</p>
+</li>
+<li><p>非0层文件，一层中所有文件之间的key不重合，因此LevelDB可以借助<strong>sstable元数据</strong>（一个文件中最小与最大的key值）进行快速定位（<strong>二分</strong>），<strong>每一层只需要查找一个sstable文件的具体内容</strong>。</p>
+</li>
+</ul>
+</li>
+</ol>
+<p>关键点：</p>
+<ul>
+<li>支持的读操作：Get和快照Get，两者的本质都是读快照。</li>
+<li><strong>快照</strong>：在LevelDB中，用户对同一个key的若干次修改（包括删除）是以<strong>维护多条数据项</strong>的方式进行存储的（直至Compaction时才会合并成同一条记录），每条数据项都会被赋予一个<strong>序列号</strong>，代表这条数据项的新旧状态。序列号就相当于快照，读数据时可指定序列号，即指定快照。</li>
+<li><strong>隔离性（并发读写）</strong>：通过快照读保证。</li>
+</ul>
+<h2 id="MemTable"><a href="#MemTable" class="headerlink" title="MemTable"></a>MemTable</h2><p>内存中的数据结构，由<strong>跳表</strong>实现。写入操作时，写入的是MemTable。MemTable达到阈值后，转换为Immutable MemTable，同时生成一个新的MemTable。</p>
+<p>Immutable MemTable是只读的，它一旦生成，很快就会被异步线程持久化到磁盘上（minor compaction），转换成Level0中的一个SST文件。这个过程需要耗费一定的时间，而如果MemTable数据量增长过快，马上又满了，<strong>写线程就会阻塞，并等待异步线程持久化Immutable MemTable完成</strong>。这是 LevelDB 的卡顿点之一，也是未来 RocksDB 的优化点。</p>
+<h2 id="SST"><a href="#SST" class="headerlink" title="SST"></a>SST</h2><p>物理结构：为了提高整体的读写效率，一个sstable文件按照固定大小进行块划分，默认每个块(block)的大小为4KB。</p>
+<p><img src="/LevelDB%E7%9F%A5%E8%AF%86%E6%95%B4%E7%90%86%E4%B8%8E%E6%80%BB%E7%BB%93/image_yha5uPd2UL.png" alt="1"></p>
+<p>逻辑结构（如上图）：</p>
+<ul>
+<li><strong>data block</strong>：存储键值对数据。由于sstable中所有的键值对都是严格按序存储的，为了节省存储空间，LevelDB并不会为每一对键值对都存储完整的key值，而是仅存储与<strong>上一个key非共享的部分</strong>。</li>
+<li><strong>filter block</strong>：存储<strong>布隆过滤器</strong>。在查询data block中的内容之前，LevelDB首先根据filter block判断指定的data block中是否有需要查询的数据。</li>
+<li><strong>meta index block</strong>：用来存储filter block在整个sstable中的索引信息。</li>
+<li><strong>index block</strong>：存储所有data block的索引信息。index block包含若干条记录，每一条记录对应一个data block的索引信息。记录中包含：该data block中的最大key值、该data block在sstable中的偏移量、该data block的大小。如此设计是为了，可以<strong>快速定位</strong>目标数据在哪个data block中。</li>
+<li><strong>footer</strong>：存储meta index block与index block在sstable中的索引信息。</li>
+</ul>
+<p>写：只有在Compaction时，才会创建SST文件，<strong>创建后不可修改</strong>。</p>
+<p>读：</p>
+<ol>
+<li>读取元数据，包括footer、meta index block、index block、filter block等。</li>
+<li>根据index block找到对应的data block。</li>
+<li>根据filter block判断数据是否存在于data block中。</li>
+</ol>
+<p>特性：</p>
+<ul>
+<li>只读。</li>
+<li>并发访问友好，因为只读。</li>
+<li>快速查找。</li>
+</ul>
+<h2 id="Compaction"><a href="#Compaction" class="headerlink" title="Compaction"></a>Compaction</h2><h3 id="minor-compaction"><a href="#minor-compaction" class="headerlink" title="minor compaction"></a>minor compaction</h3><p><img src="/LevelDB%E7%9F%A5%E8%AF%86%E6%95%B4%E7%90%86%E4%B8%8E%E6%80%BB%E7%BB%93/image_WPh75dzovM.png" alt="1"></p>
+<p>将内存中imutable memtable持久化为磁盘Level0中的一个sstable文件。</p>
+<p>每次minor compaction结束后，都会生成一个新的sstable文件，也意味着<strong>Leveldb的版本状态发生了变化</strong>，会进行一个版本的更替。</p>
+<p>值得注意的是，minor compaction是一个时效性要求非常高的过程，要求其在尽可能短的时间内完成，<strong>否则就会堵塞正常的写入操作</strong>，因此<strong>minor compaction的优先级高于major compaction</strong>。当进行minor compaction的时候有major compaction正在进行，则会首先暂停major compaction。</p>
+<h3 id="major-compaction"><a href="#major-compaction" class="headerlink" title="major compaction"></a>major compaction</h3><p>示例（如下图）：Level0层中浅蓝色的三个sstable文件，加上Level1层中的绿色的sstable文件，四个文件进行了合并，输出成两个按序组织的新sstable文件。</p>
+<p><img src="/LevelDB%E7%9F%A5%E8%AF%86%E6%95%B4%E7%90%86%E4%B8%8E%E6%80%BB%E7%BB%93/image_GNLloQcHpq.png" alt="1"></p>
+<p>major compaction触发条件：</p>
+<ol>
+<li>第0层文件数超过上限。<ul>
+<li>限制0层大小或文件数量，是因为<strong>0层文件并非严格排序，进行读操作时，需遍历0层所有文件</strong>。对0层大小进行限制，是为了提高读取效率。</li>
+</ul>
+</li>
+<li>第i(i≥i) 层大小超过10^i MB。<ul>
+<li>为什么要限制≥1层的大小？假设LevelDB只有0层和1层，那1层文件的个数会越来越多或者总数据量越来越大。而由于0层文件乱序，且0层文件key的取值范围较大，导致每一次0层文件与1层文件进行compaction时，<strong>所输入的1层文件数量将非常庞大</strong>。所以不仅要限制0层大小，每一层大小同样需要进行控制，使得<strong>每次进行major compaction时，IO开销尽量保持常量</strong>。</li>
+</ul>
+</li>
+<li>当某个文件无效读取的次数过多（<strong>错峰合并</strong>）。<ul>
+<li>存在的问题：假设0层文件完成合并之后，1层文件同时达到了数据上限，则立马需要进行合并。更加糟糕的是，0-n层的文件同时达到了合并的条件，每一层都需要进行合并。</li>
+<li>解决方法：若某个文件的查询次数过多，且查询在该文件中不命中, 那么这种行为就可以视为无效的查询开销，这种文件就可以进行错峰合并。</li>
+</ul>
+</li>
+</ol>
+<p>major compaction过程：</p>
+<ol>
+<li>寻找合适的输入文件。<ul>
+<li>对于第1、2种触发条件，采用轮转方法选择i层输入文件，记录了上一次该层合并的文件的最大key，下一次则选择在此key之后的首个文件。</li>
+</ul>
+</li>
+<li>根据key重叠情况扩大输入文件集合。<ul>
+<li>根据第i层待合并的sstable文件，<strong>找第i+1层中key范围重叠的sstable文件</strong>，再根据两层的输入文件，找第i层中key范围重叠的sstable文件。</li>
+</ul>
+</li>
+<li><strong>多路归并</strong>。<ul>
+<li>将所有输入文件中的数据按序整理，而后输出若干个第i+1层的sstable文件。</li>
+<li>在整理的过程中，需要将冗余的数据进行清理，即同一条数据的多个版本，<strong>只保留最新的那一份</strong>。</li>
+</ul>
+</li>
+</ol>
+<p>一次major compaction的过程其本质是一个多路归并的过程，存在<strong>大量的磁盘读写开销</strong>，显然这是一个严重的性能瓶颈。</p>
+<p>同时，当用户写入的速度始终大于major compaction的速度时，就会导致0层的文件数量还是不断上升，用户的读取效率持续下降。所以LevelDB 中规定：</p>
+<ul>
+<li>当0层文件数量超过<code>SlowdownTrigger</code>时，写入的速度主要减慢；</li>
+<li>当0层文件数量超过<code>PauseTrigger</code>时，写入暂停，直至major compaction完成；</li>
+</ul>
+<p>由于LevelDB 内部进行Compaction时有trivial move优化，且根据内部的文件格式组织，用户在使用LevelDB 时，可以尽量将大批量需要写入的数据进行<strong>预排序</strong>，利用空间局部性，尽量减少多路合并的IO开销。</p>
+<h2 id="缓存"><a href="#缓存" class="headerlink" title="缓存"></a>缓存</h2><p>LevelDB中使用了一种基于LRUCache的缓存机制，用于缓存：</p>
+<ul>
+<li>已打开的sstable文件对象和相关元数据。</li>
+<li>sstable中的data block的内容。</li>
+</ul>
+<p>结构：</p>
+<p><img src="/LevelDB%E7%9F%A5%E8%AF%86%E6%95%B4%E7%90%86%E4%B8%8E%E6%80%BB%E7%BB%93/image_aYC8uNNRsS.png" alt="1"></p>
+<p>其中Hash Table是基于论文《Dynamic-Sized Nonblocking Hash Table》实现的，它可以实现resize的过程中<strong>不阻塞其他并发的读写请求</strong>。</p>
+<p>哈希表扩张过程中，最小的封锁粒度为哈希桶级别。当有新的读写请求发生时，若被散列之后得到的哈希桶仍然未构建完成，则<strong>“主动”进行构建</strong>，并将构建后的哈希桶填入新的哈希表中。后台进程构建到该桶时，发现已经被构建了，则无需重复构建。</p>
+<h2 id="版本控制"><a href="#版本控制" class="headerlink" title="版本控制"></a>版本控制</h2><p>LevelDB每次Compaction，都会从一个版本升级成另外一个版本。</p>
+<p><strong>版本（version）</strong> 指整个LevelDB数据库的版本，而非具体数据的版本，相当于整个LevelDB的快照。本质是一个文件，记录着每一层中所有文件的元数据，包括有哪些文件、文件大小、最小key值和最大key值等。LevelDB采用了增量式的记录方式，通过Manifest文件记录版本变化信息。</p>
+<p><img src="/LevelDB%E7%9F%A5%E8%AF%86%E6%95%B4%E7%90%86%E4%B8%8E%E6%80%BB%E7%BB%93/image_7HdQQ6jU1x.png" alt="1"></p>
+<p>一个Manifest文件中，包含了多条<strong>Session Record</strong>。</p>
+<ul>
+<li>第一条Session Record记载了当时LevelDB的全量版本信息。</li>
+<li>后续每条Session Record则记录了从上一个版本到该版本的变化信息，包括：新增的sstable文件、删除的sstable文件、已持久化数据项中<strong>最大的序列号</strong>等等。</li>
+</ul>
+<p><img src="/LevelDB%E7%9F%A5%E8%AF%86%E6%95%B4%E7%90%86%E4%B8%8E%E6%80%BB%E7%BB%93/version_update.jpeg" alt="1"></p>
+<p>当LevelDB进行Compaction时，会创建一条Session Record添加到Manifest文件末尾。</p>
+<ul>
+<li><strong>原子性</strong>体现：Compaction完成标志为Manifest文件中写入了一条session record。在此之前，即便某些文件写入失败导致进程退出，数据库重启启动时，仍然能够恢复到崩溃之前正确的状态，并将这些无用的sstable文件删除，重新进行compaction动作。</li>
+<li><strong>一致性</strong>体现：LevelDB状态变更的操作都是以version更新为标记，而version更新是整个流程的最后一步，因此数据库必然都是从一个一致性的状态变更到另外一个一致性的状态。</li>
+</ul>
+<p>当LevelDB重启时：</p>
+<ol>
+<li>读取Current指向的Manifest文件，并依次执行Manifest中的Session Record，生成一个新的版本。</li>
+<li>创建新Manifest，第一个Session Record为新版本的快照。</li>
+<li>删除过期的Manifest。</li>
+<li>将新版本设置为数据库的当前版本。</li>
+</ol>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><h3 id="从读写性能的角度进行分析总结"><a href="#从读写性能的角度进行分析总结" class="headerlink" title="从读写性能的角度进行分析总结"></a>从读写性能的角度进行分析总结</h3><p>问题1：在常见的数据库中，写数据到磁盘时，都是采用<strong>随机写而非顺序写</strong>。以在纸上写文章为例，顺序写就是接着文章末尾的空白继续写，随机写则是对文章已写内容进行修改，不管是插入、删除还是修改，肯定更加麻烦。向硬盘中写数据也是同理，随机写会导致更多的碎片化、更多的垃圾回收和数据迁移开销。因此，不管是机械硬盘或固态硬盘，随机写性能低于顺序写。</p>
+<p>为了<strong>提高写性能</strong>，LevelDB用<strong>顺序写代替随机写</strong>。具体的写数据流程：<strong>先写入内存，而后异步地被顺序写入磁盘</strong>。</p>
+<p>问题2：采用顺序写，磁盘中数据往往是无序的，对读非常不友好。</p>
+<p>为了<strong>保障读性能</strong>，LevelDB做了以下工作：</p>
+<ol>
+<li><p>通过<strong>Compaction</strong>将无序数据变为有序。</p>
+<ul>
+<li><p><strong>minor compaction</strong>将MemTable转换为level0层中的sstable文件，文件内部数据有序。但由于<strong>level0层sstable文件序列非严格排序</strong>，读数据的时候需遍历，性能并不高。因此，level0层不能太大，且还需要转换为有序的层。</p>
+</li>
+<li><p><strong>major compaction</strong>则负责将i层合并为i+1层中有序的sstable文件序列的一部分。由此，保证≥1层都是有序的，而有序数据可采用二分等方式查找，读性能显著提升。</p>
+</li>
+<li><p>基于Compaction操作，基本决定了LevelDB的读流程：<strong>先读内存，而后依次读磁盘各层</strong>。</p>
+</li>
+</ul>
+</li>
+<li><p><strong>提高并发读写性能</strong>。</p>
+<ul>
+<li>采用<strong>快照读</strong>，避免读写冲突，通过数据项的<strong>序列号</strong>实现。在写入磁盘后，数据项会有一个序列号，序列号越大表示数据越新。读数据都采用快照读方式，默认读最大的序列号，也可以自己指定序列号。</li>
+</ul>
+</li>
+</ol>
+<p>问题3：由于Compaction过程会引起大量磁盘IO，可能会影响正常的写操作。</p>
+<p>为了<strong>提高Compaction性能</strong>，LevelDB做了以下工作：</p>
+<ol>
+<li>提高minor compaction性能（minor compaction会直接影响数据写入内存的速度）。<strong>将内存数据直接转换为level0层中的一个sstable文件</strong>，而不与level0层文件进行合并、排序。因此，level0层的sstable序列是非严格排序的。</li>
+<li>提高major compaction性能。由于major compaction需要将i层sstable与i+1层的部分sstable一起归并排序，且i层的key范围可能较大。为了防止输入的i+1层sstable过多、数据量过大，i+1层的大小和sstable数量要尽可能合理。因此，<strong>LevelDB各层大小逐步递增</strong>。</li>
+</ol>
+<h3 id="从ACID等特性角度进行分析总结"><a href="#从ACID等特性角度进行分析总结" class="headerlink" title="从ACID等特性角度进行分析总结"></a>从ACID等特性角度进行分析总结</h3><p>对于写操作：</p>
+<ul>
+<li><strong>原子性</strong>：先写WAL日志，再写内存。<strong>只要写入日志完成</strong>，就表示写入操作成功。<ul>
+<li>若写日志完成，写内存未完成时，进程退出，重启后会重新执行日志记录，写入操作终会成功。</li>
+<li>若写日志未完成时，进程退出，重启后会删除异常日志，相当于回滚。</li>
+</ul>
+</li>
+<li><strong>持久性</strong>：只要写WAL日志完成，就算持久化成功。数据库重启后，会根据日志恢复MemTable。</li>
+<li><strong>隔离性（写-写冲突）</strong>：写入内存时，会<strong>加锁</strong>，同一时间只允许一个写操作。同一时间段的多个写操作会合并成一个<strong>批量写</strong>操作，以此提高并发写的性能。</li>
+</ul>
+<p>对于读操作：</p>
+<ul>
+<li><strong>隔离性</strong>：<ul>
+<li><strong>读-写冲突</strong>（读内存数据时）：MemTable自带<strong>读写锁</strong>机制（阅读goleveldb源码时发现），不会与写内存操作冲突。</li>
+<li><strong>读-Compaction冲突</strong>（读磁盘数据时）：<ol>
+<li><strong>sstable文件是只读的</strong>。每次Compaction都只是对若干个sstable文件进行多路合并，然后创建新的sstable文件，不会影响对某个sstable文件的读操作。</li>
+<li><strong>快照读</strong>。读都是基于当前最新序列号或指定序列号，而Compaction只会生成新序列号，不会修改旧序列号的数据，即不会与读操作冲突。</li>
+<li><strong>采用引用计数来控制删除行为</strong>。当Compaction完成后试图去删除某个sstable文件，会根据该文件的引用计数（是否存在对应的读操作）作适当的删除延迟，即需要等待至该文件的计数为0才真正进行删除。</li>
+<li><strong>版本控制</strong>。Compaction完成后，才会更新LevelDB版本，比如写入数据库元数据。在此期间，读操作都基于旧版本文件进行，不受Compaction操作影响。</li>
+</ol>
+</li>
+</ul>
+</li>
+</ul>
+<p>对于Compaction操作：</p>
+<ul>
+<li><strong>原子性</strong>：Compaction完成后，会向Manifest文件写入一条session record。<ul>
+<li>若写入完成，则代表Compaction操作成功。</li>
+<li>若写入完成之前，进程退出，重启后会基于Manifest文件回滚到Compaction之前的正确状态，无效的sstable文件将被删除。</li>
+</ul>
+</li>
+<li><strong>一致性</strong>：LevelDB状态变更以version更新为标记，而version更新是Compaction操作的最后一步。因此，数据库必然都是从一个一致性的状态变更到另外一个一致性的状态。<ul>
+<li>如果在写入Manifest之后、更新version之前，进程结束，重启后会基于Manifest文件得到一个新的、正确的版本，状态依旧一致。</li>
+</ul>
+</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/BlockChain/" rel="tag"><i class="fa fa-tag"></i> 区块链</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+            </div>
+            <div class="post-nav-item">
+                <a href="/LayerZero%E8%B0%83%E7%A0%94.html" rel="next" title="LayerZero调研">
+                  LayerZero调研 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments utterances-container"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">dounine</span>
+</div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+      <span>站点总字数：</span>
+    <span title="站点总字数">545k</span>
+  </span>
+</div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/mist/" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+<script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.0/search.js" integrity="sha256-vXZMYLEqsROAXkEw93GGIvaB2ab+QW6w3+1ahD9nXXA=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.0/es5/tex-mml-chtml.js","integrity":"sha256-r+3itOMtGGjap0x+10hu6jW/gZCzxHsoKrOd7gyRSGY="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
+<script class="next-config" data-name="utterances" type="application/json">{"enable":true,"repo":"99MyCql/99MyCql.github.io","issue_term":"pathname","theme":"github-light"}</script>
+<script src="/js/third-party/comments/utterances.js"></script>
+
+</body>
+</html>

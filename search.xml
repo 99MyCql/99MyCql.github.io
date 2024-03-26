@@ -12284,4 +12284,676 @@
         <tag>区块链</tag>
       </tags>
   </entry>
+  <entry>
+    <title>跨链桥合约漏洞汇总分析</title>
+    <url>/%E8%B7%A8%E9%93%BE%E6%A1%A5%E5%90%88%E7%BA%A6%E6%BC%8F%E6%B4%9E%E6%B1%87%E6%80%BB%E5%88%86%E6%9E%90.html</url>
+    <content><![CDATA[<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>本文是本人在毕业论文研究期间，对2021至2022两年内发生的、与合约漏洞相关的重大跨链桥攻击事件的分析。主要分析这些事件中的攻击流程和漏洞利用细节。</p>
+<span id="more"></span>
+
+<p>跨链桥攻击事件主要来源：<a href="https://rekt.news/leaderboard/">Rekt - Leaderboard</a></p>
+<h1 id="2021年7月THORChain-3【800万美元】"><a href="#2021年7月THORChain-3【800万美元】" class="headerlink" title="2021年7月THORChain#3【800万美元】"></a>2021年7月THORChain#3【800万美元】</h1><h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p>时间：2021年7月22日</p>
+<p>官方：<a href="https://www.notion.so/THORChain-Incident-07-22-874a06db7bf8466caf240e1823697e35?pvs=21">https://thearchitect.notion.site/THORChain-Incident-07-22-874a06db7bf8466caf240e1823697e35</a></p>
+<p><a href="https://learnblockchain.cn/article/3317">THORChain 连遭三击，黑客会是同一个吗？ | 登链社区 | 区块链技术社区 (learnblockchain.cn)</a></p>
+<blockquote>
+<p>本次攻击跟第二次攻击一样，攻击者部署了一个攻击合约，作为自己的 router，在攻击合约里调用 THORChain Router 合约。</p>
+<p>攻击者这次利用的是 THORChain Router 合约中关于退款的逻辑缺陷，攻击者调用<strong>returnVaultAssets</strong>函数并发送很少的 ETH，同时把攻击合约设置为 asgard。然后 THORChain Router 合约把 ETH 发送到 asgard 时，asgard 也就是攻击合约触发一个 deposit 事件，攻击者随意构造 asset 和 amount，同时构造一个不符合要求的 memo，使 THORChain 节点程序无法处理，然后按照程序设计就会进入到退款逻辑。</p>
+</blockquote>
+<p><a href="https://rekt.news/zh/thorchain-rekt2/">THORCHAIN - 翻车2</a>，其中包含一份来着Halborn 团队的<a href="https://github.com/HalbornSecurity/PublicReports/blob/master/Incident%20Reports/Thorchain_Incident_Analysis_July_23_2021.pdf">详细报告</a>。</p>
+<blockquote>
+<p>攻击过程：</p>
+<ol>
+<li>攻击者创建了一个假的路由器（合约地址），然后在攻击者发送ETH时触发了一个存款事件。</li>
+<li>攻击者向returnVaultAssets()传入少量的ETH，但路由器被判定为一个Asgard金库。</li>
+<li>在Thorchain路由器上，它将ETH转发到假的Asgard上。</li>
+<li>这创造了一个带有恶意memo的假存款事件。</li>
+<li>Thorchain Bifrost监听成一个正常的存款，并由于糟糕的memo定义而退款给攻击者。</li>
+</ol>
+<p>修复：</p>
+<ul>
+<li>Bifrost组件仅解析从THORChain Router合约抛出的事件。<a href="https://gitlab.com/thorchain/thornode/-/merge_requests/1828/diffs?commit_id=1eaf4c9a7865a2864eec7296f6a7ed18f884a238">Commit</a></li>
+<li>阻塞有多个事件但to地址都不相同的交易。<a href="https://gitlab.com/thorchain/thornode/-/merge_requests/1829/diffs?commit_id=e5461625ca8195aeca440c60d225fe9de431bf77">Commit</a></li>
+</ul>
+<p>Halborn Team给出的建议：</p>
+<ul>
+<li>路由器合同应具有针对意外行为的<strong>暂停&#x2F;取消暂停功能</strong>。实现一种可以暂时停止关键功能的机制。The Router contract should have pause&#x2F;unpause functionality on the unintended behaviours. Implement a mechanism that can temporarily stop the critical functionalities.</li>
+<li><strong>白名单机制</strong>应在每个Bifrost组件事件上实施。The white-listing mechanism should implement on the every Bifrost component events.</li>
+<li>Enable Automatic Solvency Checker on the ETH transactions.</li>
+<li>Only Router emitted events should parse from the component therefore an attacker surface will minimized with this action.</li>
+<li>使用<strong>代理</strong>机制。When smart contracts are deployed into the Ethereum blockchain, they are immutable and therefore, not upgradable. In the white-listing progress, router should be placed behind the proxy.</li>
+<li>Implement a policy for tracking new bugs.</li>
+<li><strong>监控</strong>。The monitoring should be added into the components. This component should monitor activity using the events.</li>
+<li>Documentation should define all trust boundaries in the components. All counter-measure mechanisms should be defined on the attack vectors.</li>
+</ul>
+</blockquote>
+<h2 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h2><p>攻击者地址：<a href="https://etherscan.io/address/0x8c1944fac705ef172f21f905b5523ae260f76d62">https://etherscan.io/address/0x8c1944fac705ef172f21f905b5523ae260f76d62</a></p>
+<p>攻击合约：<a href="https://etherscan.io/address/0x700196e226283671a3de6704ebcdb37a76658805">https://etherscan.io/address/0x700196e226283671a3de6704ebcdb37a76658805</a>，下文简写为<strong>0x7001</strong>。由于只有字节码，可反编译为伪代码，结果请看：<a href="https://etherscan.io/bytecode-decompiler?a=0x700196e226283671a3de6704ebcdb37a76658805">https://etherscan.io/bytecode-decompiler?a=0x700196e226283671a3de6704ebcdb37a76658805</a>。</p>
+<p>THORChain Router被攻击合约：<a href="https://etherscan.io/address/0xc145990e84155416144c532e31f89b840ca8c2ce">https://etherscan.io/address/0xc145990e84155416144c532e31f89b840ca8c2ce</a>，下文简写为<strong>0xc145</strong>。</p>
+<p>THORChain金库地址：<a href="https://etherscan.io/address/0xf56cBa49337A624E94042e325Ad6Bc864436E370">https://etherscan.io/address/0xf56cBa49337A624E94042e325Ad6Bc864436E370</a>，下文简写为<strong>0xf56c</strong>。</p>
+<p>攻击者发起的攻击交易：</p>
+<p><img src="/./%E8%B7%A8%E9%93%BE%E6%A1%A5%E5%90%88%E7%BA%A6%E6%BC%8F%E6%B4%9E%E6%B1%87%E6%80%BB%E5%88%86%E6%9E%90/Untitled.png" alt="Untitled"></p>
+<p><strong>攻击流程梳理：</strong></p>
+<ol>
+<li><p>先看第一笔交易<a href="https://etherscan.io/tx/0x10352e6ec052771a92f05f93e037e066873f64bb502d4488726697987f054595">0x10352e6ec052771a92f05f93e037e066873f64bb502d4488726697987f054595</a><br>，由攻击者发给攻击合约0x7001，时间为：Jul-22-2021 09:39:40 PM +UTC。</p>
+<p> 分析input数据：</p>
+ <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">0xf9f6318f000000000000000000000000a0b86991c6218b36c1d19d4a2e9eb0ce3606eb48000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000000000028446f206e6f74207275736820636f6465207468617420636f6e74726f6c7320392066696775726573000000000000000000000000000000000000000000000000</span><br><span class="line"></span><br><span class="line">美化：</span><br><span class="line">0xf9f6318f</span><br><span class="line">000000000000000000000000a0b86991c6218b36c1d19d4a2e9eb0ce3606eb48</span><br><span class="line">0000000000000000000000000000000000000000000000000000000000000000</span><br><span class="line">0000000000000000000000000000000000000000000000000000000000000060</span><br><span class="line">0000000000000000000000000000000000000000000000000000000000000028</span><br><span class="line">446f206e6f74207275736820636f6465207468617420636f6e74726f6c732039</span><br><span class="line">2066696775726573000000000000000000000000000000000000000000000000</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p> 它调用的是0xf9f6318f函数。结合反编译之后的0x7001合约伪代码，可分析出：</p>
+<ul>
+<li>第一个参数为<strong>0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48</strong>，是USDC合约地址，用于指代USDC token；</li>
+<li>第二个参数为0；</li>
+<li>第三个参数是一个动态类型，起始位置为0x60，长度为0x28，应该是一个字符串，将十六进制<code>446f206e6f74207275736820636f6465207468617420636f6e74726f6c7320392066696775726573</code>转换为字符串可得：**<code>Do not rush code that controls 9 figures</code>**。</li>
+</ul>
+<p> 再分析0x7001合约伪代码中的这个函数，可以发现它有如下调用：</p>
+ <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">static call 0xc145990e84155416144c532e31f89b840ca8c2ce.0x3b6a673 with:</span><br><span class="line">        gas gas_remaining wei</span><br><span class="line">       args 0xf56cba49337a624e94042e325ad6bc864436e370, addr(_param1)</span><br></pre></td></tr></table></figure>
+
+<p> 可知，它调用了0xc145合约（被攻击合约）的0x3b6a673函数，参数依次为0xf56c（是thorchain一个金库vault的地址）、param1（也就是USDC token地址）。</p>
+<p> 再借助etherscan的tx-decoder：<a href="https://etherscan.io/tx-decoder?tx=0x10352e6ec052771a92f05f93e037e066873f64bb502d4488726697987f054595">https://etherscan.io/tx-decoder?tx=0x10352e6ec052771a92f05f93e037e066873f64bb502d44887266979</a>，可得：</p>
+<p> <img src="/./%E8%B7%A8%E9%93%BE%E6%A1%A5%E5%90%88%E7%BA%A6%E6%BC%8F%E6%B4%9E%E6%B1%87%E6%80%BB%E5%88%86%E6%9E%90/SCJKrmimageimage_gTWLTU6j7W.png" alt="./跨链桥合约漏洞汇总分析/SCJKrmimageimage_gTWLTU6j7W.png"></p>
+<p> 分析0xc145合约，可知vaultAllowance其实就是获取金库对应token的余额。</p>
+<p> 因此，在这笔交易中，攻击者调用攻击合约0x7001的0xf9f6318f函数，其实就是获取金库0xf56c的USDC余额，并保存在合约的stor2中。此处，返回1858760326885，乘于0.9得到<strong>1,672,884,294,196.5</strong>。</p>
+ <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">stor1 = addr(_param1)</span><br><span class="line">stor2 = 9 * ext_call.return_data / 10</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>再看第二笔交易<a href="https://etherscan.io/tx/0x26109c1fb2a71485f47176c6046fe0217ec1a384dc1cf789b4aec5939d77d280">0x26109c1fb2a71485f47176c6046fe0217ec1a384dc1cf789b4aec5939d77d280</a><br>，是攻击者发给THORChain Router合约0xc145的。</p>
+<p> 分析input数据，由于合约有源码，etherscan提供直接解码，解码如下：</p>
+<p> <img src="/./%E8%B7%A8%E9%93%BE%E6%A1%A5%E5%90%88%E7%BA%A6%E6%BC%8F%E6%B4%9E%E6%B1%87%E6%80%BB%E5%88%86%E6%9E%90/SCJKrmimageimage_bOgjpjY6BZ.png" alt="./跨链桥合约漏洞汇总分析/SCJKrmimageimage_bOgjpjY6BZ.png"></p>
+<p> 这笔交易调用<code>returnVaultAssets</code>函数，第一个参数为0，第二个参数为攻击合约地址0x7001，第三、四个参数都为空。</p>
+<p> 同时，交易输出了一个log，如下：</p>
+<p> <img src="/./%E8%B7%A8%E9%93%BE%E6%A1%A5%E5%90%88%E7%BA%A6%E6%BC%8F%E6%B4%9E%E6%B1%87%E6%80%BB%E5%88%86%E6%9E%90/SCJKrmimageimage_u3brnKZWcE.png" alt="./跨链桥合约漏洞汇总分析/SCJKrmimageimage_u3brnKZWcE.png"></p>
+<p> 这个log对应的事件在0x7001合约中被触发，事件ID为0xef51….，事件的参数名称应该有误，按我的分析，各参数如下：</p>
+<ul>
+<li>第一个索引参数topics[1] 为金库地址。</li>
+<li>第二个索引参数topics[2] 为指定的token，这里就是上一笔交易分析中提到的USDC 合约地址。</li>
+<li>data中第一个非索引参数为存款数量1672884294196，有没有发现这就是上一笔交易最后分析得出的数字！！！</li>
+<li>data中第二个非索引参数为memo，是给thorchain传达跨链信息的，这里也是上一笔交易分析中出现的input字符串参数。</li>
+</ul>
+<p> 我们再回看0x7001合约源码中的<code>returnVaultAssets</code>函数，如下。</p>
+ <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">function returnVaultAssets(address router, address payable asgard, Coin[] memory coins, string memory memo) external payable &#123;</span><br><span class="line">    if (router == address(this))&#123;</span><br><span class="line">        for(uint i = 0; i &lt; coins.length; i++)&#123;</span><br><span class="line">            _adjustAllowances(asgard, coins[i].asset, coins[i].amount);</span><br><span class="line">        &#125;</span><br><span class="line">        emit VaultTransfer(msg.sender, asgard, coins, memo); // Does not include ETH.</span><br><span class="line">    &#125; else &#123;</span><br><span class="line">        for(uint i = 0; i &lt; coins.length; i++)&#123;</span><br><span class="line">            _routerDeposit(router, asgard, coins[i].asset, coins[i].amount, memo);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    (bool success,) = asgard.call&#123;value:msg.value&#125;(&quot;&quot;); //ETH amount needs to be parsed from tx.</span><br><span class="line">    require(success);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p> 结合输入参数，可知，2-11行都跳过，直接执行12行，将调用asgard也就是攻击合约0x7001的fallback函数。</p>
+<p> 再找到0x7001合约伪代码中的fallback函数，发现其中存在如下两行代码：</p>
+ <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">log 0xef519b7e: stor2, Array(len=2 * Mask(256, -1, stor3.length.field_1), data=mem</span><br><span class="line"></span><br><span class="line">......</span><br><span class="line"></span><br><span class="line">log 0xef519b7e: stor2, Array(len=stor3.length % 128, data=mem</span><br></pre></td></tr></table></figure>
+
+<p> stor2就是第一笔交易中设置的值，为1672884294196；mem是stor3，而stor3也是在第一笔交易中被构造的；其它的就分析不来了。</p>
+</li>
+<li><p>当Thorchain节点监听到Router合约抛出这个事件后，获取事件信息，但由于memo字段不符合规范，因此触发退款逻辑，thorchain发起了第三笔交易：<a href="https://etherscan.io/tx/0x8515ce6b174ba31a849ff420650720d42cc4c72d4929adf856343e7395bd2512">https://etherscan.io/tx/0x8515ce6b174ba31a849ff420650720d42cc4c72d4929adf856343e7395bd2512</a> 。</p>
+<p> 这笔交易是金库0xf56c调用THORChain Router合约0xc145。逻辑非常简单，调用合约的<code>transferOut</code>函数，将1672794010957个USDC从金库0xf56c转移到攻击者0x8c19。</p>
+</li>
+</ol>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p><strong>三笔交易流程</strong>：</p>
+<ol>
+<li>攻击者先调用自己的攻击合约0x7001，通过访问THORChain Router合约0xc145，获取金库0xf56c的USDC余额，并保存到合约中。</li>
+<li>攻击者调用THORChain Router合约0xc145的<code>returnVaultAssets</code>函数，该函数会调用攻击合约0x7001的fallback函数，抛出Deposit事件。事件表明，攻击者向金库0xf56c存了1672794010957个USDC，实际上他并没有。</li>
+<li>THORChain监听到Deposit事件，但memo非法，触发退款逻辑，从金库0xf56c退还金额给攻击者，攻击者成功空手套白狼。</li>
+</ol>
+<p>后续攻击交易与上述流程基本一致，攻击者在盗取完USDC之后，又依次盗取了USDT、Sushi、XRUNE、ALCX、YFI。</p>
+<p><strong>漏洞总结：</strong></p>
+<ol>
+<li>参数检查漏洞。使用call方式调用用户传入的合约，未对合约地址进行检查。同时，对用户传入的其它参数也未作检查。</li>
+<li>虚假存款事件。存款事件可被攻击者伪造，而链下节点未进行正确性验证。</li>
+</ol>
+<h1 id="2021年7月ChainSwap【440万美元】"><a href="#2021年7月ChainSwap【440万美元】" class="headerlink" title="2021年7月ChainSwap【440万美元】"></a>2021年7月ChainSwap【440万美元】</h1><h2 id="参考-1"><a href="#参考-1" class="headerlink" title="参考"></a>参考</h2><p>时间：2021年7月10日19点</p>
+<p>官方：<a href="https://chain-swap.medium.com/chainswap-exploit-11-july-2021-post-mortem-6e4e346e5a32">https://chain-swap.medium.com/chainswap-exploit-11-july-2021-post-mortem-6e4e346e5a32</a> <a href="https://rekt.news/zh/chainswap-rekt/">Rekt - CHAINSWAP - 翻车</a></p>
+<blockquote>
+<p>在以太坊网络上，每个要被桥接的代币都有自己的代理工厂合约。攻击者能够利用该合约，直接向不同的地址铸造代币，然后再把它们重新汇集到最初发送交易的钱包中。</p>
+<ol>
+<li>调用工厂（铸币）合约的receive函数</li>
+<li>每笔交易使用一个新的地址作为签名来躲避马虎的权限检查系统</li>
+<li>支付0.005 ETH chargeFee</li>
+<li>将参数设置为所需的地址，该地址接收铸造的代币</li>
+<li>重复x次</li>
+</ol>
+</blockquote>
+<p><a href="https://twitter.com/cmichelio/status/1414035462164033541">https://twitter.com/cmichelio/status/1414035462164033541</a>：</p>
+<blockquote>
+<p>攻击者必须在_chargeFee中支付 0.005 ETH作为费用。没有真正的身份验证检查，只需要1个签名，问题可能是_decreseAuthQuota函数，如果当天满足了签名人的配额，该函数将恢复。但似乎每个人都是从默认配额开始的。</p>
+</blockquote>
+<p><a href="https://www.grenade.tw/blog/chainswap-cross-chain-hacking/">ChainSwap 跨链黑客攻击事件及原因分析 - Grenade 手榴弹</a></p>
+<blockquote>
+<p>MappingBase合约的receive接口使用多方签名（“多签”）的方式进行签名验证，但从黑客提交的交易讯息可以看到，此多签功能并未启用，实际上使用的是“单签”。 即单一签名验证通过即可完成跨链代币的铸造（mint）。</p>
+<p>同时，合约中未限制签名人地址，只要签名合法，任何人都可通过验证。</p>
+<p>更要命的是：任何一个新地址，都有 1,000,000 的可用额度。</p>
+<p>代码中的这个写法逆了天了，相当于突然任何地址都有了几乎是无限铸造的权利！</p>
+</blockquote>
+<p><a href="https://zhuanlan.zhihu.com/p/389738041">我为自己代言：ChainSwap攻击事件分析</a></p>
+<blockquote>
+<p>在分析代码和攻击之前，首先概述一下ChainSwap的实现机制：</p>
+<ol>
+<li>ChainSwap作为一个跨链资产桥，其设置了一个Factory用于管理和查询下属的项目。每个项目可以向ChainSwap对接自动成为跨链代币。</li>
+<li>ChainSwap为每一个验证者限定了配额（Quota），也就是说每个验证者验证的交易额在一段时间内是有限制的。但验证者会有一定的初始配额，且该配额会随着时间累积。</li>
+</ol>
+<p>总结一下，receive函数实现的<strong>整个过程</strong>，都没有对传入的Signatory的合法性进行检查。因此攻击者只需要随机生成一个地址并生成对应的签名，即可骗过ChainSwap，<strong>自己为自己提供签名</strong>。同时，由于authQuotaOf在实现逻辑上的错误，在Signatory不合法时会返回一个非常大的值，导致了这次攻击事件的发生。而本次攻击事件发生的本质，是没有对映射索引的值进行验证。由于Solidity并不会在映射的键不存在时触发任何错误（键是否存在只能靠返回值是否为0进行判断），因此这类检查就显得<strong>非常重要</strong>。正是由于（<strong>荒谬地</strong>）缺少这样的检查，导致了这次损失超过800万美元的攻击。</p>
+</blockquote>
+<h2 id="分析-1"><a href="#分析-1" class="headerlink" title="分析"></a>分析</h2><p>黑客在BSC和ETH链上都发动了攻击，通过几十笔交易盗取了各种代币。</p>
+<p>黑客在BSC上的地址为：<a href="https://bscscan.com/address/0xeda5066780de29d00dfb54581a707ef6f52d8113">0xeda5066780de29d00dfb54581a707ef6f52d8113</a>，最早发起的一笔交易为：<a href="https://bscscan.com/tx/0x3e487f4494fe2b354d6638fb4c6474cdf8ede6c7df560639669364dc0293c998">0x3e487f4494fe2b354d6638fb4c6474cdf8ede6c7df560639669364dc0293c998</a>，时间为：2021-07-10 19:17:15。</p>
+<p>黑客在ETH上的地址也为：<a href="https://etherscan.io/address/0xeda5066780de29d00dfb54581a707ef6f52d8113">0xeda5066780de29d00dfb54581a707ef6f52d8113</a>，最早的一笔交易为：<a href="https://etherscan.io/tx/0x075e2a8045344c66dc48776907d5fa6efab1636836a7dc3d8248724d7af3ae94">0x075e2a8045344c66dc48776907d5fa6efab1636836a7dc3d8248724d7af3ae94</a>，在2021-07-10 19:16:11。</p>
+<p>将以ETH上的攻击为例进行分析，如下是黑客初始发起的一系列攻击交易。</p>
+<p><img src="/./%E8%B7%A8%E9%93%BE%E6%A1%A5%E5%90%88%E7%BA%A6%E6%BC%8F%E6%B4%9E%E6%B1%87%E6%80%BB%E5%88%86%E6%9E%90/SCJKrmimageimage_-ZILKQQWsI.png" alt="./跨链桥合约漏洞汇总分析/SCJKrmimageimage_-ZILKQQWsI.png"></p>
+<p>黑客攻击了多个合约，并且对同一合约也发动了多次攻击，每个合约都对应ChainSwap中的一种代币，黑客以此盗取了大量代币。</p>
+<p>分析第一笔交易：<a href="https://etherscan.io/tx/0x075e2a8045344c66dc48776907d5fa6efab1636836a7dc3d8248724d7af3ae94">0x075e2a8045344c66dc48776907d5fa6efab1636836a7dc3d8248724d7af3ae94</a>，这笔交易是黑客发送给<a href="https://etherscan.io/address/0x7ab088fedae4fa8ada4df638c07cef6c23aff002">0x7ab088fedae4fa8ada4df638c07cef6c23aff002</a><br>合约的，这个合约是chainswap中负责管理DORA代币的代理合约，后文简称<strong>0x7ab0</strong>。</p>
+<ol>
+<li><p>交易的input数据解码如下，它调用了receive函数。</p>
+<p> <img src="/./%E8%B7%A8%E9%93%BE%E6%A1%A5%E5%90%88%E7%BA%A6%E6%BC%8F%E6%B4%9E%E6%B1%87%E6%80%BB%E5%88%86%E6%9E%90/SCJKrmimageimage_5AffEAIT4U.png" alt="./跨链桥合约漏洞汇总分析/SCJKrmimageimage_5AffEAIT4U.png"></p>
+<p> <img src="/./%E8%B7%A8%E9%93%BE%E6%A1%A5%E5%90%88%E7%BA%A6%E6%BC%8F%E6%B4%9E%E6%B1%87%E6%80%BB%E5%88%86%E6%9E%90/SCJKrmimageimage_YuMkpt41sl.png" alt="./跨链桥合约漏洞汇总分析/SCJKrmimageimage_YuMkpt41sl.png"></p>
+</li>
+<li><p>分析0x7ab0合约源码。</p>
+<p> 通过以太坊浏览器可获取0x7ab0合约源码，代码非常多，但实际上0x7ab0这个合约对应的是源码中的<code>InitializableProductProxy</code>，它只是一个代理合约，并不包含receive函数。chainswap使用代理模式，状态保存在代理合约中，而业务逻辑保存在逻辑合约中。</p>
+<p> 由于函数不存在，会调用<code>fallback</code>函数，它定义在父合约的父合约<code>Proxy</code>中，具体代码如下：</p>
+ <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">abstract contract Proxy &#123;</span><br><span class="line">  fallback () payable external &#123;</span><br><span class="line">    _fallback();</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  ...</span><br><span class="line"></span><br><span class="line">  function _fallback() internal &#123;</span><br><span class="line">    if(OpenZeppelinUpgradesAddress.isContract(msg.sender) &amp;&amp; msg.data.length == 0 &amp;&amp; gasleft() &lt;= 2300)         // for receive ETH only from other contract</span><br><span class="line">        return;</span><br><span class="line">    _willFallback();</span><br><span class="line">    _delegate(_implementation());</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p> 它其实是将交易通过<code>delegatecall</code>的方式代理到<code>_implementation()</code>返回地址对应的合约。而_implementation函数又定义在<code>ProductProxy</code>合约中，代码如下：</p>
+ <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">contract ProductProxy is Proxy &#123;</span><br><span class="line">  ...</span><br><span class="line"></span><br><span class="line">  function _name() virtual internal view returns (bytes32 name_) &#123;</span><br><span class="line">    bytes32 slot = NAME_SLOT;</span><br><span class="line">    assembly &#123;  name_ := sload(slot)  &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  function _factory() internal view returns (address factory_) &#123;</span><br><span class="line">    bytes32 slot = FACTORY_SLOT;</span><br><span class="line">    assembly &#123;</span><br><span class="line">      factory_ := sload(slot)</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  function _implementation() virtual override internal view returns (address) &#123;</span><br><span class="line">    address factory_ = _factory();</span><br><span class="line">    if(OpenZeppelinUpgradesAddress.isContract(factory_))</span><br><span class="line">        return IProxyFactory(factory_).productImplementations(_name());</span><br><span class="line">    else</span><br><span class="line">        return address(0);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p> 这个函数根据事先定义好的name和factory，到对应的代理工厂合约中获取product合约的地址，也就是0x7ab0这个代理合约对应逻辑合约的地址。然后，再将函数调用代理到该逻辑合约。</p>
+</li>
+<li><p>寻找factory合约地址。</p>
+<p> 分析0x7ab0合约的创建交易<a href="https://etherscan.io/tx/0xecbe63bbae99895761ff4fc3add11ca323fcf04d76ed6d280a827e03428f720d">0xecbe63bbae99895761ff4fc3add11ca323fcf04d76ed6d280a827e03428f720d</a>，它是chainswap的开发者0xc96e发送给合约<a href="https://etherscan.io/address/0xbf515ff38d55737c56d62e8b6a8eea322ec38aa5">0xbf515ff38d55737c56d62e8b6a8eea322ec38aa5</a>的。它调用了源码中<code>MappingTokenFactory</code>合约的<code>createTokenMapped</code>函数，根据函数逻辑可推断：0x7ab0合约中事先定义好的代理工厂合约factory地址应该就是<strong>0xbf51</strong>。而0xbf51对应源码中的<code>AdminUpgradeabilityProxy</code>合约，也是一个代理合约。</p>
+</li>
+<li><p>寻找0xbf51对应的逻辑合约。</p>
+<p> 分析创建0xbf51合约时的构造函数参数，如下：</p>
+<p> <img src="/./%E8%B7%A8%E9%93%BE%E6%A1%A5%E5%90%88%E7%BA%A6%E6%BC%8F%E6%B4%9E%E6%B1%87%E6%80%BB%E5%88%86%E6%9E%90/SCJKrmimageimage_m92mq3A-qk.png" alt="./跨链桥合约漏洞汇总分析/SCJKrmimageimage_m92mq3A-qk.png"></p>
+<p> 再结合AdminUpgradeabilityProxy 合约的构造函数，如下：</p>
+ <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">abstract contract UpgradeabilityProxy is BaseUpgradeabilityProxy &#123;</span><br><span class="line">  constructor(address _logic, bytes memory _data) public payable &#123;</span><br><span class="line">    assert(IMPLEMENTATION_SLOT == bytes32(uint256(keccak256(&#x27;eip1967.proxy.implementation&#x27;)) - 1));</span><br><span class="line">    _setImplementation(_logic);</span><br><span class="line">    if(_data.length &gt; 0) &#123;</span><br><span class="line">      (bool success,) = _logic.delegatecall(_data);</span><br><span class="line">      require(success);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  ...</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">contract AdminUpgradeabilityProxy is BaseAdminUpgradeabilityProxy, UpgradeabilityProxy &#123;</span><br><span class="line">  constructor(address _admin, address _logic, bytes memory _data) UpgradeabilityProxy(_logic, _data) public payable &#123;</span><br><span class="line">    assert(ADMIN_SLOT == bytes32(uint256(keccak256(&#x27;eip1967.proxy.admin&#x27;)) - 1));</span><br><span class="line">    _setAdmin(_admin);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p> 可知，0xbf51合约对应的逻辑合约地址为：<a href="https://etherscan.io/address/0x3f985399E66fEEd935F4181f18bd434fEf4aD637">0x3f985399E66fEEd935F4181f18bd434fEf4aD637</a>，它对应源码中的<code>MappingTokenFactory</code>合约。</p>
+</li>
+<li><p>寻找0x7ab0合约对应的逻辑合约。</p>
+<p> 回到最初调用receive函数的交易，根据第2步分析，0x7ab0代理合约会从factory合约中获取它对应的逻辑合约：<code>IProxyFactory(factory_).productImplementations(_name())</code>。结合以太坊浏览器的<a href="https://etherscan.io/tx-decoder?tx=0x075e2a8045344c66dc48776907d5fa6efab1636836a7dc3d8248724d7af3ae94">tx-decoder</a>功能，如下图。可知，factory合约返回的逻辑合约为：<a href="https://etherscan.io/address/0x2a8a3Cf57B89507E6E255f468e7b974f351EfABA">0x2a8a3Cf57B89507E6E255f468e7b974f351EfABA</a>，它对应源码中的<code>TokenMapped</code>合约。</p>
+<p> <img src="/./%E8%B7%A8%E9%93%BE%E6%A1%A5%E5%90%88%E7%BA%A6%E6%BC%8F%E6%B4%9E%E6%B1%87%E6%80%BB%E5%88%86%E6%9E%90/SCJKrmimageimage_YxPyY88t4H.png" alt="./跨链桥合约漏洞汇总分析/SCJKrmimageimage_YxPyY88t4H.png"></p>
+</li>
+<li><p>分析receive函数。</p>
+<p> TokenMapped合约的receive函数定义在父合约<code>MappingBase</code>中，如下：</p>
+ <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">function receive(uint256 fromChainId, address to, uint256 nonce, uint256 volume, Signature[] memory signatures) virtual external payable &#123;</span><br><span class="line">    _chargeFee();</span><br><span class="line">    require(received[fromChainId][to][nonce] == 0, &#x27;withdrawn already&#x27;);</span><br><span class="line">    uint N = signatures.length;</span><br><span class="line">    require(N &gt;= MappingTokenFactory(factory).getConfig(_minSignatures_), &#x27;too few signatures&#x27;);</span><br><span class="line">    for(uint i=0; i&lt;N; i++) &#123;</span><br><span class="line">        for(uint j=0; j&lt;i; j++)</span><br><span class="line">            require(signatures[i].signatory != signatures[j].signatory, &#x27;repetitive signatory&#x27;);</span><br><span class="line">        bytes32 structHash = keccak256(abi.encode(RECEIVE_TYPEHASH, fromChainId, to, nonce, volume, signatures[i].signatory));</span><br><span class="line">        bytes32 digest = keccak256(abi.encodePacked(&quot;\x19\x01&quot;, _DOMAIN_SEPARATOR, structHash));</span><br><span class="line">        address signatory = ecrecover(digest, signatures[i].v, signatures[i].r, signatures[i].s);</span><br><span class="line">        require(signatory != address(0), &quot;invalid signature&quot;);</span><br><span class="line">        require(signatory == signatures[i].signatory, &quot;unauthorized&quot;);</span><br><span class="line">        _decreaseAuthQuota(signatures[i].signatory, volume);</span><br><span class="line">        emit Authorize(fromChainId, to, nonce, volume, signatory);</span><br><span class="line">    &#125;</span><br><span class="line">    received[fromChainId][to][nonce] = volume;</span><br><span class="line">    _receive(to, volume);</span><br><span class="line">    emit Receive(fromChainId, to, nonce, volume);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p> （1）先收取一定的手续费，也就是0.005ETH。</p>
+<p> （2）判断签名个数是否达到配置要求，根据tx-decoder的显示，最小签名数配置为1。</p>
+<p> <img src="/./%E8%B7%A8%E9%93%BE%E6%A1%A5%E5%90%88%E7%BA%A6%E6%BC%8F%E6%B4%9E%E6%B1%87%E6%80%BB%E5%88%86%E6%9E%90/SCJKrmimageimage_PCJrk6K-PE.png" alt="./跨链桥合约漏洞汇总分析/SCJKrmimageimage_PCJrk6K-PE.png"></p>
+<p> （3）依次验证每个签名。此处使用<code>ecrecover</code>函数从签名中恢复公钥对应地址，然后与参数中传入的签名者地址判断是否匹配。⚠注意：此处只验证了签名与签名者是否匹配，但并没有对签名者做限制，因此只要传入任意正确的签名都可以通过验证。</p>
+<p> （4）调用<code>_decreaseAuthQuota</code>函数减少签名者的份额，代码如下。如果<code>signatory</code>此前不存在，<code>authQuotaOf[signatory]</code><br> 则为0，此处使用SafeMath的sub函数，而decrement又大于0，应该会报错抛出异常。但实际上当时交易并没有抛出异常，说明此时我看到的源码并不是当时的源码，chainswap修补了漏洞并将代码升级了。因此，需要结合当时的分析报告，才能了解当时的情况，具体可以参考：<a href="https://zhuanlan.zhihu.com/p/389738041">https://zhuanlan.zhihu.com/p/389738041</a>。</p>
+ <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">abstract contract MappingBase is ContextUpgradeSafe, Constants &#123;</span><br><span class="line">    using SafeMath for uint;</span><br><span class="line"></span><br><span class="line">    mapping (address =&gt; uint) public authQuotaOf;</span><br><span class="line"></span><br><span class="line">    ...</span><br><span class="line"></span><br><span class="line">    function _decreaseAuthQuota(address signatory, uint decrement) virtual internal returns (uint quota) &#123;</span><br><span class="line">        quota = authQuotaOf[signatory].sub(decrement);</span><br><span class="line">        authQuotaOf[signatory] = quota;</span><br><span class="line">        emit DecreaseAuthQuota(signatory, decrement, quota);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p> （5）最后receive函数通过<code>IERC20(token).safeTransfer(to, volume)</code>将代币转移到黑客账户。</p>
+</li>
+</ol>
+<h2 id="总结-1"><a href="#总结-1" class="headerlink" title="总结"></a>总结</h2><p>chainswap这次攻击，直接看源码分析起来并不难，但要理清chainswap的各个代理合约与逻辑合约之间的关系和作用，还是比较费时间（对我而言）。</p>
+<p>漏洞总结：签名验证漏洞，没有对传入的签名者地址进行校验。</p>
+<h1 id="2021年8月-Poly-Network【6-1亿美元】"><a href="#2021年8月-Poly-Network【6-1亿美元】" class="headerlink" title="2021年8月 Poly Network【6.1亿美元】"></a>2021年8月 Poly Network【6.1亿美元】</h1><h2 id="参考-2"><a href="#参考-2" class="headerlink" title="参考"></a>参考</h2><p>时间：2021年8月10日</p>
+<p><a href="https://zhuanlan.zhihu.com/p/398941126">Poly Network攻击关键步骤深度解析 - 知乎 (zhihu.com)</a></p>
+<blockquote>
+<p>第一阶段：</p>
+<p>攻击者首先在Ontology发起了一笔跨链交易，里面包含了一个攻击payload。其中包含了精心设计的函数名（图中以6631开头的数字，转换后即<code>f1121318093</code>），目的在于通过造成<code>哈希冲突</code>（hash collision）的方式调用<code>putCurEpochConPubKeyBytes</code>函数（属于以太坊上的EthCrossChainData合约）。</p>
+<p>随后，该笔交易被Ontology Relayer接收，注意这里并没有很严格的校验。该交易会通过Relayer在Poly Chain成功上链。Ethereum Relayer会感知到新区块的生成。</p>
+<p>然而，这笔交易被Ethereum Relayer拒绝了。原因在于Ethereum Relayer对目标合约地址有校验，只允许LockProxy合约作为目标地址，而攻击者传入的是EthCrossChainData地址。</p>
+<p>因此，攻击者攻击之路在此中断。但如前所述，包含恶意payload的攻击交易已经在Poly Chain成功上链，可被进一步利用。</p>
+<p>第二阶段：</p>
+<p>攻击者手动发起交易，调用EthCrossChainManager合约中的<code>verifyHeaderAndExecuteTx</code>函数，将之前一步保存在Ploy Chain区块中的攻击交易数据作为输入。由于该区块是poly chain上的合法区块，因此可以通过<code>verifyHeaderAndExecuteTx</code>中对于签名和merkle proof的校验。然后执行EthCrossChainData合约中的<code>putCurEpochConPubKeyBytes</code>函数，将原本的4个keeper修改为自己指定的地址。</p>
+</blockquote>
+<p><a href="https://rekt.news/zh/polynetwork-rekt/">Rekt - POLY NETWORK - 翻车</a></p>
+<blockquote>
+<p>来源：<a href="https://rekt.news/zh/polynetwork-rekt/">The initial analysis of the PolyNetwork Hack</a></p>
+<p><strong>“Poly有一个名为”EthCrossChainManager“的合约。它是一个有特权的合约，有权从另一个链上触发消息。这是一个跨链项目的标准配置。</strong></p>
+<p>它有一个名为<strong>verifyHeaderAndExecuteTx</strong>的函数，任何人都可以调用它来执行一个跨链交易。</p>
+<p>它（1）通过检查签名来验证区块头是否正确（似乎另一条链是一个poa侧链），然后（2）通过Merkle证明来检查交易是否包含在该区块中。<a href="https://github.com/polynetwork/eth-contracts/blob/d16252b2b857eecf8e558bd3e1f3bb14cff30e9b/contracts/core/cross_chain_manager/logic/EthCrossChainManager.sol#L127">代码在这里</a>。</p>
+<p>该函数做的最后一件事是调用<strong>executeCrossChainTx</strong>，它对目标合约进行了调用。这就是关键的缺陷所在。<a href="https://github.com/polynetwork/eth-contracts/blob/d16252b2b857eecf8e558bd3e1f3bb14cff30e9b/contracts/core/cross_chain_manager/logic/EthCrossChainManager.sol#L185">Poly检查</a>目标是一个合约，但他们忘记了防止用户调用一个非常重要的目标……**<a href="https://github.com/polynetwork/eth-contracts/blob/master/contracts/core/cross_chain_manager/data/EthCrossChainData.sol">EthCrossChainData**合约</a></p>
+<p>通过发送这个跨链信息，用户可以调用<strong>EthCrossChainData</strong>合约欺骗<strong>EthCrossChainManager</strong>，通过<strong>onlyOwner</strong>检查。现在，用户只需要制作正确的数据，就可以触发改变公钥的函数……</p>
+<p>唯一剩下的挑战是如何让<strong>EthCrossChainData</strong>调用正确的函数。现在，围绕着Solidity如何选择你要调用的函数，出现了一点点的复杂性。</p>
+<p>交易输入数据的前四个字节被称为 “签名哈希”，或简称为 “sighash”。它是一个简短的信息，告诉Solidity合约你要做什么。</p>
+<p>一个函数的sighash是通过取”<function name>(<function input types>)“的哈希值的前四个字节来计算的。例如，ERC20传输函数的sighash是”transfer(address,uint256)“的哈希值的前四个字节。</p>
+<p>Poly的合约愿意调用任何合约。然而，它只会调用与以下sighash相对应的合约函数：</p>
+<p>呃……但是等等……。这里的”**_method**”是用户的输入。攻击者为调用正确的函数所要做的就是找出”_method”的某个值，当它与其他的值结合在一起并经过哈希处理时，它的前四个字节与我们目标函数的sighash相同。</p>
+<p>只要稍加琢磨，你就能轻易地找到一些能产生正确sighash的输入。你不需要找到一个完整的哈希碰撞，你只需要检查前四个字节。那么这个理论是否正确呢？</p>
+<p>嗯……这里是目标函数的实际sighash：</p>
+<blockquote>
+<p>ethers.utils.id(‘putCurEpochConPubKeyBytes(bytes)’).slice(0, 10)</p>
+</blockquote>
+<p>‘0x41973cd9’</p>
+<p>而攻击者精心制作的sighash…</p>
+<blockquote>
+<p>ethers.utils.id(‘f1121318093(bytes,bytes,uint64)’).slice(0, 10)</p>
+</blockquote>
+<p>‘0x41973cd9’</p>
+<p><strong>太棒了。不需要泄露私钥！只要制作正确的数据，然后……合约就会自己黑掉了！</strong></p>
+<p>人们需要从中吸取的最大的设计教训之一是：如果你有像这样的跨链中继合约，<strong>确保它们不能被用来调用特殊的合约</strong>。<strong>EthCrossDomainManager</strong>不应该拥有<strong>EthCrossDomainData</strong>合约。</p>
+<p>分别关注。如果你的合约绝对需要有这样的特殊权限，请确保用户不能使用跨链消息来调用这些特殊合约。”</p>
+</blockquote>
+<h2 id="分析-2"><a href="#分析-2" class="headerlink" title="分析"></a>分析</h2><p>关于这个攻击事件，网上分析文章比较多，我就在此简单总结分析一下。</p>
+<p>根据网上的分析，黑客攻击流程大致分为3步：</p>
+<ol>
+<li>黑客首先Ontology链上发起了一笔恶意的跨链交易，这笔交易虽然被Ethereum拒绝，但成功在Poly Chain上链。</li>
+<li>黑客手动调用Ethereum上EthCrossChainManager合约的<code>verifyHeaderAndExecuteTx</code>函数，传入第1步中的恶意交易。由于EthCrossChainManager合约是EthCrossChainData行业的owner，黑客可以通过EthCrossChainManager合约成功调用EthCrossChainData合约的<code>putCurEpochConPubKeyBytes</code>函数，将跨链验证人修改为它传入地址。</li>
+<li>由于跨链验证人被修改，黑客可以伪造任意跨链交易，将资产盗取。</li>
+</ol>
+<p>下文将从第2步开始，主要分析以太坊上的攻击。</p>
+<p>以下是一些重要地址：</p>
+<ul>
+<li>黑客地址：<a href="https://etherscan.io/address/0xc8a65fadf0e0ddaf421f28feab69bf6e2e589963">0xc8a65fadf0e0ddaf421f28feab69bf6e2e589963</a>。</li>
+<li>EthCrossChainManager合约地址：<a href="https://etherscan.io/address/0x838bf9e95cb12dd76a54c9f9d2e3082eaf928270">0x838bf9e95cb12dd76a54c9f9d2e3082eaf928270</a>。以太坊浏览器上没给出源码，源码可参考<a href="https://github.com/polynetwork/eth-contracts/blob/d16252b2b857eecf8e558bd3e1f3bb14cff30e9b/contracts/core/cross_chain_manager/logic/EthCrossChainManager.sol">GitHub</a>。</li>
+<li>EthCrossChainData合约地址：<a href="https://etherscan.io/address/0xcf2afe102057ba5c16f899271045a0a37fcb10f2">0xcf2afe102057ba5c16f899271045a0a37fcb10f2</a>。</li>
+<li>LockProxy合约地址：<a href="https://etherscan.io/address/0x250e76987d838a75310c34bf422ea9f1ac4cc906">0x250e76987d838a75310c34bf422ea9f1ac4cc906</a>。</li>
+</ul>
+<p>以下是黑客当时发起的一些交易。其中，第一笔交易0xb1f7黑客完成了第2步的攻击——修改跨链验证者，之后的交易都是第3步攻击——盗取资产。</p>
+<p><img src="/./%E8%B7%A8%E9%93%BE%E6%A1%A5%E5%90%88%E7%BA%A6%E6%BC%8F%E6%B4%9E%E6%B1%87%E6%80%BB%E5%88%86%E6%9E%90/SCJKrmimageimage_c4HP9dBUkP.png" alt="./跨链桥合约漏洞汇总分析/SCJKrmimageimage_c4HP9dBUkP.png"></p>
+<ol>
+<li><p>分析第一笔交易<a href="https://etherscan.io/tx/0xb1f70464bd95b774c6ce60fc706eb5f9e35cb5f06e6cfe7c17dcda46ffd59581">0xb1f7</a>，它调用了0x838b合约的<code>verifyHeaderAndExecuteTx</code>函数。</p>
+<p> 此处，可以借助以太坊浏览器的<a href="https://etherscan.io/vmtrace?txhash=0xb1f70464bd95b774c6ce60fc706eb5f9e35cb5f06e6cfe7c17dcda46ffd59581&type=parity#decoded">vmtrace</a>功能，如下图，0xcf2a即为EthCrossChainData合约，input中的0x69d48074即为<code>getCurEpochConPubKeyBytes</code>函数的ID（获取合约abi，调用web3.js的<code>w3.eth.abi.encodeFunctionSignature()</code>函数可快速计算出每个合约函数的ID）。</p>
+<p> <img src="/./%E8%B7%A8%E9%93%BE%E6%A1%A5%E5%90%88%E7%BA%A6%E6%BC%8F%E6%B4%9E%E6%B1%87%E6%80%BB%E5%88%86%E6%9E%90/SCJKrmimageimage_bQJWjB8Da8.png" alt="./跨链桥合约漏洞汇总分析/SCJKrmimageimage_bQJWjB8Da8.png"></p>
+<p> 在verifyHeaderAndExecuteTx函数中，由于传入的是Poly Chain中已上链的交易，前面一系列校验都会正常通过，直至调用到<code>_executeCrossChainTx</code>函数，该函数会调用用户指定的合约及函数。</p>
+ <figure class="highlight jsx"><table><tr><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">_executeCrossChainTx</span>(<span class="params">address _toContract, bytes memory _method, bytes memory _args, bytes memory _fromContractAddr, uint64 _fromChainId</span>) internal returns (bool)&#123;</span><br><span class="line">    ...</span><br><span class="line"></span><br><span class="line">    <span class="comment">// The returnData will be bytes32, the last byte must be 01;</span></span><br><span class="line">    (success, returnData) = _toContract.<span class="title function_">call</span>(abi.<span class="title function_">encodePacked</span>(<span class="title function_">bytes4</span>(<span class="title function_">keccak256</span>(abi.<span class="title function_">encodePacked</span>(_method, <span class="string">&quot;(bytes,bytes,uint64)&quot;</span>))), abi.<span class="title function_">encode</span>(_args, _fromContractAddr, _fromChainId)));</span><br><span class="line"></span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p> 黑客正是在通过这段逻辑，调用到EthCrossChainData合约的putCurEpochConPubKeyBytes函数。为了准确调用到该函数，黑客通过哈希碰撞出前四字节相同的函数ID，详情可见网上其它博客的分析。总之，黑客成功调用到了该函数。</p>
+<p> putCurEpochConPubKeyBytes函数需要owner权限。但分析<a href="https://etherscan.io/tx/0x69841100ab5477449dae07c99a4745df014aec11daf01027d870fc1258d1aa3f">0x6984</a>交易的input（如下），可知EthCrossChainData合约的owner是0x838b，也就是EthCrossChainManager合约。</p>
+<p> <img src="/./%E8%B7%A8%E9%93%BE%E6%A1%A5%E5%90%88%E7%BA%A6%E6%BC%8F%E6%B4%9E%E6%B1%87%E6%80%BB%E5%88%86%E6%9E%90/SCJKrmimageimage_ume7T8BM8M.png" alt="./跨链桥合约漏洞汇总分析/SCJKrmimageimage_ume7T8BM8M.png"></p>
+<p> 因此，黑客能通过EthCrossChainManager合约调用到EthCrossChainData合约的函数。</p>
+<p> 再分析交易的<a href="https://etherscan.io/vmtrace?txhash=0xb1f70464bd95b774c6ce60fc706eb5f9e35cb5f06e6cfe7c17dcda46ffd59581&type=parity#decoded">vmtrace</a>，其中第6笔交易如下图。</p>
+<p> <img src="/./%E8%B7%A8%E9%93%BE%E6%A1%A5%E5%90%88%E7%BA%A6%E6%BC%8F%E6%B4%9E%E6%B1%87%E6%80%BB%E5%88%86%E6%9E%90/SCJKrmimageimage_5gcijrQclo.png" alt="./跨链桥合约漏洞汇总分析/SCJKrmimageimage_5gcijrQclo.png"></p>
+<p> 分析input内容：</p>
+ <figure class="highlight jsx"><table><tr><td class="code"><pre><span class="line"><span class="number">0x41973cd9000000000000000000000000000000000000000000000000000000000000006000000000000000000000000000000000000000000000000000000000000000a00000000000000000000000000000000000000000000000000000000000000003000000000000000000000000000000000000000000000000000000000000001d010000000000000014a87fb85a93ca072cd4e5f0d4f178bc831df8a00b0000000000000000000000000000000000000000000000000000000000000000000014e1a18842891f8e82a5e6e5ad0a06d8448fe2f407000000000000000000000000</span></span><br></pre></td></tr></table></figure>
+
+<p> 0x41973cd9即为putCurEpochConPubKeyBytes函数的ID。这个函数只有一个参数，因此只分析第一个参数即可。第一个参数是动态参数，起始位置为第0x60&#x3D;96个字节，长度为0x1d&#x3D;29，值为<code>0x010000000000000014a87fb85a93ca072cd4e5f0d4f178bc831df8a00b</code>。这个值是按照poly的规范进行编码的，可参考ECCUtils合约的serializeKeepers函数。最终，黑客将跨链验证人地址修改为0xa87fb85a93ca072cd4e5f0d4f178bc831df8a00b。</p>
+</li>
+<li><p>分析第二笔交易<a href="https://etherscan.io/tx/0xad7a2c70c958fcd3effbf374d0acf3774a9257577625ae4c838e24b0de17602a">0xad7a</a>。在这笔交易中，黑客盗取了约2857个ETH。</p>
+<p> 这笔交易同样调用了EthCrossChainManager合约的<code>verifyHeaderAndExecuteTx</code>函数，前面的逻辑都与第一交易相同，直到<code>_executeCrossChainTx</code>函数。这笔交易调用了LockProxy合约，合约地址为<a href="https://etherscan.io/address/0x250e76987d838a75310c34bf422ea9f1ac4cc906">0x250e76987d838a75310c34bf422ea9f1ac4cc906</a>。</p>
+<p> 结合<a href="https://etherscan.io/vmtrace?txhash=0xad7a2c70c958fcd3effbf374d0acf3774a9257577625ae4c838e24b0de17602a&type=parity">vmtrace</a>分析，第6项如下：</p>
+<p> <img src="/./%E8%B7%A8%E9%93%BE%E6%A1%A5%E5%90%88%E7%BA%A6%E6%BC%8F%E6%B4%9E%E6%B1%87%E6%80%BB%E5%88%86%E6%9E%90/SCJKrmimageimage_KaTCLaTv4y.png" alt="./跨链桥合约漏洞汇总分析/SCJKrmimageimage_KaTCLaTv4y.png"></p>
+<p> 分析input内容：</p>
+ <figure class="highlight jsx"><table><tr><td class="code"><pre><span class="line"><span class="number">0x06af4b9f000000000000000000000000000000000000000000000000000000000000006000000000000000000000000000000000000000000000000000000000000000e0000000000000000000000000000000000000000000000000000000000000000a000000000000000000000000000000000000000000000000000000000000004a14000000000000000000000000000000000000000014c8a65fadf0e0ddaf421f28feab69bf6e2e5899632662f145d8d496e79a000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001434d4a23a1fc0c694f0d74ddaf9d8d564cfe2d430000000000000000000000000</span></span><br></pre></td></tr></table></figure>
+
+<p> 0x06af4b9f为LockProxy合约的<code>unlock</code>函数，其它参数就不在这里具体分析了，直接分析unlock函数的逻辑。</p>
+<p> 首先，该函数有一个<code>onlyManagerContract</code>修饰器，它通过调用<code>IEthCrossChainManagerProxy</code>合约（地址为：<a href="https://etherscan.io/address/0x5a51e2ebf8d136926b9ca7b59b60464e7c44d2eb">0x5a51e2ebf8d136926b9ca7b59b60464e7c44d2eb</a>），获取EthCrossChainManager合约的地址，并判断交易发送者是否为该合约，显然通过。</p>
+<p> 然后，该函数对参数进行解析和一系列验证，都安全通过了。</p>
+<p> 最后，该函数调用<code>_transferFromContract</code>函数交易代币。在这笔交易中，参数toAssetHash为0x0000000000000000000000000000000000000000，toAddress为0xc8a65fadf0e0ddaf421f28feab69bf6e2e589963（黑客地址），amount为2857486346845890372134（通过查看交易的log可知）。</p>
+<p> <img src="/./%E8%B7%A8%E9%93%BE%E6%A1%A5%E5%90%88%E7%BA%A6%E6%BC%8F%E6%B4%9E%E6%B1%87%E6%80%BB%E5%88%86%E6%9E%90/SCJKrmimageimage_3p4licbxPS.png" alt="./跨链桥合约漏洞汇总分析/SCJKrmimageimage_3p4licbxPS.png"></p>
+</li>
+</ol>
+<h2 id="总结-2"><a href="#总结-2" class="headerlink" title="总结"></a>总结</h2><p>从以太坊合约的角度分析，导致这次攻击事件的原因有：</p>
+<ol>
+<li>参数校验漏洞。根据用户传入的函数名直接进行函数调用，存在哈希碰撞的风险，且未对用户传入的参数做检查。</li>
+<li>可修改存放跨链验证者的合约的owner。owner不应该是另一个合约，应该由多签账户控制。</li>
+<li>监测不及时。在以太坊链上，从owner被黑客修改(2021-08-10 9:48:40)，到最后一笔资产被盗(2021-08-10 10:27:38)，过去将近40分钟，Poly并没有采取任何措施。</li>
+</ol>
+<h1 id="2021年9月pNetwork【1000万美元】"><a href="#2021年9月pNetwork【1000万美元】" class="headerlink" title="2021年9月pNetwork【1000万美元】"></a>2021年9月pNetwork【1000万美元】</h1><h2 id="参考-3"><a href="#参考-3" class="headerlink" title="参考"></a>参考</h2><p>官方文档：<a href="https://medium.com/pnetwork/pnetwork-post-mortem-pbtc-on-bsc-exploit-170890c58d5f">pNetwork Post Mortem: pBTC-on-BSC Exploit</a></p>
+<blockquote>
+<p>这些智能合约创建了一系列事件日志：其中一个是合法的挂起请求，而其他的是攻击者的智能合约而不是pToken智能合约发出的错误挂起请求。</p>
+<p>由于Rust代码中负责提取这些日志事件的部分存在错误，合法日志和错误日志都被提取并错误处理。</p>
+<p>技术团队迅速发现了一个潜在的恶意操作并进行了干预。袭击于世界协调时下午5点30分开始，行为不端于世界协调时间下午5点33分首次被注意到，在世界协调时晚上5点40分，主要桥梁被叫停，到下午5点59分，所有桥梁都被叫停。该团队开始了一项调查，并确定了被利用的漏洞——在对根本原因进行进一步调查和修复的同时，桥梁暂时处于暂停状态。</p>
+</blockquote>
+<p><a href="https://www.defidaonews.com/media/6690448">合约漏洞：pNetwork被黑事件分析</a></p>
+<blockquote>
+<p>整个攻击写在攻击合约的构造函数中，并在攻击完成后调用selfdestruct()函数销毁合约，使得无法看到攻击合约的细节内容。通过交易的事件（Event）并结合PToken合约源码可知，攻击者首先以amount:0，userData:0x，underlyingAssetRecipient:3LngKgsXQAnm5cLP43PZUGGvMau9uUzhky.作为输入数据委托调用redeem函数。</p>
+<p>随后通过攻击合约发送多个Redeem(_msgSender(), amount, underlyingAssetRecipient, userData) event事件。</p>
+<p>触发的redeem事件都是向攻击者的多个比特币地址转账相同数量1.38个左右的bitcoin，这是跨链攻击中重要的环节。</p>
+<p>通过pToken的介绍可知，跨链转账中只是通过查询相关的deposit或redeem事件这种方式来确定btc的转账地址与数量，并没有进行其他的检查！使得黑客利用这一漏洞，在BSC上触发多次redeem事件，窃取大量的BTC。</p>
+</blockquote>
+<h2 id="分析-3"><a href="#分析-3" class="headerlink" title="分析"></a>分析</h2><p>黑客地址：<a href="https://bscscan.com/address/0x2bf5693dd3a5cea1139c4510fdce120cf042c934">0x2bf5693dd3a5cea1139c4510fdce120cf042c934</a></p>
+<p>被攻击合约：</p>
+<ul>
+<li><a href="https://bscscan.com/address/0xed28a457a5a76596ac48d87c0f577020f6ea1c4c">https://bscscan.com/address/0xed28a457a5a76596ac48d87c0f577020f6ea1c4c</a></li>
+<li><a href="https://bscscan.com/address/0xd61372d1c3e0a0925467317425359fb2959fe186">https://bscscan.com/address/0xd61372d1c3e0a0925467317425359fb2959fe186</a></li>
+</ul>
+<p>其中一笔攻击交易：<a href="https://bscscan.com/tx/0xe79e3ff4ef01a29475e6387a44c550df3e4c0a80177249bfdc9bbd66376b9ff6">https://bscscan.com/tx/0xe79e3ff4ef01a29475e6387a44c550df3e4c0a80177249bfdc9bbd66376b9ff6</a></p>
+<h2 id="总结-3"><a href="#总结-3" class="headerlink" title="总结"></a>总结</h2><p>这次事件也属于“虚假存款事件”漏洞，黑客在攻击合约中抛出伪造的Redemm事件，pNetwork不经检查就相信黑客抛出的事件。</p>
+<h1 id="2022年1月Multichain【600万美元】"><a href="#2022年1月Multichain【600万美元】" class="headerlink" title="2022年1月Multichain【600万美元】"></a>2022年1月Multichain【600万美元】</h1><h2 id="参考-4"><a href="#参考-4" class="headerlink" title="参考"></a>参考</h2><p><a href="https://www.tofreedom.me/multichain">Multichain用户资金被盗漏洞分析</a></p>
+<blockquote>
+<p>整个交易的trace挺长的，但是都是在不断调AnyswapV4Router.anySwapOutUnderlyingWithPermit函数，只是传参不同。</p>
+<ol>
+<li>可以看到，攻击者在anySwapOutUnderlyingWithPermit函数里的token参数中传入了攻击者自己部署的恶意合约的地址，在to参数中传入了攻击者自己的地址。</li>
+<li>然后调用了Exp2合约(0xb4f8)的underlying函数，返回的是WETH的地址</li>
+<li>接着，调用WETH的permit(函数不存在)并transferFrom从一个未知地址向Exp2合约转WETH</li>
+<li>最后调用了Exp2合约的depositVault、burn函数，但是这两个函数并不存在</li>
+</ol>
+<p>很明显，又是一个参数可控导致的问题，关键点在于token参数可控，并对token地址进行了函数调用，函数返回指定的地址，然后AnyswapV4Router就会调用这个地址的permit、transferFrom函数。</p>
+<p>这里有个问题是，假设underlying函数返回WETH的地址，WETH合约的permit函数会被调用，但是WETH并没有实现EIP-2612，也就是permit函数</p>
+</blockquote>
+<p><a href="https://s3cunda.github.io/2022/01/27/multichain-%E5%8E%9Fanyswap-2022.1.18%E6%94%BB%E5%87%BB%E4%BA%8B%E4%BB%B6%E5%88%86%E6%9E%90.html">Multichain（原anyswap）2022.1.18攻击事件分析</a></p>
+<blockquote>
+<p>dedaub公司将这一漏洞命名归类为“幻影函数”，也就指的是调用了某一合约没有实现的函数所造成的漏洞。这也是面向对象开发的一个通病，虽然能大大提升开发效率但是同时庞杂的类内函数和方法也会由于开发者考虑不周全而带来安全隐患。</p>
+<p>此次攻击事件的漏洞问题出在没有对传入的参数的地址做鉴别，默认其为AnySwapERC20合约地址，其合法性校验取决于permit函数，但是攻击者利用了fallback的特性，使得其越过了这一合法校验。</p>
+<p>从开发者角度，防范这一漏洞的根本还是在于要做好合法性校验，因为开发者不能约束第三方合约不写fallback函数。所以说凡是通过间接调用合约内验证函数的验证手段都需要考虑用户传入的地址是否是合法地址。针对于此次攻击事件，我本人提出如下补救方案：</p>
+<ol>
+<li>从token处入手，验证token合法性，具体做法可以是写死token地址，如果有多个地址且需要扩展的情况下owner记录一个map(address, bool)的字典，定期更新，每次调用时查询。</li>
+<li>从underlying处入手，由于本例子一个关键点在于没有返回值校验，而多数fallback函数没有返回值，可以为permit函数多设置一个返回值并且校验其返回值合法性，不仅仅以执行过程中的require保证执行正确。</li>
+</ol>
+</blockquote>
+<h2 id="分析-4"><a href="#分析-4" class="headerlink" title="分析"></a>分析</h2><p>一些重要地址：</p>
+<ul>
+<li>黑客(Exploiter1)：<a href="https://etherscan.io/address/0x4986e9017ea60e7afcd10d844f85c80912c3863c">0x4986e9017ea60e7afcd10d844f85c80912c3863c</a></li>
+<li>攻击合约(Exploiter2)：<a href="https://etherscan.io/address/0x7e015972db493d9ba9a30075e397dc57b1a677da">0x7e015972db493d9ba9a30075e397dc57b1a677da</a></li>
+<li>假token合约(Exploiter3)：<a href="https://etherscan.io/address/0xb4f89d6a8c113b4232485568e542e646d93cfab1">0xb4f89d6a8c113b4232485568e542e646d93cfab1</a></li>
+<li>WETH token合约：<a href="https://etherscan.io/address/0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2">0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2</a></li>
+<li>Multichain AnyswapV4Router合约：<a href="https://etherscan.io/address/0x6b7a87899490ece95443e979ca9485cbe7e71522">0x6b7a87899490ece95443e979ca9485cbe7e71522</a></li>
+</ul>
+<p>分析第一笔交易<a href="https://etherscan.io/tx/0xd07c0f40eec44f7674dddf617cbdec4758f258b531e99b18b8ee3b3b95885e7d">0xd07c0f40eec44f7674dddf617cbdec4758f258b531e99b18b8ee3b3b95885e7d</a>，由黑客0x4986发向攻击合约0x7e01，input数据如下：</p>
+<figure class="highlight jsx"><table><tr><td class="code"><pre><span class="line"><span class="number">0x0539154b000000000000000000000000b4f89d6a8c113b4232485568e542e646d93cfab10000000000000000000000000000000000000000000000000000000000000060000000000000000000000000c02aaa39b223fe8d0a0e5c4f27ead9083c756cc200000000000000000000000000000000000000000000000000000000000000320000000000000000000000007f4bae93c21b03836d20933ff55d9f77e5b8d34d000000000000000000000000489c9a3d952fd25541c4d5f2a5f626fb085f347800000000000000000000000038b807a474553d3f5eb3e93b3927383fbe4bb2a7000000000000000000000000e7fb823ae52982d6aa26f95434ad912110c672470000000000000000000000004745e902a6bef9d044c0ff89b0c2ed6877c2a137000000000000000000000000bb150bc7f3ba780553abaefd0421482d0a9cb53a</span>....</span><br></pre></td></tr></table></figure>
+
+<p>根据<a href="https://etherscan.io/bytecode-decompiler?a=0x7e015972db493d9ba9a30075e397dc57b1a677da">etherscan反编译0x7e01合约后的结果</a>，找到0x0539154b函数，有三个参数：<code>(addr _param1, array _param2, addr _param3)</code>。再分析input数据中的函数参数：</p>
+<ul>
+<li>第一个参数为<code>0xb4f89d6a8c113b4232485568e542e646d93cfab1</code>，是攻击合约Exploiter3的地址；</li>
+<li>第二个参数是一个地址数组，长度为50，值为<code>[0x7f4b..., 0x489c..., ......]</code>；</li>
+<li>第三个参数为<code>0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2</code>，即WETH token合约的地址。</li>
+</ul>
+<p><img src="/./%E8%B7%A8%E9%93%BE%E6%A1%A5%E5%90%88%E7%BA%A6%E6%BC%8F%E6%B4%9E%E6%B1%87%E6%80%BB%E5%88%86%E6%9E%90/SCJKrmimageimage_Zv1FWTji4G.png" alt="./跨链桥合约漏洞汇总分析/SCJKrmimageimage_Zv1FWTji4G.png"></p>
+<p>0x0539154b函数的逻辑可以结合<a href="https://etherscan.io/tx-decoder?tx=0xd07c0f40eec44f7674dddf617cbdec4758f258b531e99b18b8ee3b3b95885e7d">tx-decoder</a>（如上图）来分析：</p>
+<ol>
+<li>调用<code>_param1.0xad5c04f</code>函数，传入<code>_param3</code>。_param1是Exploiter3合约0xb4f8，_param3是WETH token合约0xc02a。此处就不去分析Exploiter3合约了，作用是大概是把0xc02a保存到合约中。</li>
+<li>进入一个while循环，遍历<code>_param2</code>中的每个地址addr。在第一次循环中，addr为数组第一个元素0x7F4bae93C21b03836D20933ff55D9F77e5B8d34D。这是授权Anyswap使用WETH代币的某个冤种用户（钱就这样被盗取了），下文将以0x7F4b这个地址为例进行分析。</li>
+</ol>
+<p>循环主体的逻辑如下：</p>
+<ol>
+<li>首先，调用<code>_param3.allowance</code>函数，获取用户0x7F4b授权AnyswapV4Router合约0x6b7a提取WETH token的限额。</li>
+<li>调用<code>_param3.balanceOf</code>函数，获取用户0x7F4b的WETH余额。</li>
+<li>调用AnyswapV4Router合约0x6b7a的0x8d7d3eea函数，即<code>anySwapOutUnderlyingWithPermit</code>函数。传入该函数的各参数，可参考下图。</li>
+</ol>
+<p><img src="/./%E8%B7%A8%E9%93%BE%E6%A1%A5%E5%90%88%E7%BA%A6%E6%BC%8F%E6%B4%9E%E6%B1%87%E6%80%BB%E5%88%86%E6%9E%90/SCJKrmimageimage_ePQG7U5jzP.png" alt="./跨链桥合约漏洞汇总分析/SCJKrmimageimage_ePQG7U5jzP.png"></p>
+<p>继续分析<code>anySwapOutUnderlyingWithPermit</code>函数：</p>
+<ol>
+<li><p>首先调用token合约的<code>underlying</code>函数，此处token值为0xB4f89D6a8C113b4232485568e542e646D93cFAB1，即Exploiter3合约。调用返回结果为WETH合约的地址0xc02a。</p>
+</li>
+<li><p>调用WETH合约的<code>permit</code>函数。</p>
+ <aside>
+ 💡 permit由EIP-2612提出，是对erc20的补充，主要是解决用户在无gas费用的情况下，可以通过发布签名委托其他人帮助其进行授权
+
+ </aside>
+
+<p> <strong>由于WETH未实现permit函数，则调用了其fallback函数，进而调用deposit函数（如下），返回成功。</strong></p>
+ <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">function() public payable &#123;</span><br><span class="line">    deposit();</span><br><span class="line">&#125;</span><br><span class="line">function deposit() public payable &#123;</span><br><span class="line">    balanceOf[msg.sender] += msg.value;</span><br><span class="line">    Deposit(msg.sender, msg.value);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>将冤种用户0x7F4b的所有剩余WETH代币，转移到token合约，即Exploiter3合约0xb4f8。</p>
+<p> <img src="/./%E8%B7%A8%E9%93%BE%E6%A1%A5%E5%90%88%E7%BA%A6%E6%BC%8F%E6%B4%9E%E6%B1%87%E6%80%BB%E5%88%86%E6%9E%90/SCJKrmimageimage_qbb1xoPSWI.png" alt="./跨链桥合约漏洞汇总分析/SCJKrmimageimage_qbb1xoPSWI.png"></p>
+</li>
+<li><p>调用Exploiter3合约的<code>depositVault</code>和<code>burn</code>函数。在Exploiter3合约中，这两个函数都直接返回true，没啥作用。</p>
+</li>
+</ol>
+<p>至此，黑客成功盗取用户0x7F4b的所有WETH代币，进入下一个循环，盗取用户0x489C9a3D952Fd25541c4d5f2a5F626fb085F3478的WETH代币，直到循环结束。</p>
+<h2 id="总结-4"><a href="#总结-4" class="headerlink" title="总结"></a>总结</h2><p>就像参考博客中所说，导致这次事件的原因如下：</p>
+<ol>
+<li>参数未严格校验。未校验用户传入的合约地址，就直接进行调用。</li>
+<li>调用关键函数而未检查返回值。</li>
+</ol>
+<h1 id="2022年1月QBridge【8000万美元】"><a href="#2022年1月QBridge【8000万美元】" class="headerlink" title="2022年1月QBridge【8000万美元】"></a>2022年1月QBridge【8000万美元】</h1><h2 id="参考-5"><a href="#参考-5" class="headerlink" title="参考"></a>参考</h2><p>官方文档：<a href="https://medium.com/@QubitFin/protocol-exploit-report-305c34540fa3">Protocol Exploit Report</a></p>
+<p><a href="https://learnblockchain.cn/article/3649">细节决定成败：QBridge被黑事件分析 | 登链社区 | 区块链技术社区 (learnblockchain.cn)</a></p>
+<blockquote>
+<p>4.账户0xeb645b4c35cf160e47f0a49c03db087c421ab545在攻击者发起deposit交易后，在BSC网络中先后连续发起了多次Vote<br>Proposal交易（调用voteProposal函数），铸造了大量的xETH Token.</p>
+<p>但实际上攻击者并没有存入任何Token，这些xETH完全是凭空铸造出来的。</p>
+<p>5.攻击者在BSC网络中以凭空铸造的大量的xETH作为抵押物，从Qubit合约中借出了其中的Token。</p>
+</blockquote>
+<p><a href="https://blog.csdn.net/Timmbe/article/details/123674641">qubit 攻击分析_放牛日记的博客-CSDN博客</a></p>
+<blockquote>
+<p>设置0地址白名单交易：<a href="https://etherscan.io/tx/0xe3da555d506638bd7b697c0bdf7920be8defc9a175cd35bf72fb10bc77167b66">https://etherscan.io/tx/0xe3da555d506638bd7b697c0bdf7920be8defc9a175cd35bf72fb10bc77167b66</a></p>
+<p>在合约QBridge中有函数<code>deposit</code>和<code>depositETH</code>代码功能几乎相同，分别调用QBridgeHandler的<code>deposit</code>和<code>depositETH</code>，但handler中函数<code>deposit</code>未校验tokenaddress地址是否为合约(同时将地址0x000000000…00设置为默认eth地址)，导致在调用<code>tokenAddress.safeTransferFrom(depositer, address(this), amount);</code>时，由于 tokenAddress 地址为 0 地址，而 call 调用无 code size 的地址时其执行结果都会为 true。最后触发了Deposit事件，跨链铸造了大量qXETH。</p>
+</blockquote>
+<p><a href="https://rekt.news/zh/qubit-rekt/">Rekt - Qubit Finance - 翻车</a></p>
+<blockquote>
+<p>来自Qubit团队的事后总结：</p>
+<ol>
+<li>攻击者在以太坊网络上调用QBridge存款功能，该功能调用存款函数QBridgeHandler。</li>
+<li>QBridgeHandler应该收到WETH代币，也就是原来的tokenAddress，如果执行交易的人没有WETH代币，就不应该发生转账。</li>
+<li>tokenAddress.safeTransferFrom(Deposit, address(this), amount)。</li>
+<li>在上面的代码中，tokenAddress是0，所以safeTransferFrom没有失败，无论金额多少，存款函数都正常结束。</li>
+<li>此外，tokenAddress在加入depositETH之前是WETH地址，但随着depositETH的加入，它被替换为零地址，也就是ETH的tokenAddress。</li>
+<li>总而言之，在depositETH新开发后，存款功能是一个不应该使用的功能，但它仍然留在合约中。</li>
+</ol>
+<p>根据Certik的<a href="https://certik.medium.com/qubit-bridge-collapse-exploited-to-the-tune-of-80-million-a7ab9068e1a0">分析</a>：</p>
+<blockquote>
+<p>漏洞的根源之一是tokenAddress.safeTransferFrom()在tokenAddress为零（空）地址（0x0…000）时没有回退。</p>
+</blockquote>
+<p>尽管在以太坊合约中没有锁定任何ETH，但攻击者的BSC地址现在可以获得<a href="https://medium.com/@QubitFin/protocol-exploit-report-305c34540fa3">77162个qXETH</a>（价值1.85亿美元），作为Qubit上贷款的抵押品。</p>
+<p>他们用该抵押品来借WETH，BTC-B，美元稳定币，以及CAKE，BUNNY和MDX，然后把所有币换成20万个BNB（约8000万美元），这些钱仍然在<a href="https://certik.medium.com/qubit-bridge-collapse-exploited-to-the-tune-of-80-million-a7ab9068e1a0">BSC地址</a>中。</p>
+</blockquote>
+<h2 id="分析-5"><a href="#分析-5" class="headerlink" title="分析"></a>分析</h2><p>黑客ETH地址：<a href="https://etherscan.io/address/0xd01ae1a708614948b2b5e0b7ab5be6afa01325c7">0xd01ae1a708614948b2b5e0b7ab5be6afa01325c7</a></p>
+<p>黑客BSC地址：<a href="https://bscscan.com/address/0xd01ae1a708614948b2b5e0b7ab5be6afa01325c7">0xd01ae1a708614948b2b5e0b7ab5be6afa01325c7</a></p>
+<p>ETH上的被攻击合约：</p>
+<ul>
+<li>QBridge代理合约：<a href="https://etherscan.io/address/0x20e5e35ba29dc3b540a1aee781d0814d5c77bce6#code">0x20e5e35ba29dc3b540a1aee781d0814d5c77bce6</a></li>
+<li>QBridge逻辑合约：<a href="https://etherscan.io/address/0x99309d2e7265528dc7c3067004cc4a90d37b7cc3">0x99309d2e7265528dc7c3067004cc4a90d37b7cc3</a></li>
+<li>QBridgeHandler代理合约：<a href="https://etherscan.io/address/0x17b7163cf1dbd286e262ddc68b553d899b93f526">0x17b7163cf1dbd286e262ddc68b553d899b93f526</a></li>
+<li>QBridgeHandler逻辑合约：<a href="https://etherscan.io/address/0x80d1486ef600cc56d4df9ed33baf53c60d5a629b">0x80d1486ef600cc56d4df9ed33baf53c60d5a629b</a></li>
+</ul>
+<p>黑客发起的攻击交易如下：</p>
+<p><img src="/./%E8%B7%A8%E9%93%BE%E6%A1%A5%E5%90%88%E7%BA%A6%E6%BC%8F%E6%B4%9E%E6%B1%87%E6%80%BB%E5%88%86%E6%9E%90/SCJKrmimageimage_Bd46eklHlp.png" alt="./跨链桥合约漏洞汇总分析/SCJKrmimageimage_Bd46eklHlp.png"></p>
+<p>前两笔交易是正常交易，并成功完成跨链。在BSC链的<a href="https://bscscan.com/tx/0x8c5877d1b618f29f6a3622cb610ace08ca96e04d8218f587072a3f91e8545bdc">0x8c58</a>和<a href="https://bscscan.com/tx/0x881a68c9c9aa36590e41dc65ca260decdce7d18dff365067cb592d3a8d0733ef">0x881a</a>这两笔交易中，黑客<a href="https://bscscan.com/address/0xd01ae1a708614948b2b5e0b7ab5be6afa01325c7">0xd01a</a>分别获得了0.1个qXETH。这是黑客在进行尝试吗？</p>
+<p>后续的交易就是黑客发起的攻击交易了，我们从第三笔交易<a href="https://etherscan.io/tx/0xac7292e7d0ec8ebe1c94203d190874b2aab30592327b6cc875d00f18de6f3133">0xac72</a>开始分析。这笔交易由黑客发向QBridge代理合约0x20e5，它会调用逻辑合约0x9930，这些信息可从交易的<a href="https://etherscan.io/vmtrace?txhash=0xac7292e7d0ec8ebe1c94203d190874b2aab30592327b6cc875d00f18de6f3133&type=parity">vmtrace</a>中得知。</p>
+<aside>
+💡 solidity可通过代理模式，实现合约的升级。其核心是delegatecall指令，可以实现状态保存在代理合约中，逻辑保存在逻辑合约中。
+目前流行的代理模式有两种：透明代理模式(TPP, Transparent Proxy Pattern)和通用可升级代理标准(UUPS, Universal Upgradeable Proxy Standard)。 QBridge使用的是TPP透明代理模式。
+
+</aside>
+
+<p>0xac72调用QBridge合约的<code>deposit</code>函数：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">function deposit(uint8 destinationDomainID, bytes32 resourceID, bytes calldata data) external payable notPaused &#123;</span><br><span class="line">    require(msg.value == fee, &quot;QBridge: invalid fee&quot;);</span><br><span class="line"></span><br><span class="line">    address handler = resourceIDToHandlerAddress[resourceID];</span><br><span class="line">    require(handler != address(0), &quot;QBridge: invalid resourceID&quot;);</span><br><span class="line"></span><br><span class="line">    uint64 depositNonce = ++_depositCounts[destinationDomainID];</span><br><span class="line"></span><br><span class="line">    IQBridgeHandler(handler).deposit(resourceID, msg.sender, data);</span><br><span class="line">    emit Deposit(destinationDomainID, resourceID, depositNonce, msg.sender, data);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>它最终调用QBridgeHander合约的<code>deposit</code>函数，代码如下。QBridgeHandler合约也采用了代理模式，逻辑合约在<a href="https://etherscan.io/address/0x80d1486ef600cc56d4df9ed33baf53c60d5a629b">0x80d1</a>。</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">function deposit(bytes32 resourceID, address depositer, bytes calldata data) external override onlyBridge &#123;</span><br><span class="line">    uint option;</span><br><span class="line">    uint amount;</span><br><span class="line">    (option, amount) = abi.decode(data, (uint, uint));</span><br><span class="line"></span><br><span class="line">    address tokenAddress = resourceIDToTokenContractAddress[resourceID];</span><br><span class="line">    require(contractWhitelist[tokenAddress], &quot;provided tokenAddress is not whitelisted&quot;);</span><br><span class="line"></span><br><span class="line">    if (burnList[tokenAddress]) &#123;</span><br><span class="line">        require(amount &gt;= withdrawalFees[resourceID], &quot;less than withdrawal fee&quot;);</span><br><span class="line">        QBridgeToken(tokenAddress).burnFrom(depositer, amount);</span><br><span class="line">    &#125; else &#123;</span><br><span class="line">        require(amount &gt;= minAmounts[resourceID][option], &quot;less than minimum amount&quot;);</span><br><span class="line">        tokenAddress.safeTransferFrom(depositer, address(this), amount);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">...</span><br><span class="line"></span><br><span class="line">function safeTransferFrom(</span><br><span class="line">    address token,</span><br><span class="line">    address from,</span><br><span class="line">    address to,</span><br><span class="line">    uint value</span><br><span class="line">) internal &#123;</span><br><span class="line">    // bytes4(keccak256(bytes(&#x27;transferFrom(address,address,uint256)&#x27;)));</span><br><span class="line">    (bool success, bytes memory data) = token.call(abi.encodeWithSelector(0x23b872dd, from, to, value));</span><br><span class="line">    require(success &amp;&amp; (data.length == 0 || abi.decode(data, (bool))), &quot;!safeTransferFrom&quot;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>data数据可从交易的input中获取，前两个uint分别为<code>0x69</code>和<code>0xa4cc799563c380000 = 190000000000000000000 = 190ETH</code>。</p>
+<figure class="highlight jsx"><table><tr><td class="code"><pre><span class="line">000000000000000000000000000000000000000000000000000000000000006900000000000000000000000000000000000000000000000a4cc799563c380000000000000000000000000000d01ae1a708614948b2b5e0b7ab5be6afa01325c7</span><br></pre></td></tr></table></figure>
+
+<p>tokenAddress为<code>0x0000000000000000000000000000000000000000</code>，<code>safeTransferFrom</code>函数是QBridge自己实现的，其中并没有判断token地址是否为一个合约地址。</p>
+<aside>
+💡 call在调用一个没有code size的地址（也就是非合约地址）时，会直接返回true。
+
+</aside>
+
+<p>最终，黑客一分钱没存，deposit函数也成功执行，并抛出<code>Deposit</code>事件，触发跨链交易。而后，在BSC链上，黑客在交易<a href="https://bscscan.com/tx/0x61ca8bc28f5b2ee87f9a10c3d8fff790658e345a1e407f9e5c3f22b48106ccff">0x61ca</a>中获得了199个qXETH。</p>
+<h2 id="总结-5"><a href="#总结-5" class="headerlink" title="总结"></a>总结</h2><ol>
+<li>在QBridgeHander合约的deposit函数中，地址0不应该包括在合约白名单中。</li>
+<li>call调用之前，应该检查地址是否为合约地址。</li>
+<li>链下应该对抛出的事件进行验证。</li>
+</ol>
+<h1 id="2022年2月Wormhole【1000万美元】"><a href="#2022年2月Wormhole【1000万美元】" class="headerlink" title="2022年2月Wormhole【1000万美元】"></a>2022年2月Wormhole【1000万美元】</h1><p><a href="https://www.anquanke.com/post/id/275550#h2-1">https://www.anquanke.com/post/id/275550#h2-1</a></p>
+<blockquote>
+<p>管理员不仅需要通过调用原实现合约B中的upgradeToAndCall函数通过新实现合约 B’ 中的initialize函数更改A存储中的upgrader变量（第一步），同时也需要额外在外部独立调用一次initialize函数更改 B’ 存储中的upgrader变量（第二步）。</p>
+<p>在缺少第2步的情况下，相当于是代理合约A被正确的初始化了，用户无法通过代理合约A进行任何恶意的行为，但是 B’<br>没有做任何的初始化，用户仍旧可以直接调用B’ 的初始化函数initialize，将 B’ 的存储中的upgrader更新为自己，通过控制 B’<br>的升级行为去调用自毁操作实现将 B’ 合约销毁的操作，使得A合约所指向的实现合约 B’ 消失了，代理A合约所剩下的数据存储也将没有任何用处。</p>
+<p>Wormhole负责更新与鉴权的具体逻辑与上文所描述的思路来说稍复杂。其负责实现UUPS标准upgradeToAndCall函数实际名称为submitContractUpgrade，并且鉴权时使用了parseVM等与自定义虚拟机相关的操作。<br>在实现合约中，initialize负责对管理员变量进行初始化。</p>
+<p>Wormhole在上一次调用submitContractUpgrade()更新在区块高度13818843（2021年12月16日），之后实际合约B’<br>始终处于未初始化的状态。</p>
+<p>攻击者可以未授权调用实际合约B’ 的初始化函数initialize( )获取 B’ 合约管理员权限，随后凭借所获得的管理员权限恶意地调用更新函数submitContractUpgrade()，该更新函数中的delegatecall允许执行攻击者指定的任意代码，其中危害最大的是执行selfdestruct让实际合约 B’ 自毁，使得Wormhole项目中的资产被冻结。</p>
+<p>Wormhole项目方在高度14269474（2022年2月24日）调用了初始化函数后修复了该问题。修复交易：<a href="https://etherscan.io/tx/0x9acb2b580aba4f5be75366255800df5f62ede576619cb5ce638cedc61273a50f">https://etherscan.io/tx/0x9acb2b580aba4f5be75366255800df5f62ede576619cb5ce638cedc61273a50f</a></p>
+</blockquote>
+<p>代理合约：<a href="https://etherscan.io/address/0x98f3c9e6E3fAce36bAAd05FE09d375Ef1464288B">https://etherscan.io/address/0x98f3c9e6E3fAce36bAAd05FE09d375Ef1464288B</a></p>
+<p>逻辑合约：<a href="https://etherscan.io/address/0x736D2A394f7810C17b3c6fEd017d5BC7D60c077d">https://etherscan.io/address/0x736D2A394f7810C17b3c6fEd017d5BC7D60c077d</a></p>
+<p>总结：采用UUPS代理模式，调用代理合约完成初始化后，一定要再调用逻辑合约进行初始化！！！</p>
+<h1 id="2022年2月Meter【440万美元】"><a href="#2022年2月Meter【440万美元】" class="headerlink" title="2022年2月Meter【440万美元】"></a>2022年2月Meter【440万美元】</h1><h2 id="参考-6"><a href="#参考-6" class="headerlink" title="参考"></a>参考</h2><p><a href="https://rekt.news/zh/meter-rekt/">METER - 翻车</a></p>
+<p><a href="https://news.marsbit.co/20220210104924432715.html">知道创宇区块链安全实验室｜Meter.io 攻击事件分析_MarsBit</a></p>
+<blockquote>
+<p>漏洞关键在于跨链桥合约的 deposit 函数中，deposit 函数会根据 resourceID 取相应的depositHandler合约，并调用合约中的 deposit 函数进行实际的质押逻辑。</p>
+<p>而在 depositHandler 合约的 deposit 函数中，存在逻辑缺陷，当 tokenAddress 不为 _wtokenAddress 地址时进行 ERC20 代币的销毁或锁定，若为 _wtokenAddress 则直接跳过该部分处理。</p>
+<p>该存在缺陷的逻辑判断可能基于在跨链桥合约中的depositETH函数会将链平台币转为wToken后转至depositHandler地址，所以在depositHandler执行deposit逻辑时，已处理过代币转移，故跳过代币处理逻辑。</p>
+<p>但跨链桥合约的deposit函数中并没有处理代币转移及校验，在转由deposiHandler执行deposit时，若data数据构造成满足tokenAddress &#x3D;&#x3D; _wtokenAddress即可绕过处理，实现空手套白狼。</p>
+</blockquote>
+<p><a href="https://zhuanlan.zhihu.com/p/464789562">跨链桥Meter.io被攻击事件分析</a></p>
+<blockquote>
+<p>虚假存款:</p>
+<ul>
+<li><a href="https://link.zhihu.com/?target=https://bscscan.com/tx/0x63f37aff7e40b85b0a6b3fd414389f6011cc09b276dc8e13b6afa19061f7ed8e">https://bscscan.com/tx/0x63f37aff7e40b85b0a6b3fd414389f6011cc09b276dc8e13b6afa19061f7ed8e</a></li>
+<li><a href="https://link.zhihu.com/?target=https://etherscan.io/tx/0x2d3987963b77159cfe4f820532d729b0364c7f05511f23547765c75b110b629c">https://etherscan.io/tx/0x2d3987963b77159cfe4f820532d729b0364c7f05511f23547765c75b110b629c</a></li>
+<li><a href="https://link.zhihu.com/?target=https://bscscan.com/tx/0xc7eb98e00d21ec2025fd97b8a84af141325531c0b54aacc37633514f2fd8ffdc">https://bscscan.com/tx/0xc7eb98e00d21ec2025fd97b8a84af141325531c0b54aacc37633514f2fd8ffdc</a></li>
+<li><a href="https://link.zhihu.com/?target=https://etherscan.io/tx/0xdfea6413c7eb3068093dcbbe65bcc9ba635e227c35e57fe482bb5923c89e31f7">https://etherscan.io/tx/0xdfea6413c7eb3068093dcbbe65bcc9ba635e227c35e57fe482bb5923c89e31f7</a></li>
+<li><a href="https://link.zhihu.com/?target=https://bscscan.com/tx/0x5d7cd17bfeb944390667c76f4fc2786f748dc3eb363c01c24b92becaaf5690b4">https://bscscan.com/tx/0x5d7cd17bfeb944390667c76f4fc2786f748dc3eb363c01c24b92becaaf5690b4</a></li>
+</ul>
+<p>铸币:</p>
+<ul>
+<li><a href="https://link.zhihu.com/?target=https://bscscan.com/tx/0xf70b4aa715c0a04079c56cd9036cc63cdb6101e400520a8f2c019ad2ced5358e">https://bscscan.com/tx/0xf70b4aa715c0a04079c56cd9036cc63cdb6101e400520a8f2c019ad2ced5358e</a></li>
+<li><a href="https://link.zhihu.com/?target=https://moonriver.moonscan.io/tx/0x689ff22ebf7f7aa6ecf0d60345979855442a09dfb7439c8553b2369e6e130409">https://moonriver.moonscan.io/tx/0x689ff22ebf7f7aa6ecf0d60345979855442a09dfb7439c8553b2369e6e130409</a></li>
+<li><a href="https://link.zhihu.com/?target=https://etherscan.io/tx/0xd619ace8a8cca2f7eb72dbc0a896fc2d4d8b20aa11f4d747f1a5333305bbb875">https://etherscan.io/tx/0xd619ace8a8cca2f7eb72dbc0a896fc2d4d8b20aa11f4d747f1a5333305bbb875</a></li>
+<li><a href="https://link.zhihu.com/?target=https://moonriver.moonscan.io/tx/0xc7f764644e9af42714d98763b7e8dcf5e1de6b855b63e2c6ff2438e09b61ccc7">https://moonriver.moonscan.io/tx/0xc7f764644e9af42714d98763b7e8dcf5e1de6b855b63e2c6ff2438e09b61ccc7</a></li>
+</ul>
+<p><strong>步骤一：</strong>攻击者调用<code>Bridge.deposit()</code>函数，将0.008BNB存入连接到多个链的合约Bridge，包括币安智能链、以太坊以及Moonriver（两次）。</p>
+<p><strong>步骤三：</strong>由于输入的resourceID是<code>0x000000000000bb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c01</code>，token地址将为<code>0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c</code>，这与<code>_wtokenAddress</code>相同。</p>
+<p>一般来说deposit()用于ERC20代币的存款，depositETH()用于WETH&#x2F;WBNB代币的存款。Bridge合约提供了两个方法：deposit()和 depositETH()。然而，这两个方法造成了相同事件，并且deposit()函数并没有阻止WETH&#x2F;WBNB的存款交易，因为deposit()没有烧毁或锁定WETH&#x2F;WBNB。黑客通过使用deposit()来制作假的存款事件，在没有任何真实存款的情况下，将WETH&#x2F;WBNB存入。</p>
+</blockquote>
+<h2 id="分析-6"><a href="#分析-6" class="headerlink" title="分析"></a>分析</h2><p>黑客：</p>
+<ul>
+<li><a href="https://bscscan.com/address/0x8d3d13cac607B7297Ff61A5E1E71072758AF4D01">https://bscscan.com/address/0x8d3d13cac607B7297Ff61A5E1E71072758AF4D01</a></li>
+<li><a href="https://etherscan.io/address/0x8d3d13cac607b7297ff61a5e1e71072758af4d01">https://etherscan.io/address/0x8d3d13cac607b7297ff61a5e1e71072758af4d01</a></li>
+<li><a href="https://moonriver.moonscan.io/address/0x8d3d13cac607B7297Ff61A5E1E71072758AF4D01">https://moonriver.moonscan.io/address/0x8d3d13cac607B7297Ff61A5E1E71072758AF4D01</a></li>
+</ul>
+<p>被攻击合约：</p>
+<ul>
+<li>Bridge:<ul>
+<li><a href="https://bscscan.com/address/0xfd55ebc7bbde603a048648c6eab8775c997c1001">https://bscscan.com/address/0xfd55ebc7bbde603a048648c6eab8775c997c1001</a></li>
+<li><a href="https://etherscan.io/address/0xa2a22b46b8df38cd7c55e6bf32ea5a32637cf2b1">https://etherscan.io/address/0xa2a22b46b8df38cd7c55e6bf32ea5a32637cf2b</a></li>
+</ul>
+</li>
+<li>ERC20Handler:<ul>
+<li><a href="https://bscscan.com/address/0x5945241bbb68b4454bb67bd2b069e74c09ac3d51">https://bscscan.com/address/0x5945241bbb68b4454bb67bd2b069e74c09ac3d51</a></li>
+<li><a href="https://etherscan.io/address/0xde4fc7c3c5e7be3f16506fcc790a8d93f8ca0b40">https://etherscan.io/address/0xde4fc7c3c5e7be3f16506fcc790a8d93f8ca0b40</a></li>
+</ul>
+</li>
+</ul>
+<p>此次攻击事件涉及多条链（ETH、BSC、moonriver），而且涉及跨链转账，导致一开始分析有点懵。</p>
+<p>先看黑客在ETH上发起的攻击，有如下两笔交易：</p>
+<p><img src="/./%E8%B7%A8%E9%93%BE%E6%A1%A5%E5%90%88%E7%BA%A6%E6%BC%8F%E6%B4%9E%E6%B1%87%E6%80%BB%E5%88%86%E6%9E%90/SCJKrmimageimage_jI7pPcWWJi.png" alt="./跨链桥合约漏洞汇总分析/SCJKrmimageimage_jI7pPcWWJi.png"></p>
+<ol>
+<li><p>分析第一笔交易<a href="https://etherscan.io/tx/0x2d3987963b77159cfe4f820532d729b0364c7f05511f23547765c75b110b629c">0x2d39</a>，它调用Bridge合约<a href="https://etherscan.io/address/0xa2a22b46b8df38cd7c55e6bf32ea5a32637cf2b1">0xa2A2</a>的<code>deposit</code>函数，input数据解析后：</p>
+<ul>
+<li>destinationChainID为1，<strong>根据后文分析，1指代以太坊</strong>，这笔跨链交易是以太坊跨以太坊。</li>
+<li>resourceID为0x0000000000000000000000c02aaa39b223fe8d0a0e5c4f27ead9083c756cc201。</li>
+<li>data为：<br> <code>javascript 000000000000000000000000000000000000000000000016e77c77f5de41f3a4 0000000000000000000000000000000000000000000000000000000000000014 8d3d13cac607b7297ff61a5e1e71072758af4d01</code></li>
+</ul>
+</li>
+<li><p>分析Bridge合约deposit函数。</p>
+ <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">function deposit(uint8 destinationChainID, bytes32 resourceID, bytes calldata data) external payable whenNotPaused &#123;</span><br><span class="line">    uint256 fee = _getFee(destinationChainID);</span><br><span class="line"></span><br><span class="line">    require(msg.value == fee, &quot;Incorrect fee supplied&quot;);</span><br><span class="line"></span><br><span class="line">    address handler = _resourceIDToHandlerAddress[resourceID];</span><br><span class="line">    require(handler != address(0), &quot;resourceID not mapped to handler&quot;);</span><br><span class="line"></span><br><span class="line">    uint64 depositNonce = ++_depositCounts[destinationChainID];</span><br><span class="line">    _depositRecords[depositNonce][destinationChainID] = data;</span><br><span class="line"></span><br><span class="line">    IDepositExecute depositHandler = IDepositExecute(handler);</span><br><span class="line">    depositHandler.deposit(resourceID, destinationChainID, depositNonce, msg.sender, data);</span><br><span class="line"></span><br><span class="line">    emit Deposit(destinationChainID, resourceID, depositNonce);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p> 它先根据resourceID获取handler合约地址，此处为ERC20Handler合约地址<a href="https://etherscan.io/address/0xde4fc7c3c5e7be3f16506fcc790a8d93f8ca0b40">0xde4f</a>；再调用ERC20Handler合约的<code>deposit</code>函数。</p>
+</li>
+<li><p>分析ERC20Handler合约的deposit函数。</p>
+ <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">/**</span><br><span class="line">    @notice A deposit is initiatied by making a deposit in the Bridge contract.</span><br><span class="line">    @param destinationChainID Chain ID of chain tokens are expected to be bridged to.</span><br><span class="line">    @param depositNonce This value is generated as an ID by the Bridge contract.</span><br><span class="line">    @param depositer Address of account making the deposit in the Bridge contract.</span><br><span class="line">    @param data Consists of: &#123;resourceID&#125;, &#123;amount&#125;, &#123;lenRecipientAddress&#125;, and &#123;recipientAddress&#125;</span><br><span class="line">    all padded to 32 bytes.</span><br><span class="line">    @notice Data passed into the function should be constructed as follows:</span><br><span class="line">    amount                      uint256     bytes   0 - 32</span><br><span class="line">    recipientAddress length     uint256     bytes  32 - 64</span><br><span class="line">    recipientAddress            bytes       bytes  64 - END</span><br><span class="line">    @dev Depending if the corresponding &#123;tokenAddress&#125; for the parsed &#123;resourceID&#125; is</span><br><span class="line">    marked true in &#123;_burnList&#125;, deposited tokens will be burned, if not, they will be locked.</span><br><span class="line"> */</span><br><span class="line">function deposit(</span><br><span class="line">    bytes32 resourceID,</span><br><span class="line">    uint8   destinationChainID,</span><br><span class="line">    uint64  depositNonce,</span><br><span class="line">    address depositer,</span><br><span class="line">    bytes   calldata data</span><br><span class="line">) external override onlyBridge &#123;</span><br><span class="line">    bytes   memory recipientAddress;</span><br><span class="line">    uint256        amount;</span><br><span class="line">    uint256        lenRecipientAddress;</span><br><span class="line"></span><br><span class="line">    assembly &#123;</span><br><span class="line"></span><br><span class="line">        amount := calldataload(0xC4)</span><br><span class="line"></span><br><span class="line">        recipientAddress := mload(0x40)</span><br><span class="line">        lenRecipientAddress := calldataload(0xE4)</span><br><span class="line">        mstore(0x40, add(0x20, add(recipientAddress, lenRecipientAddress)))</span><br><span class="line"></span><br><span class="line">        calldatacopy(</span><br><span class="line">            recipientAddress, // copy to destinationRecipientAddress</span><br><span class="line">            0xE4, // copy from calldata @ 0x104</span><br><span class="line">            sub(calldatasize(), 0xE) // copy size (calldatasize - 0x104)</span><br><span class="line">        )</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    address tokenAddress = _resourceIDToTokenContractAddress[resourceID];</span><br><span class="line">    require(_contractWhitelist[tokenAddress], &quot;provided tokenAddress is not whitelisted&quot;);</span><br><span class="line"></span><br><span class="line">    // ether case, the weth already in handler, do nothing</span><br><span class="line">    if (tokenAddress != _wtokenAddress) &#123;</span><br><span class="line">        if (_burnList[tokenAddress]) &#123;</span><br><span class="line">            burnERC20(tokenAddress, depositer, amount);</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">            lockERC20(tokenAddress, depositer, address(this), amount);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    _depositRecords[destinationChainID][depositNonce] = DepositRecord(</span><br><span class="line">        tokenAddress,</span><br><span class="line">        uint8(lenRecipientAddress),</span><br><span class="line">        destinationChainID,</span><br><span class="line">        resourceID,</span><br><span class="line">        recipientAddress,</span><br><span class="line">        depositer,</span><br><span class="line">        amount</span><br><span class="line">    );</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p> 根据函数注释，可以解析data中数据：</p>
+<ul>
+<li>amount为<code>0x16e77c77f5de41f3a4 = 422508708639363200424 wei = 422 ETH</code>。</li>
+<li>recipientAddress length为<code>0x14=20</code>。</li>
+<li>recipientAddress为<code>0x8d3d13cac607b7297ff61a5e1e71072758af4d01</code>。</li>
+</ul>
+<p> 根据resourceID可得到tokenAddress为<code>0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2</code>，其实就是resourceID去掉结尾的<code>01</code>，这个地址为<a href="https://etherscan.io/address/0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2">WETH token合约地址</a>。</p>
+<p> 同时，由于 <code>_wtokenAddress</code>也等于WETH token合约地址，if语句被跳过，直接保存存款记录。存款记录中：</p>
+<ul>
+<li>tokenAddress为WETH token地址0xc02a。</li>
+<li>lenRecipientAddress为0x14。</li>
+<li>destinationChainID为1，以太坊。</li>
+<li>resourceID为<code>0x0000000000000000000000c02aaa39b223fe8d0a0e5c4f27ead9083c756cc201</code>。</li>
+<li>recipientAddress为0x8d3d13cac607b7297ff61a5e1e71072758af4d01，即黑客地址。</li>
+<li>depositer为交易发起者，也就是黑客地址。</li>
+<li>amount为<code>422508708639363200424 wei = 422 ETH</code>。</li>
+</ul>
+<p> 该函数成功执行，最后返回Bridge合约的deposit函数，<code>Deposit</code>事件被抛出。</p>
+</li>
+<li><p>10分钟后，以太坊上的黑客<a href="https://etherscan.io/address/0x8d3d13cac607b7297ff61a5e1e71072758af4d01#internaltx">0x8d3d</a>收到一笔422ETH的转账，来自交易<a href="https://etherscan.io/tx/0xd619ace8a8cca2f7eb72dbc0a896fc2d4d8b20aa11f4d747f1a5333305bbb875">0xd619</a>。</p>
+<p> <img src="/./%E8%B7%A8%E9%93%BE%E6%A1%A5%E5%90%88%E7%BA%A6%E6%BC%8F%E6%B4%9E%E6%B1%87%E6%80%BB%E5%88%86%E6%9E%90/SCJKrmimage1689671775667_4Jm4Wi_8XT.png" alt="./跨链桥合约漏洞汇总分析/SCJKrmimage1689671775667_4Jm4Wi_8XT.png"></p>
+</li>
+</ol>
+<p>同理，分析黑客在以太坊上发起的第二笔交易<a href="https://etherscan.io/tx/0xdfea6413c7eb3068093dcbbe65bcc9ba635e227c35e57fe482bb5923c89e31f7">0xdfea</a>，大体流程与第一笔相同。不同的是，这笔交易是发到destinationChainID为3的目标链上，数量为<code>0x5150ae84a8cdf00000 = 1500000000000000000000 wei = 1500 ETH</code>。目前，我还没搞清楚ID为3的链是哪条，所以分析不到钱最终去哪了。</p>
+<p>接着，分析BSC链上黑客发起的攻击交易，如下：</p>
+<p><img src="/./%E8%B7%A8%E9%93%BE%E6%A1%A5%E5%90%88%E7%BA%A6%E6%BC%8F%E6%B4%9E%E6%B1%87%E6%80%BB%E5%88%86%E6%9E%90/SCJKrmimageimage_FZBpONgTDB.png" alt="./跨链桥合约漏洞汇总分析/SCJKrmimageimage_FZBpONgTDB.png"></p>
+<p>第一笔交易<a href="https://bscscan.com/tx/0xc4d7e160c7652f2db22681aa2777c5b37937bf30375c5b2c6b2bd172ae984950">0xc4d7</a>是发到ID为3的目标链上，token地址为WMTRG token合约地址<a href="https://bscscan.com/address/0xbd2949f67dcdc549c6ebe98696449fa79d988a9f">0xbd29</a>。此处token地址似乎并不等于<code>_wtokenAddress</code>，这笔攻击交易似乎没有利用成功。</p>
+<p>第二笔交易<a href="https://bscscan.com/tx/0x63f37aff7e40b85b0a6b3fd414389f6011cc09b276dc8e13b6afa19061f7ed8e">0x63f3</a>是发到ID为4的目标链上（根据后续分析，<strong>4指BSC链</strong>），token地址为WBNB token合约地址<a href="https://bscscan.com/address/0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c">0xbb4c</a>，数量为<code>0xc4ef2bf0fd2ac0dda7 = 3632795971816270486660 = 3632 BNB</code>。这次利用成功了，BSC上黑客地址随后收到了3632个BNB的转账：</p>
+<p><img src="/./%E8%B7%A8%E9%93%BE%E6%A1%A5%E5%90%88%E7%BA%A6%E6%BC%8F%E6%B4%9E%E6%B1%87%E6%80%BB%E5%88%86%E6%9E%90/SCJKrmimageimage_oKRAsMB4gF.png" alt="./跨链桥合约漏洞汇总分析/SCJKrmimageimage_oKRAsMB4gF.png"></p>
+<p>后续两笔交易<a href="https://bscscan.com/tx/0xc7eb98e00d21ec2025fd97b8a84af141325531c0b54aacc37633514f2fd8ffdc">0xc7eb</a>和<a href="https://bscscan.com/tx/0x5d7cd17bfeb944390667c76f4fc2786f748dc3eb363c01c24b92becaaf5690b4">0x5d7c</a>都是发到<strong>ID为5的目标链上（moonriver链）</strong>，数量都为<code>0x32d26d12e980b600000 = 15000000000000000000000 = 15000 BNB</code>。这两笔交易都攻击成功，黑客在moonriver上的地址<a href="https://moonriver.moonscan.io/address/0x8d3d13cac607B7297Ff61A5E1E71072758AF4D01">0x8d3d</a>随后收到了这两笔跨链转账：</p>
+<p><img src="/./%E8%B7%A8%E9%93%BE%E6%A1%A5%E5%90%88%E7%BA%A6%E6%BC%8F%E6%B4%9E%E6%B1%87%E6%80%BB%E5%88%86%E6%9E%90/SCJKrmimageimage_qln6w0X_dZ.png" alt="./跨链桥合约漏洞汇总分析/SCJKrmimageimage_qln6w0X_dZ.png"></p>
+<h2 id="总结-6"><a href="#总结-6" class="headerlink" title="总结"></a>总结</h2><p>meter这次漏洞感觉就是开发人员的疏忽，代码写得也不咋优雅，主要有如下几个问题。</p>
+<ol>
+<li>未校验函数调用前提。Bridge合约中，deposit函数用于储存ERC20代币，depositETH函数用于储存原生代币，它们最终都调用ERC20Handler合约的deposit函数。这两个函数中都没对传入的resourceID做判断，导致黑客能够调用deposit函数储存原生代币。</li>
+<li>逻辑混乱。储存过程中最重要的转账步骤，一个实现在Bridge合约中（原生代币），一个实现在ERC20Handler合约中（ERC20代币）。</li>
+<li>未校验存款事件的正确性。直接就相信了，而没有进行深入的验证。</li>
+</ol>
+<h1 id="2022年3月LayerZero"><a href="#2022年3月LayerZero" class="headerlink" title="2022年3月LayerZero"></a>2022年3月LayerZero</h1><p><a href="https://foresightnews.pro/article/detail/1599">Cobo 安全团队：简析 Stargate 跨链桥底层协议 LayerZero 重大安全漏洞</a></p>
+<blockquote>
+<p>LayerZero 3月28日在未发表任何公告的情况下更新了跨链使用的验证合约[2]。Cobo安全团队通过对比原始验证合约（MPTValidator）和新验证合约（MPTValidatorV2）代码[3]，发现本次更新是对之前重大安全漏洞的修復。</p>
+<p>原始漏洞代码在进行 MPT 验证时，通过外部传入的 pointer 来获取下一层计算所用到的 hashRoot。这里使用 solidity 底层 add, mload 等汇编指令从 proofBytes 中获取 hashRoot ，由于没有限制 pointer 在 proofBytes 长度内，因此攻击者可以通过传入越界的 pointer，使合约读取到 proofBytes 以外的数据作为下一层的 hashRoot。这样就存在伪造 hashRoot 的可能，进一步导致伪造的交易 receipt 可以通过 MPT 验证。最终可造成的后果是，在 Oracle 完全可信的前提下，Relayer 仍可以单方面通过伪造 receipt 数据的方式来实现对跨链协议的攻击，打破了 LayerZero 之前的安全假设。</p>
+</blockquote>
+<p>新合约（包含源码）：<a href="https://etherscan.io/address/0xe9AE261D3aFf7d3fCCF38Fa2d612DD3897e07B2d#code">0xe9AE261D3aFf7d3fCCF38Fa2d612DD3897e07B2d</a></p>
+<p>旧合约：<a href="https://cdn.jsdelivr.net/npm/@layerzerolabs/proof-evm@1.0.1-beta.0/contracts/">https:&#x2F;&#x2F;cdn.jsdelivr.net&#x2F;npm&#x2F;@layerzerolabs&#x2F;proof-evm@1.0.1-beta.0/contracts/</a></p>
+<p>总结：本质是越界问题。</p>
+<h1 id="2022年8月Nomad【1-9亿美元】"><a href="#2022年8月Nomad【1-9亿美元】" class="headerlink" title="2022年8月Nomad【1.9亿美元】"></a>2022年8月Nomad【1.9亿美元】</h1><h2 id="参考-7"><a href="#参考-7" class="headerlink" title="参考"></a>参考</h2><p><a href="https://www.anquanke.com/post/id/277553">Nomad 跨链桥被盗1.8亿美元事件分析-安全客 - 安全资讯平台 (anquanke.com)</a></p>
+<blockquote>
+<p>由于Replica合约初始化时，_committedRoot传入了零值，导致之后合约中的confirmAt[0x000…000]均为true。在process方法中可直接通过判断条件，导致每条消息在默认情况下都被证明有效，任何人都可以发送构造消息转移资金。</p>
+</blockquote>
+<p><a href="https://www.163.com/dy/article/HDSLQBJ00552ZPJC.html">Nomad被黑解析｜致命漏洞损失1.9亿美元，白帽已返还近900万美元</a></p>
+<blockquote>
+<p>在该合约的初始化交易中可以看到，输入的所有变量都为0，也就是说在初始化阶段 confirmAt[0x00..0] 的值被设为了1。</p>
+<p>而confirmAt[] 只在initialize，update和 setConfirmation三个函数中出现被修改的情况，导致此次攻击事件发生的问题出现在<br>initialize 函数中。</p>
+<p>这也就直接导致了 acceptableRoot 函数中发生了不合理的绕过。</p>
+<p>初始化交易哈希：</p>
+<p>0x53fd92771d2084a9bf39a6477015ef53b7f116c79d98a21be723d06d79024cad</p>
+</blockquote>
+<p><a href="https://www.odaily.news/post/5180857">Nomad被攻击事件分析：黑客点火，多人“趁火打劫”</a></p>
+<h2 id="分析-7"><a href="#分析-7" class="headerlink" title="分析"></a>分析</h2><p>合约：</p>
+<ul>
+<li>UpgradeBeacon：</li>
+<li>Replica：<ul>
+<li>代理(UpgradeBeaconProxy)：<ul>
+<li><a href="https://etherscan.io/address/0x049b51e531fd8f90da6d92ea83dc4125002f20ef">https://etherscan.io/address/0x049b51e531fd8f90da6d92ea83dc4125002f20ef</a></li>
+<li><a href="https://etherscan.io/address/0x5d94309e5a0090b165fa4181519701637b6daeba">https://etherscan.io/address/0x5d94309e5a0090b165fa4181519701637b6daeba</a></li>
+<li><a href="https://etherscan.io/address/0x5bae47bf29f4e9b1e275c0b427b84c4daa30033a">https://etherscan.io/address/0x5bae47bf29f4e9b1e275c0b427b84c4daa30033a</a></li>
+</ul>
+</li>
+<li>逻辑：<a href="https://etherscan.io/address/0xB92336759618F55bd0F8313bd843604592E27bd8">https://etherscan.io/address/0xB92336759618F55bd0F8313bd843604592E27bd8</a></li>
+</ul>
+</li>
+<li>Nomad ERC20 Bridge：<ul>
+<li>代理(UpgradeBeaconProxy)：<a href="https://etherscan.io/address/0x88a69b4e698a4b090df6cf5bd7b2d47325ad30a3">https://etherscan.io/address/0x88a69b4e698a4b090df6cf5bd7b2d47325ad30a3</a></li>
+<li>逻辑：<a href="https://etherscan.io/address/0x15fda9f60310d09fea54e3c99d1197dff5107248">https://etherscan.io/address/0x15fda9f60310d09fea54e3c99d1197dff5107248</a></li>
+</ul>
+</li>
+</ul>
+<p>黑客：</p>
+<ul>
+<li><p><a href="https://etherscan.io/address/0xbf293d5138a2a1ba407b43672643434c43827179">https://etherscan.io/address/0xbf293d5138a2a1ba407b43672643434c43827179</a></p>
+<p>  攻击交易：<a href="https://etherscan.io/tx/0x96a2cfadb19cac9ba2a21c1f32b6f21b6132afe1b4f4698dee563ca01ec20e01">https://etherscan.io/tx/0x96a2cfadb19cac9ba2a21c1f32b6f21b6132afe1b4f4698dee563ca01ec20e01</a></p>
+</li>
+<li><p><a href="https://etherscan.io/address/0xb5c55f76f90cc528b2609109ca14d8d84593590e">https://etherscan.io/address/0xb5c55f76f90cc528b2609109ca14d8d84593590e</a></p>
+<p>  攻击交易：<a href="https://etherscan.io/tx/0xc4938e6f6368061194d076d44f73a8cae3a318b1ee7cf8b026abe10b7c206c2a">https://etherscan.io/tx/0xc4938e6f6368061194d076d44f73a8cae3a318b1ee7cf8b026abe10b7c206c2a</a></p>
+</li>
+<li><p><a href="https://etherscan.io/address/0x0c79132266696787598917b079f43cffc13bdcdd">https://etherscan.io/address/0x0c79132266696787598917b079f43cffc13bdcdd</a></p>
+<p>  攻击交易：<a href="https://etherscan.io/tx/0x87ba810b530e2d76062b9088bc351a62c184b39ce60e0a3605150df0a49e51d0">https://etherscan.io/tx/0x87ba810b530e2d76062b9088bc351a62c184b39ce60e0a3605150df0a49e51d0</a></p>
+</li>
+</ul>
+<p>Nomad这次攻击事件比较混乱，最初的那名黑客在网上公布了攻击方法后，很多人开始效仿，导致出现了很多黑客，攻击方式也各不相同。而且，Replica合约有多个代理合约，它们都指向一个实现合约0xb923，这些代理合约似乎都受到了各种攻击。由于被攻击的合约很多，攻击交易也很多，攻击方法也是各具特色，我就不一一分析了。</p>
+<p>直接分析一笔流程相对简单的攻击交易：<a href="https://etherscan.io/tx/0x87ba810b530e2d76062b9088bc351a62c184b39ce60e0a3605150df0a49e51d0">0x87ba81</a>。发起这笔交易的黑客只盗取了几百美金，还使用ENS地址。</p>
+<p>通过分析<a href="https://etherscan.io/vmtrace?txhash=0x87ba810b530e2d76062b9088bc351a62c184b39ce60e0a3605150df0a49e51d0&type=parity">vmtrace</a>，这笔交易调用的是代理合约<a href="https://etherscan.io/address/0x5d94309e5a0090b165fa4181519701637b6daeba">0x5d94</a>，逻辑合约在<a href="https://etherscan.io/address/0xb92336759618f55bd0f8313bd843604592e27bd8">0xb923</a>，对应<code>Replica</code>合约。交易调用的是<code>process</code>函数，传入的<code>_message</code>参数如下（结合代码进行了一点优化）：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">0x000063310000000000000000000000009FAF7F27C46ACDECEE58EB4B0AB6489E603EC251000002CE0065746800000000000000000000000088A69B4E698A4B090DF6CF5BD7B2D47325AD30A3006574680000000000000000000000003D6F0DEA3AC3C607B3998E6CE14B6350721752D9030000000000000000000000000C79132266696787598917B079F43CFFC13BDCDD00000000000000000000000000000000000000000000004BD2B6144303B2F00CBA3D8A5E319F14B64B064EA8FB15093F84A84CFF2B1DF818F409C871315D2112</span><br><span class="line"></span><br><span class="line">优化：</span><br><span class="line"></span><br><span class="line">0:  00006331</span><br><span class="line">4:  0000000000000000000000009FAF7F27C46ACDECEE58EB4B0AB6489E603EC251</span><br><span class="line">36: 000002CE</span><br><span class="line">40: 00657468</span><br><span class="line">44: 00000000000000000000000088A69B4E698A4B090DF6CF5BD7B2D47325AD30A3</span><br><span class="line">76: 00657468</span><br><span class="line">    0000000000000000000000003D6F0DEA3AC3C607B3998E6CE14B6350721752D9</span><br><span class="line">    03</span><br><span class="line">    0000000000000000000000000C79132266696787598917B079F43CFFC13BDCDD</span><br><span class="line">    00000000000000000000000000000000000000000000004BD2B6144303B2F00C</span><br><span class="line">    BA3D8A5E319F14B64B064EA8FB15093F84A84CFF2B1DF818F409C871315D2112</span><br></pre></td></tr></table></figure>
+
+<p>当然，在这个漏洞中，参数似乎并不重要。漏洞的关键是<code>process</code>函数中的这行校验代码：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">function process(bytes memory _message) public returns (bool _success)</span><br><span class="line">    ...</span><br><span class="line">    require(acceptableRoot(messages[_messageHash]), &quot;!proven&quot;);</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>它调用了<code>acceptableRoot</code>函数（如下），该函数在参数<code>_root</code>为0时，<code>confirmAt[_root]</code>不为0，函数返回true。而用户只要传入任意不存在的<code>_messageHash</code>，<code>messages[_messageHash]</code>就为0，就能通过require验证。</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">function acceptableRoot(bytes32 _root) public view returns (bool) &#123;</span><br><span class="line">    // this is backwards-compatibility for messages proven/processed</span><br><span class="line">    // under previous versions</span><br><span class="line">    if (_root == LEGACY_STATUS_PROVEN) return true;</span><br><span class="line">    if (_root == LEGACY_STATUS_PROCESSED) return false;</span><br><span class="line"></span><br><span class="line">    uint256 _time = confirmAt[_root];</span><br><span class="line">    if (_time == 0) &#123;</span><br><span class="line">        return false;</span><br><span class="line">    &#125;</span><br><span class="line">    return block.timestamp &gt;= _time;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>confirmAt只有在initialize，update和setConfirmation三个函数中被修改。</p>
+<p>关于何时将0设置为可信根，即<code>confirmAt[0]=1</code>。有些博客说是在交易<a href="https://etherscan.io/tx/0x53fd92771d2084a9bf39a6477015ef53b7f116c79d98a21be723d06d79024cad">0x53fd92</a>中。<strong>但这笔交易是发向Replica逻辑合约0xb923的，它只修改了逻辑合约的状态。</strong>而实际黑客攻击的是代理合约，代理合约通过delegatecall调用逻辑合约，状态保存在代理合约中。因此，<strong>这笔交易并没有影响代理合约的状态</strong>。</p>
+<p>有些博客则称是在创建合约时，就将0设置为可信根，这个说法我是认同的。在创建代理合约0x5d94的交易<a href="https://etherscan.io/tx/0x99662dacfb4b963479b159fc43c2b4d048562104fe154a4d0c2519ada72e50bf">0x99662d</a>中，调用了代理合约的构造函数，构造函数中又调用了逻辑合约：</p>
+<p><img src="/./%E8%B7%A8%E9%93%BE%E6%A1%A5%E5%90%88%E7%BA%A6%E6%BC%8F%E6%B4%9E%E6%B1%87%E6%80%BB%E5%88%86%E6%9E%90/SCJKrmimageimage_fO2PpW-PiV.png" alt="./跨链桥合约漏洞汇总分析/SCJKrmimageimage_fO2PpW-PiV.png"></p>
+<p>其中，input数据优化如下：</p>
+<figure class="highlight jsx"><table><tr><td class="code"><pre><span class="line"><span class="number">0xe7e7a7b70000000000000000000000000000000000000000000000000000000061766178000000000000000000000000b93d4dbb87b80f0869a5ce0839fb75acdbeb1b7700000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000708</span></span><br></pre></td></tr></table></figure>
+
+<p><code>0xe7e7a7b7</code>是Replica合约的<code>initialize</code>函数的ID，该函数代码如下。第三个参数为0，进而导致<code>confirmAt[0] = 1</code>。</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">function initialize(</span><br><span class="line">    uint32 _remoteDomain,</span><br><span class="line">    address _updater,</span><br><span class="line">    bytes32 _committedRoot,</span><br><span class="line">    uint256 _optimisticSeconds</span><br><span class="line">) public initializer &#123;</span><br><span class="line">    __NomadBase_initialize(_updater);</span><br><span class="line">    // set storage variables</span><br><span class="line">    entered = 1;</span><br><span class="line">    remoteDomain = _remoteDomain;</span><br><span class="line">    committedRoot = _committedRoot;</span><br><span class="line">    // pre-approve the committed root.</span><br><span class="line">    confirmAt[_committedRoot] = 1;</span><br><span class="line">    _setOptimisticTimeout(_optimisticSeconds);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>不过，创建这个代理合约时，逻辑合约为<a href="https://etherscan.io/address/0x7f58bb8311db968ab110889f2dfa04ab7e8e831b">0x7f58</a>。而被黑客攻击时，逻辑合约又变为0xb923。当然，逻辑合约变动，并不影响代理合约中存储的状态。因此，我认为，是在代理合约被创建时，就将0设为可信根，进而导致了后续的漏洞。但Nomad开发者为什么要将0设为可信根呢，这就不得而知了。</p>
+<h2 id="总结-7"><a href="#总结-7" class="headerlink" title="总结"></a>总结</h2><p>总之，这次漏洞是因为：</p>
+<ol>
+<li>配置错误。开发者将不知道啥用的值，设置到关键配置中。</li>
+<li>开发疏忽。开发acceptableRoot函数时，没有考虑到参数 _root 为0的情况。</li>
+</ol>
+<h1 id="2022年10月TRANSIT-SWAP【2000万美元】"><a href="#2022年10月TRANSIT-SWAP【2000万美元】" class="headerlink" title="2022年10月TRANSIT SWAP【2000万美元】"></a>2022年10月TRANSIT SWAP【2000万美元】</h1><p><a href="https://slowmist.medium.com/cross-chain-dex-aggregator-transit-swap-hacked-analysis-74ba39c22020">Cross-chain DEX Aggregator Transit Swap Hacked Analysis | by SlowMist | Medium</a></p>
+<p>这种攻击的主要原因是Transit Swap协议在令牌交换期间没有严格验证用户传入的数据，从而导致任意外部调用。攻击者利用任意外部调用中的此漏洞窃取用户授权的令牌。</p>
+<p><a href="https://www.tuoniaox.com/news/p-544820.html">跨链DEX聚合器Transit Swap攻击分析</a></p>
+<p><a href="https://news.marsbit.co/20221002174905316287.html">Transit Swap被黑分析</a></p>
+<p><a href="https://www.bitpush.news/articles/3177505">Transit Swap 被黑事件简析</a></p>
+<p>黑客：</p>
+<ul>
+<li><a href="https://bscscan.com/address/0x75F2abA6a44580D7be2C4e42885D4a1917bFFD46">https://bscscan.com/address/0x75F2abA6a44580D7be2C4e42885D4a1917bFFD46</a></li>
+<li><a href="https://etherscan.io/address/0x75F2abA6a44580D7be2C4e42885D4a1917bFFD46">https://etherscan.io/address/0x75F2abA6a44580D7be2C4e42885D4a1917bFFD46</a></li>
+</ul>
+<p>攻击交易：<a href="https://etherscan.io/tx/0x743e4ee2c478300ac768fdba415eb4a23ae66981c076f9bff946c0bf530be0c7">https://etherscan.io/tx/0x743e4ee2c478300ac768fdba415eb4a23ae66981c076f9bff946c0bf530be0c7</a></p>
+]]></content>
+      <categories>
+        <category>欲穷千里目，更上一层楼</category>
+        <category>区块链</category>
+      </categories>
+      <tags>
+        <tag>区块链</tag>
+        <tag>跨链</tag>
+        <tag>智能合约</tag>
+        <tag>安全</tag>
+      </tags>
+  </entry>
 </search>
